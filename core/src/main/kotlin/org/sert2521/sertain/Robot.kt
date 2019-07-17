@@ -2,7 +2,7 @@ package org.sert2521.sertain
 
 import edu.wpi.first.hal.HAL
 import edu.wpi.first.wpilibj.DriverStation
-import org.sert2521.sertain.core.initializeWPILib
+import org.sert2521.sertain.core.initializeWpiLib
 import org.sert2521.sertain.coroutines.RobotScope
 import org.sert2521.sertain.events.*
 
@@ -54,7 +54,7 @@ enum class RobotMode {
 }
 
 fun robot(configure: Robot.() -> Unit) {
-    initializeWPILib()
+    initializeWpiLib()
 
     // tell the DS that robot is ready to enable
     HAL.observeUserProgramStarting()

@@ -9,7 +9,7 @@ import java.io.File
 
 const val KOTLIN_LANGUAGE = 6
 
-fun initializeWPILib() {
+fun initializeWpiLib() {
     // set up network tables
     val ntInstance = NetworkTableInstance.getDefault()
     ntInstance.setNetworkIdentity("Robot")
