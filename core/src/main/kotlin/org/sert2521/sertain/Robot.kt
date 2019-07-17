@@ -1,6 +1,6 @@
 package org.sert2521.sertain
 
-import org.sert2521.sertain.events.subscribe
+import org.sert2521.sertain.events.*
 
 @DslMarker
 annotation class RobotDsl
@@ -10,33 +10,33 @@ class Robot {
     var mode: RobotMode? = null
 
     @Suppress("unused")
-    fun onConnect(action: suspend () -> Unit) {
-        subscribe("connect", action)
+    fun onConnect(action: suspend (event: Connect) -> Unit) {
+        subscribe(action)
     }
 
     @Suppress("unused")
-    fun onDisable(action: suspend () -> Unit) {
-        subscribe("disable", action)
+    fun onDisable(action: suspend (event: Disable) -> Unit) {
+        subscribe(action)
     }
 
     @Suppress("unused")
-    fun onEnable(action: suspend () -> Unit) {
-        subscribe("enable", action)
+    fun onEnable(action: suspend (event: Enable) -> Unit) {
+        subscribe(action)
     }
 
     @Suppress("unused")
-    fun onTeleop(action: suspend () -> Unit) {
-        subscribe("teleop", action)
+    fun onTeleop(action: suspend (event: Teleop) -> Unit) {
+        subscribe(action)
     }
 
     @Suppress("unused")
-    fun onAuto(action: suspend () -> Unit) {
-        subscribe("auto", action)
+    fun onAuto(action: suspend (event: Auto) -> Unit) {
+        subscribe(action)
     }
 
     @Suppress("unused")
-    fun onTest(action: suspend () -> Unit) {
-        subscribe("test", action)
+    fun onTest(action: suspend (event: Test) -> Unit) {
+        subscribe(action)
     }
 }
 

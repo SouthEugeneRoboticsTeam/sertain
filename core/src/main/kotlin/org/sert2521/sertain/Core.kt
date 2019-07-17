@@ -6,7 +6,7 @@ import edu.wpi.first.networktables.NetworkTableInstance
 import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.RobotBase
 import edu.wpi.first.wpilibj.util.WPILibVersion
-import org.sert2521.sertain.events.fire
+import org.sert2521.sertain.events.*
 import java.io.File
 
 const val KOTLIN_LANGUAGE = 6
@@ -49,7 +49,7 @@ fun robot(configure: Robot.() -> Unit) {
         if (hasNewData) {
             if (robot.mode == null || robot.mode == RobotMode.DISCONNECTED) {
                 if (robot.mode != null) robot.mode = RobotMode.DISABLED
-                fire("connect")
+                fire(Connect)
             }
 
             val wasDisabled = robot.mode == RobotMode.DISABLED
@@ -58,25 +58,25 @@ fun robot(configure: Robot.() -> Unit) {
                 ds.isDisabled && robot.mode != RobotMode.DISABLED -> {
                     HAL.observeUserProgramDisabled()
                     robot.mode = RobotMode.DISABLED
-                    fire("disable")
+                    fire(Disable)
                 }
                 ds.isAutonomous && robot.mode != RobotMode.AUTONOMOUS -> {
                     HAL.observeUserProgramAutonomous()
                     robot.mode = RobotMode.AUTONOMOUS
-                    if (wasDisabled) fire("enable")
-                    fire("auto")
+                    if (wasDisabled) fire(Enable)
+                    fire(Auto)
                 }
                 ds.isOperatorControl && robot.mode != RobotMode.TELEOPERATED -> {
                     HAL.observeUserProgramTeleop()
                     robot.mode = RobotMode.TELEOPERATED
-                    if (wasDisabled) fire("enable")
-                    fire("teleop")
+                    if (wasDisabled) fire(Enable)
+                    fire(Teleop)
                 }
                 ds.isTest && robot.mode != RobotMode.TEST -> {
                     HAL.observeUserProgramTest()
                     robot.mode = RobotMode.TEST
-                    if (wasDisabled) fire("enable")
-                    fire("test")
+                    if (wasDisabled) fire(Enable)
+                    fire(Test)
                 }
             }
         }
