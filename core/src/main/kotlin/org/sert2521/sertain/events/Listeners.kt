@@ -21,7 +21,7 @@ inline fun <reified E : Event> subscribe(noinline action: suspend (event: E) -> 
 }
 
 fun fire(event: Event) {
-    listeners[event::class.simpleName]?.forEach {
+    listeners[event::class.simpleName]?.iterator()?.forEach {
         GlobalScope.launch { it(event) }
     }
 }
