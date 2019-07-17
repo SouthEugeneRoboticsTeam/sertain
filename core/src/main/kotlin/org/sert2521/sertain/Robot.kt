@@ -8,6 +8,7 @@ annotation class RobotDsl
 @RobotDsl
 class Robot {
     var mode: RobotMode? = null
+        internal set
 
     @Suppress("unused")
     fun onConnect(action: suspend (event: Connect) -> Unit) {
