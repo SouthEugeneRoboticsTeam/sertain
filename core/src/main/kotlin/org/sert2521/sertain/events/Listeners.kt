@@ -4,7 +4,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlin.reflect.KClass
 
-val listeners = mutableMapOf<String, MutableList<suspend (Event) -> Unit>>()
+internal val listeners = mutableMapOf<String, MutableList<suspend (Event) -> Unit>>()
 
 fun <E : Event> subscribe(eventClass: KClass<E>, action: suspend (event: E) -> Unit) {
     if (listeners[eventClass.simpleName] == null) {
