@@ -2,6 +2,7 @@ package org.sert2521.sertain.events
 
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import org.sert2521.sertain.coroutines.RobotScope
 import kotlin.reflect.KClass
 
 internal val listeners = mutableMapOf<String, MutableList<suspend (Event) -> Unit>>()
@@ -22,6 +23,6 @@ inline fun <reified E : Event> subscribe(noinline action: suspend (event: E) -> 
 
 fun fire(event: Event) {
     listeners[event::class.simpleName]?.iterator()?.forEach {
-        GlobalScope.launch { it(event) }
+        RobotScope.launch { it(event) }
     }
 }

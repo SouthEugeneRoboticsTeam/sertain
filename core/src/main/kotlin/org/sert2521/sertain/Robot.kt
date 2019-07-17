@@ -1,12 +1,13 @@
 package org.sert2521.sertain
 
+import org.sert2521.sertain.coroutines.RobotScope
 import org.sert2521.sertain.events.*
 
 @DslMarker
 annotation class RobotDsl
 
 @RobotDsl
-class Robot {
+class Robot : RobotScope() {
     var mode: RobotMode? = null
         internal set
 
