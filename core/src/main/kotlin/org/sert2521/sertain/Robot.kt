@@ -12,7 +12,7 @@ annotation class RobotDsl
 
 @RobotDsl
 class Robot : RobotScope() {
-    var mode: RobotMode? = null
+    var mode: RobotMode = RobotMode.DISCONNECTED
         internal set
 
     @Suppress("unused")
@@ -74,9 +74,9 @@ fun robot(configure: Robot.() -> Unit) {
         }
 
         if (hasNewData) {
-            if (robot.mode == null || robot.mode == RobotMode.DISCONNECTED) {
+            if (robot.mode == RobotMode.DISCONNECTED) {
                 // robot has just connected to DS
-                if (robot.mode != null) robot.mode = RobotMode.DISABLED
+                robot.mode = RobotMode.DISABLED
                 fire(Connect)
             }
 
@@ -89,21 +89,21 @@ fun robot(configure: Robot.() -> Unit) {
                     robot.mode = RobotMode.DISABLED
                     fire(Disable)
                 }
-                ds.isAutonomous && robot.mode != RobotMode.AUTONOMOUS -> {
+                ds.isAutonomous && !ds.isDisabled && robot.mode != RobotMode.AUTONOMOUS -> {
                     // robot has just been set to autonomous
                     HAL.observeUserProgramAutonomous()
                     robot.mode = RobotMode.AUTONOMOUS
                     if (wasDisabled) fire(Enable)
                     fire(Auto)
                 }
-                ds.isOperatorControl && robot.mode != RobotMode.TELEOPERATED -> {
+                ds.isOperatorControl && !ds.isDisabled && robot.mode != RobotMode.TELEOPERATED -> {
                     // robot has just been set to teleop
                     HAL.observeUserProgramTeleop()
                     robot.mode = RobotMode.TELEOPERATED
                     if (wasDisabled) fire(Enable)
                     fire(Teleop)
                 }
-                ds.isTest && robot.mode != RobotMode.TEST -> {
+                ds.isTest && !ds.isDisabled && robot.mode != RobotMode.TEST -> {
                     // robot has just been set to test
                     HAL.observeUserProgramTest()
                     robot.mode = RobotMode.TEST
