@@ -88,21 +88,21 @@ fun robot(configure: Robot.() -> Unit) {
                     robot.mode = RobotMode.DISABLED
                     fire(Disable)
                 }
-                ds.isAutonomous && !ds.isDisabled && robot.mode != RobotMode.AUTONOMOUS -> {
+                ds.isAutonomous && ds.isEnabled && robot.mode != RobotMode.AUTONOMOUS -> {
                     // robot has just been set to autonomous
                     HAL.observeUserProgramAutonomous()
                     robot.mode = RobotMode.AUTONOMOUS
                     if (wasDisabled) fire(Enable)
                     fire(Auto)
                 }
-                ds.isOperatorControl && !ds.isDisabled && robot.mode != RobotMode.TELEOPERATED -> {
+                ds.isOperatorControl && ds.isEnabled && robot.mode != RobotMode.TELEOPERATED -> {
                     // robot has just been set to teleop
                     HAL.observeUserProgramTeleop()
                     robot.mode = RobotMode.TELEOPERATED
                     if (wasDisabled) fire(Enable)
                     fire(Teleop)
                 }
-                ds.isTest && !ds.isDisabled && robot.mode != RobotMode.TEST -> {
+                ds.isTest && ds.isEnabled && robot.mode != RobotMode.TEST -> {
                     // robot has just been set to test
                     HAL.observeUserProgramTest()
                     robot.mode = RobotMode.TEST
