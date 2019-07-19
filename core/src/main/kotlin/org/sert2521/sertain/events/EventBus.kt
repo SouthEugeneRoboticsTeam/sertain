@@ -21,6 +21,5 @@ inline fun <T, reified E : Event> T.subscribe(noinline action: suspend (E) -> Un
     return events.asFlow()
             .filter { it is E && ((it as? TargetedEvent<T>) == null || (it as? TargetedEvent<T>)?.target == this) }
             .map { it as E }
-            .apply { RobotScope.launch { collect(action) }
-    }
+            .apply { RobotScope.launch { collect(action) } }
 }
