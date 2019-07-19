@@ -4,6 +4,7 @@ import edu.wpi.first.hal.HAL
 import edu.wpi.first.wpilibj.DriverStation
 import org.sert2521.sertain.core.initializeWpiLib
 import org.sert2521.sertain.coroutines.RobotScope
+import org.sert2521.sertain.coroutines.periodic
 import org.sert2521.sertain.events.*
 
 @DslMarker
@@ -61,6 +62,10 @@ fun robot(configure: Robot.() -> Unit) {
 
     val ds: DriverStation = DriverStation.getInstance()
     val running = true
+
+    periodic(20) {
+        fire(Tick)
+    }
 
     val robot = Robot().apply(configure)
 
