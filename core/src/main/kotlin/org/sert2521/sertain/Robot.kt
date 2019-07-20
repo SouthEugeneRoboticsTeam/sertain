@@ -2,6 +2,7 @@ package org.sert2521.sertain
 
 import edu.wpi.first.hal.HAL
 import edu.wpi.first.wpilibj.DriverStation
+import kotlinx.coroutines.launch
 import org.sert2521.sertain.core.initializeWpiLib
 import org.sert2521.sertain.coroutines.RobotScope
 import org.sert2521.sertain.coroutines.periodic
@@ -63,11 +64,13 @@ fun robot(configure: Robot.() -> Unit) {
     val ds: DriverStation = DriverStation.getInstance()
     val running = true
 
-    periodic(20) {
-        fire(Tick)
-    }
-
     val robot = Robot().apply(configure)
+
+    robot.launch {
+        periodic(20) {
+            fire(Tick)
+        }
+    }
 
     while (running) {
         val hasNewData = ds.waitForData(0.02)
