@@ -8,10 +8,6 @@ import org.sert2521.sertain.coroutines.RobotScope
 import org.sert2521.sertain.coroutines.periodic
 import org.sert2521.sertain.events.*
 
-@DslMarker
-annotation class RobotDsl
-
-@RobotDsl
 class Robot : RobotScope() {
     var mode: RobotMode = RobotMode.DISCONNECTED
         internal set
