@@ -12,34 +12,32 @@ class Robot : RobotScope() {
     var mode: RobotMode = RobotMode.DISCONNECTED
         internal set
 
-    @Suppress("unused")
     fun onConnect(action: suspend (event: Connect) -> Unit) {
-        subscribe(action)
+        launch { subscribe(action) }
     }
 
-    @Suppress("unused")
     fun onDisable(action: suspend (event: Disable) -> Unit) {
-        subscribe(action)
+        launch { subscribe(action) }
     }
 
-    @Suppress("unused")
     fun onEnable(action: suspend (event: Enable) -> Unit) {
-        subscribe(action)
+        launch { subscribe(action) }
     }
 
-    @Suppress("unused")
     fun onTeleop(action: suspend (event: Teleop) -> Unit) {
-        subscribe(action)
+        launch { subscribe(action) }
     }
 
-    @Suppress("unused")
     fun onAuto(action: suspend (event: Auto) -> Unit) {
-        subscribe(action)
+        launch { subscribe(action) }
     }
 
-    @Suppress("unused")
     fun onTest(action: suspend (event: Test) -> Unit) {
-        subscribe(action)
+        launch { subscribe(action) }
+    }
+
+    fun onTick(action: suspend (event: Tick) -> Unit) {
+        launch { subscribe(action) }
     }
 }
 
@@ -51,7 +49,7 @@ enum class RobotMode {
     TEST
 }
 
-fun robot(configure: Robot.() -> Unit) {
+suspend fun robot(configure: Robot.() -> Unit) {
     initializeWpiLib()
 
     // tell the DS that robot is ready to enable
@@ -64,7 +62,9 @@ fun robot(configure: Robot.() -> Unit) {
 
     robot.launch {
         periodic(20) {
-            fire(Tick)
+            launch {
+                fire(Tick)
+            }
         }
     }
 
