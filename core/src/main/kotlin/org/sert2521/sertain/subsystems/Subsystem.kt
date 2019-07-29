@@ -22,5 +22,3 @@ fun clear(subsystem: Subsystem, important: Boolean = true): Boolean {
     }
     return false
 }
-
-fun use(subsystems: Subsystem)
