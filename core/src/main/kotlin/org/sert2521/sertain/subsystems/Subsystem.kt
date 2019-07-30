@@ -6,7 +6,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import org.sert2521.sertain.coroutines.RobotScope
 import org.sert2521.sertain.events.Use
+import org.sert2521.sertain.events.events
 import org.sert2521.sertain.events.fire
+import kotlin.coroutines.coroutineContext
 
 abstract class Subsystem {
     internal var currentJob: Job? = null
@@ -22,12 +24,13 @@ abstract class Subsystem {
 }
 
 suspend fun <R> use(vararg subsystems: Subsystem, important: Boolean = true, action: suspend CoroutineScope.() -> R): R {
+    val context = coroutineContext
     return suspendCancellableCoroutine { continuation ->
-        RobotScope.launch {
+        CoroutineScope(context).launch {
             fire(Use(
                     subsystems.toSet(),
                     important,
-                    coroutineContext,
+                    context,
                     continuation,
                     action
             ))

@@ -1,6 +1,8 @@
 package org.sert2521.sertain.subsystems
 
+import edu.wpi.first.wpilibj.DriverStation.reportError
 import kotlinx.coroutines.*
+import org.sert2521.sertain.coroutines.RobotDispatcher
 import org.sert2521.sertain.coroutines.RobotScope
 import org.sert2521.sertain.events.Use
 import org.sert2521.sertain.events.subscribe
@@ -9,8 +11,8 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
-fun RobotScope.manageSubsystems() {
-    launch {
+fun manageSubsystems() {
+    GlobalScope.launch(RobotDispatcher) {
         subscribe<Use<Any?>> { use ->
             // Subsystems used in parent coroutine
             val lastSubsystems: Set<Subsystem> = use.callerContext[Requirements] ?: emptySet()

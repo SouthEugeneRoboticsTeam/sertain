@@ -59,9 +59,10 @@ suspend fun robot(configure: Robot.() -> Unit) {
     val ds: DriverStation = DriverStation.getInstance()
     val running = true
 
+    manageSubsystems()
+
     val robot = Robot().apply {
         configure()
-        manageSubsystems()
     }
 
     robot.launch {
