@@ -7,7 +7,7 @@ import org.sert2521.sertain.core.initializeWpiLib
 import org.sert2521.sertain.coroutines.RobotScope
 import org.sert2521.sertain.coroutines.periodic
 import org.sert2521.sertain.events.*
-import org.sert2521.sertain.subsystems.initializeSubsystems
+import org.sert2521.sertain.subsystems.manageSubsystems
 
 class Robot : RobotScope() {
     var mode: RobotMode = RobotMode.DISCONNECTED
@@ -59,9 +59,10 @@ suspend fun robot(configure: Robot.() -> Unit) {
     val ds: DriverStation = DriverStation.getInstance()
     val running = true
 
-    initializeSubsystems()
-
-    val robot = Robot().apply(configure)
+    val robot = Robot().apply {
+        configure()
+        manageSubsystems()
+    }
 
     robot.launch {
         periodic(20) {

@@ -6,10 +6,12 @@ import org.sert2521.sertain.events.Use
 import org.sert2521.sertain.events.subscribe
 import kotlin.coroutines.AbstractCoroutineContextElement
 import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 
 fun RobotScope.manageSubsystems() {
     launch {
-        subscribe<Use> { use ->
+        subscribe<Use<Any?>> { use ->
             // Subsystems used in parent coroutine
             val lastSubsystems: Set<Subsystem> = use.callerContext[Requirements] ?: emptySet()
             // Subsystems used in new coroutine but not in parent coroutine
@@ -23,14 +25,22 @@ fun RobotScope.manageSubsystems() {
                     Requirements(subsystems),
                     CoroutineStart.ATOMIC
             ) {
-                // Suspend until all conflicting jobs are canceled and joined
-                withContext(NonCancellable) {
-                    conflictingSubsystems.forEach { it.currentJob?.cancel() }
-                    conflictingSubsystems.forEach { it.currentJob?.join() }
-                }
+                try {
+                    // Suspend until all conflicting jobs are canceled and joined
+                    withContext(NonCancellable) {
+                        conflictingSubsystems.forEach { it.currentJob?.cancel() }
+                        conflictingSubsystems.forEach { it.currentJob?.join() }
+                    }
 
-                coroutineScope { use.action(this) }
+                    val result = coroutineScope { use.action(this) }
+
+                    use.continuation.resume(result)
+                } catch (e: Throwable) {
+                    use.continuation.resumeWithException(e)
+                }
             }
+
+            newSubsystems.forEach { it.currentJob = newJob }
         }
     }
 }
