@@ -23,6 +23,8 @@ fun manageSubsystems() {
             // Subsystems that are already in use
             val conflictingSubsystems = subsystems.filter { it.inUse }
 
+            val conflictingJobs = conflictingSubsystems.map { it.currentJob!! }
+
             val newJob = CoroutineScope(use.callerContext).launch(
                     Requirements(subsystems),
                     CoroutineStart.ATOMIC
@@ -30,8 +32,9 @@ fun manageSubsystems() {
                 try {
                     // Suspend until all conflicting jobs are canceled and joined
                     withContext(NonCancellable) {
-                        conflictingSubsystems.forEach { it.currentJob?.cancel() }
-                        conflictingSubsystems.forEach { it.currentJob?.join() }
+                        println("cancelling and joining conflicts")
+                        conflictingJobs.forEach { it.cancel() }
+                        conflictingJobs.forEach { it.join() }
                     }
 
                     val result = coroutineScope { use.action(this) }
