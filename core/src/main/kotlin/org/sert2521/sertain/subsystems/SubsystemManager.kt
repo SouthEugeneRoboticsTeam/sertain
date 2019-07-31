@@ -1,8 +1,6 @@
 package org.sert2521.sertain.subsystems
 
-import edu.wpi.first.wpilibj.DriverStation.reportError
 import kotlinx.coroutines.*
-import org.sert2521.sertain.coroutines.RobotDispatcher
 import org.sert2521.sertain.coroutines.RobotScope
 import org.sert2521.sertain.events.Use
 import org.sert2521.sertain.events.subscribe
@@ -12,7 +10,7 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
 fun manageSubsystems() {
-    GlobalScope.launch(RobotDispatcher) {
+    RobotScope.launch {
         subscribe<Use<Any?>> { use ->
             // Subsystems used in parent coroutine
             val lastSubsystems: Set<Subsystem> = use.callerContext[Requirements] ?: emptySet()
@@ -32,7 +30,6 @@ fun manageSubsystems() {
                 try {
                     // Suspend until all conflicting jobs are canceled and joined
                     withContext(NonCancellable) {
-                        println("cancelling and joining conflicts")
                         conflictingJobs.forEach { it.cancel() }
                         conflictingJobs.forEach { it.join() }
                     }
