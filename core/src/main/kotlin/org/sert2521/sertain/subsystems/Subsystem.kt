@@ -9,6 +9,8 @@ import org.sert2521.sertain.events.fire
 import kotlin.coroutines.coroutineContext
 
 abstract class Subsystem {
+    var isEnabled = true
+
     internal var currentJob: Job? = null
 
     val occupied: Boolean

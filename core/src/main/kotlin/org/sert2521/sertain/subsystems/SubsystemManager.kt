@@ -15,22 +15,32 @@ fun manageSubsystems() {
     RobotScope.launch {
         subscribe<Use<Any?>> { use ->
             // Subsystems used in parent coroutine
-            val lastSubsystems: Set<Subsystem> = use.callerContext[Requirements] ?: emptySet()
+            val prevSubsystems: Set<Subsystem> = use.callerContext[Requirements] ?: emptySet()
             // Subsystems used in new coroutine but not in parent coroutine
-            val newSubsystems = use.subsystems - lastSubsystems
+            val newSubsystems = use.subsystems - prevSubsystems
             // Subsystems from both parent and new coroutines
-            val subsystems = use.subsystems + lastSubsystems
-            // Subsystems that are already in use
-            val conflictingSubsystems = subsystems.filter { it.occupied }
+            val allSubsystems = use.subsystems + prevSubsystems
 
-            if (!use.important && conflictingSubsystems.isNotEmpty()) {
-                error("Not allowed to cancel subsystems.")
+            if (allSubsystems.any { !it.isEnabled }) {
+                use.continuation.resumeWithException(
+                        CancellationException("Cannot execute action because not all used subsystems are enabled.")
+                )
             }
 
-            val conflictingJobs = conflictingSubsystems.map { it.currentJob!! }
+            // Subsystems that are already occupied
+            val occupiedSubsystems = allSubsystems.filter { it.occupied }
+
+            if (!use.important && occupiedSubsystems.isNotEmpty()) {
+                use.continuation.resumeWithException(
+                        CancellationException("Cannot execute unimportant action because some subsystems are occupied.")
+                )
+            }
+
+            // Jobs of conflicting subsystems
+            val conflictingJobs = occupiedSubsystems.map { it.currentJob!! }
 
             val newJob = CoroutineScope(use.callerContext).launch(
-                    Requirements(subsystems),
+                    Requirements(allSubsystems),
                     CoroutineStart.ATOMIC
             ) {
                 try {
@@ -46,7 +56,6 @@ fun manageSubsystems() {
                 } catch (e: Throwable) {
                     use.continuation.resumeWithException(e)
                 } finally {
-                    println("FINALLY!")
                     fire(Clean(newSubsystems, coroutineContext[Job]!!))
                 }
             }
@@ -59,7 +68,6 @@ fun manageSubsystems() {
         subscribe<Clean> { clean ->
             clean.subsystems
                     .filter { it.currentJob == clean.job }
-                    .also { println(it) }
                     .forEach {
                         it.currentJob = null
                         if (it.default != null) {
