@@ -2,7 +2,9 @@ package org.sert2521.sertain.subsystems
 
 import kotlinx.coroutines.*
 import org.sert2521.sertain.coroutines.RobotScope
+import org.sert2521.sertain.events.Clean
 import org.sert2521.sertain.events.Use
+import org.sert2521.sertain.events.fire
 import org.sert2521.sertain.events.subscribe
 import kotlin.coroutines.AbstractCoroutineContextElement
 import kotlin.coroutines.CoroutineContext
@@ -19,7 +21,11 @@ fun manageSubsystems() {
             // Subsystems from both parent and new coroutines
             val subsystems = use.subsystems + lastSubsystems
             // Subsystems that are already in use
-            val conflictingSubsystems = subsystems.filter { it.inUse }
+            val conflictingSubsystems = subsystems.filter { it.occupied }
+
+            if (!use.important && conflictingSubsystems.isNotEmpty()) {
+                error("Not allowed to cancel subsystems.")
+            }
 
             val conflictingJobs = conflictingSubsystems.map { it.currentJob!! }
 
@@ -39,10 +45,29 @@ fun manageSubsystems() {
                     use.continuation.resume(result)
                 } catch (e: Throwable) {
                     use.continuation.resumeWithException(e)
+                } finally {
+                    println("FINALLY!")
+                    fire(Clean(newSubsystems, coroutineContext[Job]!!))
                 }
             }
 
             newSubsystems.forEach { it.currentJob = newJob }
+        }
+    }
+
+    RobotScope.launch {
+        subscribe<Clean> { clean ->
+            clean.subsystems
+                    .filter { it.currentJob == clean.job }
+                    .also { println(it) }
+                    .forEach {
+                        it.currentJob = null
+                        if (it.default != null) {
+                            RobotScope.launch {
+                                use(it) { it.default?.invoke(this) }
+                            }
+                        }
+                    }
         }
     }
 }

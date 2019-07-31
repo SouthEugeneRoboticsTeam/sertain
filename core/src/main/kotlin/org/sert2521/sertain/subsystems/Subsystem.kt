@@ -4,21 +4,19 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
-import org.sert2521.sertain.coroutines.RobotScope
 import org.sert2521.sertain.events.Use
-import org.sert2521.sertain.events.events
 import org.sert2521.sertain.events.fire
 import kotlin.coroutines.coroutineContext
 
 abstract class Subsystem {
     internal var currentJob: Job? = null
-    val inUse: Boolean
+
+    val occupied: Boolean
         get() = currentJob?.isActive ?: false
 
-    internal var default: (suspend () -> Unit)? = null
+    internal var default: (suspend CoroutineScope.() -> Unit)? = null
 
-    fun default(action: suspend () -> Unit) {
-        currentJob?.cancel()
+    fun default(action: suspend CoroutineScope.() -> Unit) {
         default = action
     }
 }
