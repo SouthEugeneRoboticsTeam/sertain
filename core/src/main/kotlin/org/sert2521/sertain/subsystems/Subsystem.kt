@@ -14,7 +14,7 @@ abstract class Subsystem {
     internal var currentJob: Job? = null
 
     val occupied: Boolean
-        get() = currentJob?.isActive ?: false
+        get() = currentJob != null
 
     internal var default: (suspend CoroutineScope.() -> Unit)? = null
 
