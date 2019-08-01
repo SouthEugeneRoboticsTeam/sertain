@@ -21,6 +21,10 @@ abstract class Subsystem {
     fun default(action: suspend CoroutineScope.() -> Unit) {
         default = action
     }
+
+    fun noDefault() {
+        default = null
+    }
 }
 
 suspend fun <R> use(vararg subsystems: Subsystem, important: Boolean = true, action: suspend CoroutineScope.() -> R): R {
