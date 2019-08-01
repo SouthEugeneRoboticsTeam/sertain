@@ -6,7 +6,7 @@ import kotlinx.coroutines.Job
 import org.sert2521.sertain.subsystems.Subsystem
 import kotlin.coroutines.CoroutineContext
 
-abstract class TaskEvent : Event()
+abstract class SubsystemEvent : Event()
 
 class Use<R>(
         val subsystems: Set<Subsystem>,
@@ -15,9 +15,9 @@ class Use<R>(
         val context: CoroutineContext,
         val continuation: CancellableContinuation<R>,
         val action: suspend CoroutineScope.() -> R
-) : TaskEvent()
+) : SubsystemEvent()
 
 class Clean(
         val subsystems: Set<Subsystem>,
         val job: Job
-) : TaskEvent()
+) : SubsystemEvent()
