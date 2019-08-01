@@ -15,7 +15,7 @@ fun manageSubsystems() {
     RobotScope.launch {
         subscribe<Use<Any?>> { use ->
             // Subsystems used in parent coroutine
-            val prevSubsystems: Set<Subsystem> = use.callerContext[Requirements] ?: emptySet()
+            val prevSubsystems: Set<Subsystem> = use.context[Requirements] ?: emptySet()
             // Subsystems used in new coroutine but not in parent coroutine
             val newSubsystems = use.subsystems - prevSubsystems
             // Subsystems from both parent and new coroutines
@@ -23,7 +23,10 @@ fun manageSubsystems() {
 
             if (allSubsystems.any { !it.isEnabled }) {
                 use.continuation.resumeWithException(
-                        CancellationException("Cannot execute action because not all used subsystems are enabled.")
+                        CancellationException(
+                                "Cannot execute action ${use.name} because the following subsystems are disabled:" +
+                                        " ${allSubsystems.filter { !it.isEnabled }.joinToString(" ")}."
+                        )
                 )
             }
 
@@ -32,14 +35,17 @@ fun manageSubsystems() {
 
             if (!use.important && occupiedSubsystems.isNotEmpty()) {
                 use.continuation.resumeWithException(
-                        CancellationException("Cannot execute unimportant action because some subsystems are occupied.")
+                        CancellationException(
+                                "Cannot execute unimportant action ${use.name} because the following subsystems are " +
+                                        "occupied: ${occupiedSubsystems.joinToString(" ")}"
+                        )
                 )
             }
 
             // Jobs of conflicting subsystems
             val conflictingJobs = occupiedSubsystems.map { it.currentJob!! }
 
-            val newJob = CoroutineScope(use.callerContext).launch(
+            val newJob = CoroutineScope(use.context).launch(
                     Requirements(allSubsystems),
                     CoroutineStart.ATOMIC
             ) {
@@ -72,7 +78,7 @@ fun manageSubsystems() {
                         it.currentJob = null
                         if (it.default != null) {
                             RobotScope.launch {
-                                use(it) { it.default?.invoke(this) }
+                                use(it, name = "DEFAULT") { it.default?.invoke(this) }
                             }
                         }
                     }

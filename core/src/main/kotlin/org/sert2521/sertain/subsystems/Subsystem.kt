@@ -8,7 +8,7 @@ import org.sert2521.sertain.events.Use
 import org.sert2521.sertain.events.fire
 import kotlin.coroutines.coroutineContext
 
-abstract class Subsystem {
+abstract class Subsystem(val name: String) {
     var isEnabled = true
 
     internal var currentJob: Job? = null
@@ -27,13 +27,19 @@ abstract class Subsystem {
     }
 }
 
-suspend fun <R> use(vararg subsystems: Subsystem, important: Boolean = true, action: suspend CoroutineScope.() -> R): R {
+suspend fun <R> use(
+        vararg subsystems: Subsystem,
+        important: Boolean = true,
+        name: String = "ACTION",
+        action: suspend CoroutineScope.() -> R
+): R {
     val context = coroutineContext
     return suspendCancellableCoroutine { continuation ->
         CoroutineScope(context).launch {
             fire(Use(
                     subsystems.toSet(),
                     important,
+                    name,
                     context,
                     continuation,
                     action

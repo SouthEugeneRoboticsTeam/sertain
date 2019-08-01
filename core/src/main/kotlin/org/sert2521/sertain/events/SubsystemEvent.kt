@@ -11,7 +11,8 @@ abstract class TaskEvent : Event()
 class Use<R>(
         val subsystems: Set<Subsystem>,
         val important: Boolean,
-        val callerContext: CoroutineContext,
+        val name: String,
+        val context: CoroutineContext,
         val continuation: CancellableContinuation<R>,
         val action: suspend CoroutineScope.() -> R
 ) : TaskEvent()
