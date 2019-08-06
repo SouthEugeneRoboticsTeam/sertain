@@ -2,41 +2,43 @@ package org.sert2521.sertain
 
 import edu.wpi.first.hal.HAL
 import edu.wpi.first.wpilibj.DriverStation
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.sert2521.sertain.core.initializeWpiLib
 import org.sert2521.sertain.coroutines.RobotScope
 import org.sert2521.sertain.coroutines.periodic
 import org.sert2521.sertain.events.*
+import org.sert2521.sertain.subsystems.manageSubsystems
 
-class Robot : RobotScope() {
+class Robot {
     var mode: RobotMode = RobotMode.DISCONNECTED
         internal set
 
-    fun onConnect(action: suspend (event: Connect) -> Unit) {
+    fun CoroutineScope.onConnect(action: suspend (event: Connect) -> Unit) {
         launch { subscribe(action) }
     }
 
-    fun onDisable(action: suspend (event: Disable) -> Unit) {
+    fun CoroutineScope.onDisable(action: suspend (event: Disable) -> Unit) {
         launch { subscribe(action) }
     }
 
-    fun onEnable(action: suspend (event: Enable) -> Unit) {
+    fun CoroutineScope.onEnable(action: suspend (event: Enable) -> Unit) {
         launch { subscribe(action) }
     }
 
-    fun onTeleop(action: suspend (event: Teleop) -> Unit) {
+    fun CoroutineScope.onTeleop(action: suspend (event: Teleop) -> Unit) {
         launch { subscribe(action) }
     }
 
-    fun onAuto(action: suspend (event: Auto) -> Unit) {
+    fun CoroutineScope.onAuto(action: suspend (event: Auto) -> Unit) {
         launch { subscribe(action) }
     }
 
-    fun onTest(action: suspend (event: Test) -> Unit) {
+    fun CoroutineScope.onTest(action: suspend (event: Test) -> Unit) {
         launch { subscribe(action) }
     }
 
-    fun onTick(action: suspend (event: Tick) -> Unit) {
+    fun CoroutineScope.onTick(action: suspend (event: Tick) -> Unit) {
         launch { subscribe(action) }
     }
 }
@@ -58,9 +60,11 @@ suspend fun robot(configure: Robot.() -> Unit) {
     val ds: DriverStation = DriverStation.getInstance()
     val running = true
 
+    manageSubsystems()
+
     val robot = Robot().apply(configure)
 
-    robot.launch {
+    RobotScope.launch {
         periodic(20) {
             launch {
                 fire(Tick)

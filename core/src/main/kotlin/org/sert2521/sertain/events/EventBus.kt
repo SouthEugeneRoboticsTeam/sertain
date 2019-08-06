@@ -9,7 +9,7 @@ suspend fun <E : Event> fire(event: E) {
     events.send(event)
 }
 
-suspend inline fun <reified E> subscribe(noinline action: suspend (E) -> Unit) =
+suspend inline fun <reified E : Event> subscribe(noinline action: suspend (E) -> Unit) =
         events.asFlow().filter { it is E }.map { it as E }.apply { collect(action) }
 
 suspend inline fun <T, reified E : TargetedEvent<T>> subscribe(target: T, noinline action: suspend (E) -> Unit) =
