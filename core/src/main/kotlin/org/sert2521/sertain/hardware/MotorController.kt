@@ -25,6 +25,10 @@ abstract class MotorController(val name: String, val ctreMotorController: CtreMo
         set(ControlMode.PERCENT_OUTPUT, output)
     }
 
+    fun setPosition(output: Double) {
+        set(ControlMode.POSITION, output)
+    }
+
     fun setVelocity(output: Double) {
         set(ControlMode.VELOCITY, output)
     }
