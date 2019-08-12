@@ -16,7 +16,7 @@ object Millimeters : LinearUnit(0.001)
 
 abstract class AngularUnit(radians: Double) : MetricUnit<Angular>(Angular, radians)
 
-object Degrees : AngularUnit(0.0174533)
+object Degrees : AngularUnit(PI / 180)
 object Radians : AngularUnit(1.0)
 object Revolutions : AngularUnit(PI * 2)
 
@@ -28,6 +28,6 @@ object MillimetersPerSecond : LinearVelocityUnit(0.001)
 abstract class AngularVelocityUnit(radiansPerSecond: Double) : MetricUnit<AngularVelocity>(AngularVelocity, radiansPerSecond)
 
 object RadiansPerSecond : LinearVelocityUnit(1.0)
-object DegreesPerSecond : LinearVelocityUnit(0.0174533)
+object DegreesPerSecond : LinearVelocityUnit(PI / 180)
 object RevolutionsPerSecond : LinearVelocityUnit(PI * 2)
 object RevolutionsPerMinute : LinearVelocityUnit((PI * 2) / 60)
