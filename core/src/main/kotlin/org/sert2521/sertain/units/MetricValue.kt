@@ -3,6 +3,7 @@ package org.sert2521.sertain.units
 class MetricValue<T : MetricUnitType, U : MetricUnit<T>>(val unit: U, val value: Double)
 
 val Number.s get() = MetricValue(Seconds, toDouble())
+val Number.ms get() = MetricValue(Milliseconds, toDouble())
 val Number.m get() = MetricValue(Meters, toDouble())
 val Number.mm get() = MetricValue(Millimeters, toDouble())
 val Number.deg get() = MetricValue(Degrees, toDouble())
