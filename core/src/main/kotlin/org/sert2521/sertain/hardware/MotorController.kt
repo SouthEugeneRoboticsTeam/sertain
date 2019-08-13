@@ -1,9 +1,14 @@
 package org.sert2521.sertain.hardware
 
+import org.sert2521.sertain.units.*
+import java.text.FieldPosition
 import com.ctre.phoenix.motorcontrol.ControlMode as CtreControlMode
 import com.ctre.phoenix.motorcontrol.can.BaseMotorController as CtreMotorController
 
-abstract class MotorController(val name: String, val ctreMotorController: CtreMotorController) {
+class MotorController(val name: String, val ctreMotorController: CtreMotorController) {
+    val encoderTicks = EncoderTicks(4096)
+
+
     enum class ControlMode {
         PERCENT_OUTPUT,
         POSITION,
@@ -31,5 +36,9 @@ abstract class MotorController(val name: String, val ctreMotorController: CtreMo
 
     fun setVelocity(output: Double) {
         set(ControlMode.VELOCITY, output)
+    }
+
+    fun <U : MetricUnit<Angular>> set(position: MetricValue<Angular, U>) {
+        setPosition(position.convertTo(encoderTicks).value)
     }
 }
