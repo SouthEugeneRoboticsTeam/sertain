@@ -7,6 +7,7 @@ abstract class MetricUnit<T : MetricUnitType>(val type: T, val base: Double)
 abstract class ChronicUnit(seconds: Double) : MetricUnit<Chronic>(Chronic, seconds)
 
 object Seconds : ChronicUnit(1.0)
+object Minutes : ChronicUnit(60.0)
 object Milliseconds : ChronicUnit(0.001)
 
 abstract class LinearUnit(meters: Double) : MetricUnit<Linear>(Linear, meters)
