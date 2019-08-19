@@ -1,5 +1,6 @@
 package org.sert2521.sertain.hardware
 
+import org.sert2521.sertain.control.PidfConfigure
 import com.ctre.phoenix.motorcontrol.can.TalonSRX as CtreTalon
 import com.ctre.phoenix.motorcontrol.can.VictorSPX as CtreVictor
 import com.ctre.phoenix.motorcontrol.ControlMode as CtreControlMode
@@ -18,7 +19,7 @@ fun ctreMotorController(id: MotorId): CtreMotorController {
     }
 }
 
-open class MotorController<T : MotorId>(val id: T, vararg followerIds: MotorId) {
+open class MotorController<T : MotorId>(val id: T, val name: String = "ANONYMOUS_MOTOR", vararg followerIds: MotorId) {
     val ctreMotorController = ctreMotorController(id)
 
     var master: MotorController<*>? = null
@@ -166,5 +167,10 @@ enum class NeutralMode {
     COAST
 }
 
-
-
+class MotorPidfConfigure : PidfConfigure() {
+    var integralZone: Int = 0
+    var allowedError: Int = 0
+    var maxIntegral: Double = 0.0
+    var maxOutput: Double = 0.0
+    var period: Int = 0
+}
