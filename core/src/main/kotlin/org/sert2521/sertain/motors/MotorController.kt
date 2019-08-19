@@ -1,4 +1,4 @@
-package org.sert2521.sertain.hardware
+package org.sert2521.sertain.motors
 
 import org.sert2521.sertain.control.PidfConfigure
 import org.sert2521.sertain.units.*
