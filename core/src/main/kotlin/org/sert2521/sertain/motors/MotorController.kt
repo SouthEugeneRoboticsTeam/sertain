@@ -1,5 +1,6 @@
 package org.sert2521.sertain.motors
 
+import com.ctre.phoenix.motorcontrol.FeedbackDevice
 import org.sert2521.sertain.control.PidfConfigure
 import org.sert2521.sertain.units.*
 import com.ctre.phoenix.motorcontrol.can.TalonSRX as CtreTalon
@@ -84,6 +85,10 @@ open class MotorController<T : MotorId>(val id: T, vararg followerIds: MotorId, 
                 field = value
             }
 
+    init {
+        eachMotor { ctreMotorController.setNeutralMode(CtreNeutralMode.Coast) }
+    }
+
     var pidSlot: Int = 0
             set(value) {
                 ctreMotorController.selectProfileSlot(value, 0)
@@ -119,16 +124,16 @@ open class MotorController<T : MotorId>(val id: T, vararg followerIds: MotorId, 
             }
 
     val percentOutput: Double
-        get() = ctreMotorController.motorOutputPercent
+            get() = ctreMotorController.motorOutputPercent
 
     var position: Int
-        get() = ctreMotorController.getSelectedSensorPosition(0)
-        set(value) {
-            ctreMotorController.selectedSensorPosition = value
-        }
+            get() = ctreMotorController.getSelectedSensorPosition(0)
+            set(value) {
+                ctreMotorController.selectedSensorPosition = value
+            }
 
     val velocity: Int
-        get() = ctreMotorController.getSelectedSensorVelocity(0)
+            get() = ctreMotorController.getSelectedSensorVelocity(0)
 
     val encoderTicks = EncoderTicks(4096)
     val encoderTicksPerSecond = encoderTicks / Seconds
