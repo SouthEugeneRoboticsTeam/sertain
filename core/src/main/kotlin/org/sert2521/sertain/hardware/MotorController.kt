@@ -20,7 +20,7 @@ fun ctreMotorController(id: MotorId): CtreMotorController {
     }
 }
 
-open class MotorController<T : MotorId>(val id: T, val name: String = "ANONYMOUS_MOTOR", vararg followerIds: MotorId) {
+open class MotorController<T : MotorId>(val id: T, vararg followerIds: MotorId, val name: String = "ANONYMOUS_MOTOR" ) {
     val ctreMotorController = ctreMotorController(id)
 
     var master: MotorController<*>? = null
