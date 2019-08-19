@@ -1,6 +1,7 @@
 package org.sert2521.sertain.hardware
 
 import org.sert2521.sertain.control.PidfConfigure
+import org.sert2521.sertain.units.*
 import com.ctre.phoenix.motorcontrol.can.TalonSRX as CtreTalon
 import com.ctre.phoenix.motorcontrol.can.VictorSPX as CtreVictor
 import com.ctre.phoenix.motorcontrol.ControlMode as CtreControlMode
@@ -118,16 +119,19 @@ open class MotorController<T : MotorId>(val id: T, val name: String = "ANONYMOUS
             }
 
     val percentOutput: Double
-            get() = ctreMotorController.motorOutputPercent
+        get() = ctreMotorController.motorOutputPercent
 
     var position: Int
-            get() = ctreMotorController.getSelectedSensorPosition(0)
-            set(value) {
-                ctreMotorController.selectedSensorPosition = value
-            }
+        get() = ctreMotorController.getSelectedSensorPosition(0)
+        set(value) {
+            ctreMotorController.selectedSensorPosition = value
+        }
 
     val velocity: Int
-            get() = ctreMotorController.getSelectedSensorVelocity(0)
+        get() = ctreMotorController.getSelectedSensorVelocity(0)
+
+    val encoderTicks = EncoderTicks(4096)
+    val encoderTicksPerSecond = encoderTicks / Seconds
 
     fun setPercentOutput(output: Double) {
         ctreMotorController.set(CtreControlMode.PercentOutput, output)
@@ -137,8 +141,18 @@ open class MotorController<T : MotorId>(val id: T, val name: String = "ANONYMOUS
         ctreMotorController.set(CtreControlMode.Position, position)
     }
 
+    fun <U : MetricUnit<Angular>> setPosition(position: MetricValue<Angular, U>) {
+        setPosition(position.convertTo(encoderTicks).value)
+    }
+
     fun setVelocity(velocity: Double) {
         ctreMotorController.set(CtreControlMode.Velocity, velocity)
+    }
+
+    fun <U : MetricUnit<CompositeUnitType<Per, Angular, Chronic>>> setVelocity(
+            velocity: MetricValue<CompositeUnitType<Per, Angular, Chronic>, U>
+    ) {
+        setVelocity(velocity.convertTo(encoderTicksPerSecond).value)
     }
 
     fun setCurrent(current: Double) {
