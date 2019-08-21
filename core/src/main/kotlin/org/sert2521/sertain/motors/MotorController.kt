@@ -203,7 +203,7 @@ class MotorController<T : MotorId>(val id: T, vararg followerIds: MotorId, val n
         ctreMotorController.neutralOutput()
     }
 
-    fun updatePidf(slot: Int, pidf: MotorPidf) {
+    internal fun updatePidf(slot: Int, pidf: MotorPidf) {
         with(pidf) {
             ctreMotorController.apply {
                 config_kP(slot, kp)
@@ -219,7 +219,7 @@ class MotorController<T : MotorId>(val id: T, vararg followerIds: MotorId, val n
         }
     }
 
-    fun updateCurrentLimit(limit: CurrentLimit) {
+    internal fun updateCurrentLimit(limit: CurrentLimit) {
         with(limit) {
             eachTalon {
                 (ctreMotorController as CtreTalon).apply {
