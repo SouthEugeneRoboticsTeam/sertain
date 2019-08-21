@@ -2,6 +2,7 @@ package org.sert2521.sertain.motors
 
 import org.sert2521.sertain.control.PidfConfigure
 import org.sert2521.sertain.units.*
+import kotlin.math.PI
 import com.ctre.phoenix.motorcontrol.can.TalonSRX as CtreTalon
 import com.ctre.phoenix.motorcontrol.can.VictorSPX as CtreVictor
 import com.ctre.phoenix.motorcontrol.ControlMode as CtreControlMode
@@ -252,6 +253,8 @@ class MotorController<T : MotorId>(val id: T, vararg followerIds: MotorId, val n
 // Current can only be read from talons
 val MotorController<TalonId>.current: Double
         get() = (ctreMotorController as CtreTalon).outputCurrent
+
+class EncoderTicks(ticksPerRevolution: Int) : MetricUnit<Angular>(Angular, (PI * 2) / ticksPerRevolution)
 
 enum class ControlMode {
     PERCENT_OUTPUT,
