@@ -4,10 +4,6 @@ import kotlinx.coroutines.CoroutineScope
 import org.sert2521.sertain.coroutines.RobotDispatcher
 import kotlin.coroutines.CoroutineContext
 
-@DslMarker
-annotation class TaskDsl
-
-@TaskDsl
 class TaskConfigure {
     internal val subsystems = mutableListOf<Subsystem>()
 
@@ -15,14 +11,13 @@ class TaskConfigure {
         subsystems += subsystem
     }
 
-    internal var action: (suspend ActionConfigure.() -> Unit)? = null
+    internal var action: (suspend CoroutineScope.() -> Unit)? = null
 
-    fun action(action: suspend ActionConfigure.() -> Unit) {
+    fun action(action: suspend CoroutineScope.() -> Unit) {
         this.action = action
     }
 }
 
-@TaskDsl
 class ActionConfigure : CoroutineScope {
     override val coroutineContext: CoroutineContext = RobotDispatcher
 }
@@ -30,7 +25,8 @@ class ActionConfigure : CoroutineScope {
 suspend fun doTask(name: String = "ANONYMOUS_TASK", configure: TaskConfigure.() -> Unit) {
     with(TaskConfigure().apply(configure)) {
         action?.let {
-                use(*subsystems.toTypedArray(), action = (it as suspend CoroutineScope.() -> Unit))
+            @Suppress("unchecked_cast") // Will work, ActionConfigure extends CoroutineScope
+            use(*subsystems.toTypedArray(), name = name, action = it)
         }
     }
 }
