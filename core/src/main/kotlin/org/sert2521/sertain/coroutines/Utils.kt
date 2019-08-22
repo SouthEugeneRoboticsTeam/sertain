@@ -47,3 +47,7 @@ class ActionGroupConfigure {
         actions.add(action)
     }
 }
+
+suspend fun delayUntil(condition: () -> Boolean) {
+    while (!condition()) delay(20)
+}
