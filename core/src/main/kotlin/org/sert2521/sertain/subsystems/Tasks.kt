@@ -1,7 +1,13 @@
 package org.sert2521.sertain.subsystems
 
 import kotlinx.coroutines.CoroutineScope
+import org.sert2521.sertain.coroutines.RobotDispatcher
+import kotlin.coroutines.CoroutineContext
 
+@DslMarker
+annotation class TaskDsl
+
+@TaskDsl
 class TaskConfigure {
     internal val subsystems = mutableListOf<Subsystem>()
 
@@ -9,22 +15,27 @@ class TaskConfigure {
         subsystems += subsystem
     }
 
-    internal var action: (suspend CoroutineScope.() -> Unit)? = null
+    internal var action: (suspend ActionConfigure.() -> Unit)? = null
 
-    fun action(action: suspend CoroutineScope.() -> Unit) {
+    fun action(action: suspend ActionConfigure.() -> Unit) {
         this.action = action
     }
 }
 
-suspend fun doTask(configure: TaskConfigure.() -> Unit) {
+@TaskDsl
+class ActionConfigure : CoroutineScope {
+    override val coroutineContext: CoroutineContext = RobotDispatcher
+}
+
+suspend fun doTask(name: String = "ANONYMOUS_TASK", configure: TaskConfigure.() -> Unit) {
     with(TaskConfigure().apply(configure)) {
-        action?.let { action ->
-            use(*subsystems.toTypedArray(), action = action)
+        action?.let {
+                use(*subsystems.toTypedArray(), action = (it as suspend CoroutineScope.() -> Unit))
         }
     }
 }
 
-val Subsystem.accessor: TaskConfigure.() -> Subsystem
+val <S : Subsystem> S.accessor: TaskConfigure.() -> S
         get() = {
             this += this@accessor
             this@accessor
