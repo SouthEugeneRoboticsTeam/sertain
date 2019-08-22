@@ -1,7 +1,6 @@
 package org.sert2521.sertain.coroutines
 
 import kotlinx.coroutines.*
-import java.lang.String.join
 
 suspend fun periodic(period: Long, delay: Long = 0, action: () -> Unit) {
     delay(delay)
@@ -49,5 +48,7 @@ class ActionGroupConfigure {
 }
 
 suspend fun delayUntil(condition: () -> Boolean) {
-    while (!condition()) delay(20)
+    while (!condition()) {
+        delay(20)
+    }
 }
