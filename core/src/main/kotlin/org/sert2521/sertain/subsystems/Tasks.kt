@@ -18,10 +18,6 @@ class TaskConfigure {
     }
 }
 
-class ActionConfigure : CoroutineScope {
-    override val coroutineContext: CoroutineContext = RobotDispatcher
-}
-
 suspend fun doTask(name: String = "ANONYMOUS_TASK", configure: TaskConfigure.() -> Unit) {
     with(TaskConfigure().apply(configure)) {
         action?.let {
