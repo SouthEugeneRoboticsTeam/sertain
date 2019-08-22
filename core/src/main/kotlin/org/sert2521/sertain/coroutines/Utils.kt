@@ -1,8 +1,7 @@
 package org.sert2521.sertain.coroutines
 
 import kotlinx.coroutines.*
-import kotlin.coroutines.EmptyCoroutineContext
-import kotlin.coroutines.coroutineContext
+import java.lang.String.join
 
 suspend fun periodic(period: Long, delay: Long = 0, action: () -> Unit) {
     delay(delay)
@@ -12,18 +11,20 @@ suspend fun periodic(period: Long, delay: Long = 0, action: () -> Unit) {
     }
 }
 
-suspend fun doAll(configure: ActionGroupConfigure.() -> Unit) {
+suspend fun CoroutineScope.doAll(configure: ActionGroupConfigure.() -> Unit) {
     with(ActionGroupConfigure().apply(configure)) {
-        val job = RobotScope.launch {
-            actions.forEach { launch(block = it) }
+        val job = launch {
+            actions.forEach {
+                launch(block = it)
+            }
         }
         job.join()
     }
 }
 
-suspend fun doOne(configure: ActionGroupConfigure.() -> Unit) {
+suspend fun CoroutineScope.doOne(configure: ActionGroupConfigure.() -> Unit) {
     with(ActionGroupConfigure().apply(configure)) {
-        val job = RobotScope.launch {
+        val job = launch {
             val scope = this
             actions.forEach {
                 launch {
@@ -40,7 +41,7 @@ suspend fun doOne(configure: ActionGroupConfigure.() -> Unit) {
 }
 
 class ActionGroupConfigure {
-    internal var actions = mutableListOf<suspend CoroutineScope.() -> Unit>()
+    internal val actions = mutableListOf<suspend CoroutineScope.() -> Unit>()
 
     fun action(action: suspend CoroutineScope.() -> Unit) {
         actions.add(action)
