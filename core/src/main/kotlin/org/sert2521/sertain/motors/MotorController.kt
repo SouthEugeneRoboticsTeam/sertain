@@ -1,7 +1,6 @@
 package org.sert2521.sertain.motors
 
 import org.sert2521.sertain.units.*
-import kotlin.math.PI
 import com.ctre.phoenix.motorcontrol.can.TalonSRX as CtreTalon
 import com.ctre.phoenix.motorcontrol.ControlMode as CtreControlMode
 import com.ctre.phoenix.motorcontrol.NeutralMode as CtreNeutralMode
@@ -13,6 +12,8 @@ class MotorController<T : MotorId>(
         configure: MotorController<T>.() -> Unit = {}
 ) {
     internal val ctreMotorController = ctreMotorController(id)
+
+    val encoder = Encoder(4096)
 
     var master: MotorController<*>? = null
            internal set(value) {
@@ -153,9 +154,6 @@ class MotorController<T : MotorId>(
                 field = value
             }
 
-    val encoderTicks = EncoderTicks(4096)
-    val encoderTicksPerSecond = encoderTicks / Seconds
-
     fun setPercentOutput(output: Double) {
         ctreMotorController.set(CtreControlMode.PercentOutput, output)
     }
@@ -165,7 +163,7 @@ class MotorController<T : MotorId>(
     }
 
     fun <U : MetricUnit<Angular>> setPosition(position: MetricValue<Angular, U>) {
-        setPosition(position.convertTo(encoderTicks).value)
+        setPosition(position.convertTo(encoder.ticks).value)
     }
 
     fun setVelocity(velocity: Double) {
@@ -175,7 +173,7 @@ class MotorController<T : MotorId>(
     fun <U : MetricUnit<CompositeUnitType<Per, Angular, Chronic>>> setVelocity(
             velocity: MetricValue<CompositeUnitType<Per, Angular, Chronic>, U>
     ) {
-        setVelocity(velocity.convertTo(encoderTicksPerSecond).value)
+        setVelocity(velocity.convertTo(encoder.ticksPerSecond).value)
     }
 
     fun setCurrent(current: Double) {
@@ -237,8 +235,6 @@ class MotorController<T : MotorId>(
 // Current can only be read from talons
 val MotorController<TalonId>.current: Double
         get() = (ctreMotorController as CtreTalon).outputCurrent
-
-class EncoderTicks(ticksPerRevolution: Int) : MetricUnit<Angular>(Angular, (PI * 2) / ticksPerRevolution)
 
 enum class ControlMode {
     PERCENT_OUTPUT,
