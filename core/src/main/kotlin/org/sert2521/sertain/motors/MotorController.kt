@@ -1,35 +1,18 @@
 package org.sert2521.sertain.motors
 
-import org.sert2521.sertain.control.PidfConfigure
 import org.sert2521.sertain.units.*
 import kotlin.math.PI
 import com.ctre.phoenix.motorcontrol.can.TalonSRX as CtreTalon
-import com.ctre.phoenix.motorcontrol.can.VictorSPX as CtreVictor
 import com.ctre.phoenix.motorcontrol.ControlMode as CtreControlMode
 import com.ctre.phoenix.motorcontrol.NeutralMode as CtreNeutralMode
-import com.ctre.phoenix.motorcontrol.can.BaseMotorController as CtreMotorController
 
-sealed class MotorId(val number: Int)
-
-class TalonId(number: Int) : MotorId(number)
-class VictorId(number: Int) : MotorId(number)
-
-fun ctreMotorController(id: MotorId): CtreMotorController {
-    return when (id) {
-        is TalonId -> CtreTalon(id.number)
-        is VictorId -> CtreVictor(id.number)
-    }
-}
-
-fun ctreNeutralMode(mode: NeutralMode): CtreNeutralMode {
-    return when (mode) {
-        NeutralMode.COAST -> CtreNeutralMode.Coast
-        NeutralMode.BREAK -> CtreNeutralMode.Brake
-    }
-}
-
-class MotorController<T : MotorId>(val id: T, vararg followerIds: MotorId, val name: String = "ANONYMOUS_MOTOR" ) {
-    val ctreMotorController = ctreMotorController(id)
+class MotorController<T : MotorId>(
+        val id: T,
+        vararg followerIds: MotorId,
+        val name: String = "ANONYMOUS_MOTOR",
+        configure: MotorController<T>.() -> Unit = {}
+) {
+    internal val ctreMotorController = ctreMotorController(id)
 
     var master: MotorController<*>? = null
            internal set(value) {
@@ -219,7 +202,7 @@ class MotorController<T : MotorId>(val id: T, vararg followerIds: MotorId, val n
         }
     }
 
-    internal fun updateCurrentLimit(limit: CurrentLimit) {
+    private fun updateCurrentLimit(limit: CurrentLimit) {
         with(limit) {
             eachTalon {
                 (ctreMotorController as CtreTalon).apply {
@@ -246,6 +229,7 @@ class MotorController<T : MotorId>(val id: T, vararg followerIds: MotorId, val n
                 updatePidf(it.key, it.value)
             }
             updateCurrentLimit(currentLimit)
+            configure()
         }
     }
 }
@@ -269,49 +253,9 @@ enum class NeutralMode {
     COAST
 }
 
-class MotorPidfConfigure : PidfConfigure() {
-    var integralZone: Int = 0
-    var allowedError: Int = 0
-    var maxIntegral: Double = 0.0
-    var maxOutput: Double = 0.0
-    var period: Int = 0
-}
-
-data class MotorPidf(
-        val kp: Double = 0.0,
-        val ki: Double = 0.0,
-        val kd: Double = 0.0,
-        val kf: Double = 0.0,
-        val integralZone: Int = 0,
-        val allowedError: Int = 0,
-        val maxIntegral: Double = 0.0,
-        val maxOutput: Double = 0.0,
-        val period: Int = 0
-)
-
-class CurrentLimitConfigure {
-    var continuousLimit: Int = 0
-    var maxLimit: Int = 0
-    var maxDuration: Int = 0
-    var enabled: Boolean = true
-}
-
-data class CurrentLimit(
-        val continuousLimit: Int = 0,
-        val maxLimit: Int = 0,
-        val maxDuration: Int = 0,
-        val enabled: Boolean = true
-)
-
-class MotorPidfCollection(val motor: MotorController<*>, vararg initialPidf: Pair<Int, MotorPidf>) {
-    private val pidfMap = initialPidf.toMap(mutableMapOf())
-
-    fun toMap() = pidfMap
-
-    operator fun set(slot: Int, pidf: MotorPidf) {
-        pidfMap[slot] = pidf
-        motor.updatePidf(slot, pidf)
+fun ctreNeutralMode(mode: NeutralMode): CtreNeutralMode {
+    return when (mode) {
+        NeutralMode.COAST -> CtreNeutralMode.Coast
+        NeutralMode.BREAK -> CtreNeutralMode.Brake
     }
-
-    operator fun get(slot: Int) = pidfMap[slot]
 }
