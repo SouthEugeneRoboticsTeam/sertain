@@ -21,6 +21,7 @@ dependencies {
     implementation("edu.wpi.first.wpilibj", "wpilibj-java", "2019.4.1")
     implementation("edu.wpi.first.hal", "hal-java", "2019.4.1")
     implementation("edu.wpi.first.ntcore", "ntcore-java", "2019.4.1")
+    implementation("com.ctre.phoenix", "api-java", "5.14.1")
 }
 
 tasks.withType<KotlinCompile> {
