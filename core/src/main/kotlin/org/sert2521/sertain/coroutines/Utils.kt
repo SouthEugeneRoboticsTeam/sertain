@@ -52,3 +52,9 @@ suspend fun delayUntil(condition: () -> Boolean) {
         delay(20)
     }
 }
+
+suspend fun delayForever() {
+    while (true) {
+        delay(2000)
+    }
+}
