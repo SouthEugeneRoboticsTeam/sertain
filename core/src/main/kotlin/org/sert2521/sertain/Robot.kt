@@ -2,7 +2,6 @@ package org.sert2521.sertain
 
 import edu.wpi.first.hal.HAL
 import edu.wpi.first.wpilibj.DriverStation
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.sert2521.sertain.core.initializeWpiLib
 import org.sert2521.sertain.coroutines.RobotScope
@@ -48,34 +47,6 @@ class Robot {
         val subsystem = access(S::class)
         this += subsystem
         return subsystem
-    }
-
-    fun CoroutineScope.onConnect(action: suspend (event: Connect) -> Unit) {
-        launch { subscribe(action) }
-    }
-
-    fun CoroutineScope.onDisable(action: suspend (event: Disable) -> Unit) {
-        launch { subscribe(action) }
-    }
-
-    fun CoroutineScope.onEnable(action: suspend (event: Enable) -> Unit) {
-        launch { subscribe(action) }
-    }
-
-    fun CoroutineScope.onTeleop(action: suspend (event: Teleop) -> Unit) {
-        launch { subscribe(action) }
-    }
-
-    fun CoroutineScope.onAuto(action: suspend (event: Auto) -> Unit) {
-        launch { subscribe(action) }
-    }
-
-    fun CoroutineScope.onTest(action: suspend (event: Test) -> Unit) {
-        launch { subscribe(action) }
-    }
-
-    fun CoroutineScope.onTick(action: suspend (event: Tick) -> Unit) {
-        launch { subscribe(action) }
     }
 }
 
