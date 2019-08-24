@@ -16,6 +16,11 @@ class TaskConfigure {
     fun action(action: suspend CoroutineScope.() -> Unit) {
         this.action = action
     }
+
+    fun <S : Subsystem> S.use(): S {
+        subsystems += this
+        return this
+    }
 }
 
 suspend fun doTask(name: String = "ANONYMOUS_TASK", configure: TaskConfigure.() -> Unit) {
@@ -27,8 +32,7 @@ suspend fun doTask(name: String = "ANONYMOUS_TASK", configure: TaskConfigure.() 
     }
 }
 
-val <S : Subsystem> S.accessor: TaskConfigure.() -> S
-        get() = {
-            this += this@accessor
-            this@accessor
-        }
+fun <S : Subsystem> TaskConfigure.use(subsystem: S): S {
+    this += subsystem
+    return subsystem
+}

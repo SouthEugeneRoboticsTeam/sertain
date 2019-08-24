@@ -8,11 +8,47 @@ import org.sert2521.sertain.core.initializeWpiLib
 import org.sert2521.sertain.coroutines.RobotScope
 import org.sert2521.sertain.coroutines.periodic
 import org.sert2521.sertain.events.*
+import org.sert2521.sertain.subsystems.Subsystem
+import org.sert2521.sertain.subsystems.TaskConfigure
 import org.sert2521.sertain.subsystems.manageSubsystems
+import java.lang.IllegalStateException
+import kotlin.reflect.KClass
+import kotlin.reflect.full.createInstance
 
 class Robot {
     var mode: RobotMode = RobotMode.DISCONNECTED
         internal set
+
+    internal var subsystems = mutableMapOf<KClass<*>, Subsystem>()
+
+    fun <S : Subsystem> add(reference: KClass<*>, subsystem: S) {
+        subsystems[reference] = subsystem
+    }
+
+    fun <S : Subsystem> add(subsystem: S) {
+        add(subsystem::class, subsystem)
+    }
+
+    inline fun <reified S : Subsystem> add() {
+        add(S::class, S::class.createInstance())
+    }
+
+    fun <S : Subsystem> access(reference: KClass<S>): S {
+        @Suppress("unchecked_cast") // Safe because subsystems is internally managed
+        subsystems[reference]?.let {
+            return it as S
+        }
+        throw IllegalStateException("Subsystem with type ${reference.qualifiedName} does not exist." +
+                " Did you forget to add it?")
+    }
+
+    inline fun <reified S : Subsystem> access() = access(S::class)
+
+    inline fun <reified S : Subsystem> TaskConfigure.use(): S {
+        val subsystem = access(S::class)
+        this += subsystem
+        return subsystem
+    }
 
     fun CoroutineScope.onConnect(action: suspend (event: Connect) -> Unit) {
         launch { subscribe(action) }
