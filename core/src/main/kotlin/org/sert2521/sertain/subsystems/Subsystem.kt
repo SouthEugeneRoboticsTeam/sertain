@@ -29,8 +29,8 @@ abstract class Subsystem(val name: String) {
 
 suspend fun <R> use(
         vararg subsystems: Subsystem,
-        important: Boolean = true,
-        name: String = "ACTION",
+        cancelConflicts: Boolean = true,
+        name: String = "ANONYMOUS_TASK",
         action: suspend CoroutineScope.() -> R
 ): R {
     val context = coroutineContext
@@ -38,7 +38,7 @@ suspend fun <R> use(
         CoroutineScope(context).launch {
             fire(Use(
                     subsystems.toSet(),
-                    important,
+                    cancelConflicts,
                     name,
                     context,
                     continuation,

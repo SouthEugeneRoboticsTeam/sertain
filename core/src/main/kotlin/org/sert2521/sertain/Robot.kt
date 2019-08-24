@@ -2,44 +2,51 @@ package org.sert2521.sertain
 
 import edu.wpi.first.hal.HAL
 import edu.wpi.first.wpilibj.DriverStation
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.sert2521.sertain.core.initializeWpiLib
 import org.sert2521.sertain.coroutines.RobotScope
 import org.sert2521.sertain.coroutines.periodic
 import org.sert2521.sertain.events.*
+import org.sert2521.sertain.subsystems.Subsystem
+import org.sert2521.sertain.subsystems.TaskConfigure
 import org.sert2521.sertain.subsystems.manageSubsystems
+import java.lang.IllegalStateException
+import kotlin.reflect.KClass
+import kotlin.reflect.full.createInstance
 
 class Robot {
     var mode: RobotMode = RobotMode.DISCONNECTED
         internal set
 
-    fun CoroutineScope.onConnect(action: suspend (event: Connect) -> Unit) {
-        launch { subscribe(action) }
+    internal var subsystems = mutableMapOf<KClass<*>, Subsystem>()
+
+    fun <S : Subsystem> add(reference: KClass<*>, subsystem: S) {
+        subsystems[reference] = subsystem
     }
 
-    fun CoroutineScope.onDisable(action: suspend (event: Disable) -> Unit) {
-        launch { subscribe(action) }
+    fun <S : Subsystem> add(subsystem: S) {
+        add(subsystem::class, subsystem)
     }
 
-    fun CoroutineScope.onEnable(action: suspend (event: Enable) -> Unit) {
-        launch { subscribe(action) }
+    inline fun <reified S : Subsystem> add() {
+        add(S::class, S::class.createInstance())
     }
 
-    fun CoroutineScope.onTeleop(action: suspend (event: Teleop) -> Unit) {
-        launch { subscribe(action) }
+    fun <S : Subsystem> access(reference: KClass<S>): S {
+        @Suppress("unchecked_cast") // Safe because subsystems is internally managed
+        subsystems[reference]?.let {
+            return it as S
+        }
+        throw IllegalStateException("Subsystem with type ${reference.qualifiedName} does not exist." +
+                " Did you forget to add it?")
     }
 
-    fun CoroutineScope.onAuto(action: suspend (event: Auto) -> Unit) {
-        launch { subscribe(action) }
-    }
+    inline fun <reified S : Subsystem> access() = access(S::class)
 
-    fun CoroutineScope.onTest(action: suspend (event: Test) -> Unit) {
-        launch { subscribe(action) }
-    }
-
-    fun CoroutineScope.onTick(action: suspend (event: Tick) -> Unit) {
-        launch { subscribe(action) }
+    inline fun <reified S : Subsystem> TaskConfigure.use(): S {
+        val subsystem = access(S::class)
+        this += subsystem
+        return subsystem
     }
 }
 

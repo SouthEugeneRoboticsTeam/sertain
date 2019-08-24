@@ -33,7 +33,7 @@ fun manageSubsystems() {
             // Subsystems that are already occupied
             val occupiedSubsystems = allSubsystems.filter { it.occupied }
 
-            if (!use.important && occupiedSubsystems.isNotEmpty()) {
+            if (!use.cancelConflicts && occupiedSubsystems.isNotEmpty()) {
                 use.continuation.resumeWithException(
                         CancellationException(
                                 "Cannot execute unimportant action ${use.name} because the following subsystems are " +

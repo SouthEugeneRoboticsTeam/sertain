@@ -10,7 +10,7 @@ abstract class SubsystemEvent : Event()
 
 class Use<R>(
         val subsystems: Set<Subsystem>,
-        val important: Boolean,
+        val cancelConflicts: Boolean,
         val name: String,
         val context: CoroutineContext,
         val continuation: CancellableContinuation<R>,
