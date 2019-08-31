@@ -46,7 +46,7 @@ Finally, fire the event using `fire`:
 fire(MyEvent())
 ```
 
-Keep in mind that subscribe suspends the coroutine that it is called it. If that coroutine is cancelled, the subscription will no longer be active. This can be used to your advantage, for instance if you wanted to only subscribe until a certain event occured.
+Keep in mind that `subscribe` suspends the coroutine that it is called it. If that coroutine is cancelled, the subscription will no longer be active. This can be used to your advantage, for instance if you wanted to only subscribe until a certain event occured.
 
 Sertain also provides pre-defined event subscribers. Event subscribers launch a new coroutine that is subscribed to the event. For example, `onConnect` subscribes to the `Connect` event, like so:
 
