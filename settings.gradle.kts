@@ -1,3 +1,4 @@
 rootProject.name = "sertain"
 
-include(":core")
+include("core")
+include("trajectories")
