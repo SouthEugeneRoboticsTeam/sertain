@@ -1,1 +1,0 @@
-fun hello() = println("Hello")
