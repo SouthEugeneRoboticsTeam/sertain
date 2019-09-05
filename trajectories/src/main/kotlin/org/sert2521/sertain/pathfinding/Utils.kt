@@ -1,10 +1,6 @@
 package org.sert2521.sertain.pathfinding
 
 import kotlin.math.PI
-import kotlin.math.abs
-import kotlin.properties.ReadOnlyProperty
-import kotlin.properties.ReadWriteProperty
-import kotlin.reflect.KProperty
 
 fun almostEqual(a: Double, b: Double) = Math.abs(a - b) < 1E-6
 
