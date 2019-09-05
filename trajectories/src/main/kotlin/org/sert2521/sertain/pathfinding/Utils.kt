@@ -21,10 +21,4 @@ fun boundAngle(angle: Double, bounds: ClosedRange<Double>): Double {
     return result
 }
 
-class CachedValue<T>(val get: () -> T) : ReadOnlyProperty<Any?, T> {
-    val value: T = get()
-
-    override fun getValue(thisRef: Any?, property: KProperty<*>): T {
-
-    }
-}
+fun p(x: Double, y: Double) = Point(x, y)
