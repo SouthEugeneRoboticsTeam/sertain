@@ -24,6 +24,19 @@ class CompositeUnit<OP : CompositionOperation, T1 : MetricUnitType, T2 : MetricU
             Per -> unit1.base / unit2.base
             By -> unit1.base * unit2.base
             else -> throw IllegalArgumentException("Unsupported unit operation")
+        },
+        when (operation) {
+            Per -> if (unit1 != unit2) {
+                " ${unit1.symbol.trim()}/${unit2.symbol.trim()}"
+            } else {
+                ""
+            }
+            By -> if (unit1 != unit2) {
+                " ${unit1.symbol.trim()}-${unit2.symbol.trim()}"
+            } else {
+                " ${unit1.symbol.trim()}²"
+            }
+            else -> throw IllegalArgumentException("Unsupported unit operation")
         }
 )
 

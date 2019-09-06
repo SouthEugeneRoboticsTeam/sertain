@@ -11,4 +11,4 @@ class Encoder(ticksPerRevolution: Int) {
     val ticksPerSecond = ticks / Seconds
 }
 
-class EncoderTicks(ticksPerRevolution: Int) : MetricUnit<Angular>(Angular, (PI * 2) / ticksPerRevolution)
+class EncoderTicks(ticksPerRevolution: Int) : MetricUnit<Angular>(Angular, (PI * 2) / ticksPerRevolution, " ticks")
