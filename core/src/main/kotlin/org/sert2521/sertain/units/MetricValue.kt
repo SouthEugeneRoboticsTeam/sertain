@@ -9,22 +9,27 @@ data class MetricValue<T : MetricUnitType, U : MetricUnit<T>>(val unit: U, val v
         false
     }
 
-    inline operator fun <reified R : T> plus(other: MetricValue<R, *>) =
-            MetricValue(unit, value + (other.value * other.unit.base / unit.base))
+    @Suppress("UNCHECKED_CAST")
+    inline operator fun <reified R : T, S : MetricUnit<R>> plus(other: MetricValue<R, S>) =
+            MetricValue(unit, value + other.convertTo(unit as MetricUnit<R>).value)
 
-    inline operator fun <reified R : T> minus(other: MetricValue<R, *>) =
-            MetricValue(unit, value - (other.value * other.unit.base / unit.base))
+    @Suppress("UNCHECKED_CAST")
+    inline operator fun <reified R : T, S : MetricUnit<R>> minus(other: MetricValue<R, S>) =
+            MetricValue(unit, value - other.convertTo(unit as MetricUnit<R>).value)
 
-    inline operator fun <reified R : T> times(other: MetricValue<R, *>) =
-            MetricValue(CompositeUnit(By, unit, unit), value * (other.value * other.unit.base / unit.base))
+    @Suppress("UNCHECKED_CAST")
+    inline operator fun <reified R : T, S : MetricUnit<R>> times(other: MetricValue<R, S>) =
+            MetricValue(CompositeUnit(By, unit, unit), value * other.convertTo(unit as MetricUnit<R>).value)
 
-    inline operator fun <reified R : T> div(other: MetricValue<R, *>) =
-            value / (other.value * other.unit.base / unit.base)
+    @Suppress("UNCHECKED_CAST")
+    inline operator fun <reified R : T, S : MetricUnit<R>> div(other: MetricValue<R, S>) =
+            value / other.convertTo(unit as MetricUnit<R>).value
 
-    inline operator fun <reified R : T> rem(other: MetricValue<R, *>) =
-            MetricValue(unit, value % (other.value * other.unit.base / unit.base))
+    @Suppress("UNCHECKED_CAST")
+    inline operator fun <reified R : T, S : MetricUnit<R>> rem(other: MetricValue<R, S>) =
+            MetricValue(unit, value % other.convertTo(unit as MetricUnit<R>).value)
 
-    inline operator fun <reified R : T> compareTo(other: MetricValue<R, *>) =
+    inline operator fun <reified R : T, S : MetricUnit<R>> compareTo(other: MetricValue<R, S>) =
             ceil(value * unit.base - other.value * other.unit.base).toInt()
 
     override fun hashCode(): Int {
