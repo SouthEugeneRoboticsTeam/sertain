@@ -9,15 +9,15 @@ import kotlin.coroutines.CoroutineContext
 abstract class SubsystemEvent : Event()
 
 class Use<R>(
-        val subsystems: Set<Subsystem>,
-        val cancelConflicts: Boolean,
-        val name: String,
-        val context: CoroutineContext,
-        val continuation: CancellableContinuation<R>,
-        val action: suspend CoroutineScope.() -> R
+    val subsystems: Set<Subsystem>,
+    val cancelConflicts: Boolean,
+    val name: String,
+    val context: CoroutineContext,
+    val continuation: CancellableContinuation<R>,
+    val action: suspend CoroutineScope.() -> R
 ) : SubsystemEvent()
 
 class Clean(
-        val subsystems: Set<Subsystem>,
-        val job: Job
+    val subsystems: Set<Subsystem>,
+    val job: Job
 ) : SubsystemEvent()

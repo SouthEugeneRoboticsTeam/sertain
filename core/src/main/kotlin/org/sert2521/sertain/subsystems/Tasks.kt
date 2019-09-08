@@ -1,8 +1,6 @@
 package org.sert2521.sertain.subsystems
 
 import kotlinx.coroutines.CoroutineScope
-import org.sert2521.sertain.coroutines.RobotDispatcher
-import kotlin.coroutines.CoroutineContext
 
 class TaskConfigure {
     internal val subsystems = mutableListOf<Subsystem>()
