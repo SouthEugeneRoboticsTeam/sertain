@@ -5,17 +5,17 @@ sealed class CompositionOperation
 object Per : CompositionOperation()
 object By : CompositionOperation()
 
-class CompositeUnitType<OP : CompositionOperation, T1 : MetricUnitType, T2 : MetricUnitType>(
-    operation: OP,
-    type1: T1,
-    type2: T2
+data class CompositeUnitType<OP : CompositionOperation, T1 : MetricUnitType, T2 : MetricUnitType>(
+    val operation: OP,
+    val type1: T1,
+    val type2: T2
 ) : MetricUnitType()
 
 // By operation is not well tested!
-class CompositeUnit<OP : CompositionOperation, T1 : MetricUnitType, T2 : MetricUnitType>(
-    operation: OP,
-    unit1: MetricUnit<T1>,
-    unit2: MetricUnit<T2>
+data class CompositeUnit<OP : CompositionOperation, T1 : MetricUnitType, T2 : MetricUnitType>(
+    val operation: OP,
+    val unit1: MetricUnit<T1>,
+    val unit2: MetricUnit<T2>
 ) : MetricUnit<CompositeUnitType<OP, T1, T2>>(
         CompositeUnitType(operation, unit1.type, unit2.type),
         when (operation) {
