@@ -1,20 +1,20 @@
 package org.sert2521.sertain.motors
 
-import org.sert2521.sertain.control.PidfConfigure
+import org.sert2521.sertain.control.PidfConfig
 
 data class MotorPidf(
-        val kp: Double = 0.0,
-        val ki: Double = 0.0,
-        val kd: Double = 0.0,
-        val kf: Double = 0.0,
-        val integralZone: Int = 0,
-        val allowedError: Int = 0,
-        val maxIntegral: Double = 0.0,
-        val maxOutput: Double = 0.0,
-        val period: Int = 0
+    val kp: Double = 0.0,
+    val ki: Double = 0.0,
+    val kd: Double = 0.0,
+    val kf: Double = 0.0,
+    val integralZone: Int = 0,
+    val allowedError: Int = 0,
+    val maxIntegral: Double = 0.0,
+    val maxOutput: Double = 0.0,
+    val period: Int = 0
 )
 
-class MotorPidfConfigure : PidfConfigure() {
+class MotorPidfConfig : PidfConfig() {
     var integralZone: Int = 0
     var allowedError: Int = 0
     var maxIntegral: Double = 0.0

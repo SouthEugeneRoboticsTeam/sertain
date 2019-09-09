@@ -1,27 +1,33 @@
 package org.sert2521.sertain.motors
 
-import org.sert2521.sertain.units.*
-import com.ctre.phoenix.motorcontrol.can.TalonSRX as CtreTalon
+import org.sert2521.sertain.units.Angular
+import org.sert2521.sertain.units.Chronic
+import org.sert2521.sertain.units.CompositeUnitType
+import org.sert2521.sertain.units.MetricUnit
+import org.sert2521.sertain.units.MetricValue
+import org.sert2521.sertain.units.Per
+import org.sert2521.sertain.units.convertTo
 import com.ctre.phoenix.motorcontrol.ControlMode as CtreControlMode
 import com.ctre.phoenix.motorcontrol.NeutralMode as CtreNeutralMode
+import com.ctre.phoenix.motorcontrol.can.TalonSRX as CtreTalon
 
 class MotorController<T : MotorId>(
-        val id: T,
-        vararg followerIds: MotorId,
-        val name: String = "ANONYMOUS_MOTOR",
-        configure: MotorController<T>.() -> Unit = {}
+    val id: T,
+    vararg followerIds: MotorId,
+    val name: String = "ANONYMOUS_MOTOR",
+    configure: MotorController<T>.() -> Unit = {}
 ) {
     internal val ctreMotorController = ctreMotorController(id)
 
     val encoder = Encoder(4096)
 
     var master: MotorController<*>? = null
-           internal set(value) {
-                if (value != null) {
-                    ctreMotorController.follow(value.ctreMotorController)
-                }
-                field = value
+        internal set(value) {
+            if (value != null) {
+                ctreMotorController.follow(value.ctreMotorController)
             }
+            field = value
+        }
 
     val followers = with(mutableMapOf<MotorId, MotorController<*>>()) {
         followerIds.forEach {
@@ -81,15 +87,15 @@ class MotorController<T : MotorId>(
 
     val pidf = MotorPidfCollection(this, 0 to MotorPidf())
 
-    fun pidf(slot: Int = pidfSlot, configure: MotorPidfConfigure.() -> Unit) {
-        with(MotorPidfConfigure().apply(configure)) {
+    fun pidf(slot: Int = pidfSlot, configure: MotorPidfConfig.() -> Unit) {
+        with(MotorPidfConfig().apply(configure)) {
             pidf[slot] = MotorPidf(
-                    kp, ki, kd, kf,
-                    integralZone,
-                    allowedError,
-                    maxIntegral,
-                    maxOutput,
-                    period
+                kp, ki, kd, kf,
+                integralZone,
+                allowedError,
+                maxIntegral,
+                maxOutput,
+                period
             )
         }
     }
@@ -171,7 +177,7 @@ class MotorController<T : MotorId>(
     }
 
     fun <U : MetricUnit<CompositeUnitType<Per, Angular, Chronic>>> setVelocity(
-            velocity: MetricValue<CompositeUnitType<Per, Angular, Chronic>, U>
+        velocity: MetricValue<CompositeUnitType<Per, Angular, Chronic>, U>
     ) {
         setVelocity(velocity.convertTo(encoder.ticksPerSecond).value)
     }
