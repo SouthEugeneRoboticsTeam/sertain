@@ -9,27 +9,30 @@ data class MetricValue<T : MetricUnitType, U : MetricUnit<T>>(val unit: U, val v
         false
     }
 
-    @Suppress("UNCHECKED_CAST")
-    operator fun <R : T, S : MetricUnit<R>> plus(other: MetricValue<R, S>) =
-            MetricValue(unit, value + other.convertTo(unit as MetricUnit<R>).value)
+    operator fun <S : MetricUnit<T>> plus(other: MetricValue<T, S>) =
+            MetricValue(unit, value + other.convertTo(unit).value)
+
+    operator fun <S : MetricUnit<T>> minus(other: MetricValue<T, S>) =
+            MetricValue(unit, value - other.convertTo(unit).value)
 
     @Suppress("UNCHECKED_CAST")
-    operator fun <R : T, S : MetricUnit<R>> minus(other: MetricValue<R, S>) =
-            MetricValue(unit, value - other.convertTo(unit as MetricUnit<R>).value)
+    operator fun <R : MetricUnitType, S : MetricUnit<R>> times(other: MetricValue<*, S>) = if (unit.type == other.unit.type) {
+        MetricValue(CompositeUnit(By, unit, unit), value * (other as MetricValue<T, U>).convertTo(unit).value)
+    } else {
+        MetricValue(CompositeUnit(By, unit, other.unit), value * other.value)
+    }
 
     @Suppress("UNCHECKED_CAST")
-    operator fun <R : T, S : MetricUnit<R>> times(other: MetricValue<R, S>) =
-            MetricValue(CompositeUnit(By, unit, unit), value * other.convertTo(unit as MetricUnit<R>).value)
+    operator fun <R : MetricUnitType, S : MetricUnit<R>> div(other: MetricValue<*, S>) = if (unit.type == other.unit.type) {
+        MetricValue(CompositeUnit(Per, unit, unit), value / (other as MetricValue<T, U>).convertTo(unit).value)
+    } else {
+        MetricValue(CompositeUnit(Per, unit, other.unit), value / other.value)
+    }
 
-    @Suppress("UNCHECKED_CAST")
-    operator fun <R : T, S : MetricUnit<R>> div(other: MetricValue<R, S>) =
-            value / other.convertTo(unit as MetricUnit<R>).value
+    operator fun <S : MetricUnit<T>> rem(other: MetricValue<T, S>) =
+            MetricValue(unit, value % other.convertTo(unit).value)
 
-    @Suppress("UNCHECKED_CAST")
-    operator fun <R : T, S : MetricUnit<R>> rem(other: MetricValue<R, S>) =
-            MetricValue(unit, value % other.convertTo(unit as MetricUnit<R>).value)
-
-    operator fun <R : T, S : MetricUnit<R>> compareTo(other: MetricValue<R, S>) =
+    operator fun <S : MetricUnit<T>> compareTo(other: MetricValue<T, S>) =
             ceil(value * unit.base - other.value * other.unit.base).toInt()
 
     override fun hashCode(): Int {
