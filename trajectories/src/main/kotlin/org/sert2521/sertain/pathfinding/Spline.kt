@@ -1,5 +1,9 @@
 package org.sert2521.sertain.pathfinding
 
+import org.sert2521.sertain.almostEqual
+import org.sert2521.sertain.boundAngle
+import org.sert2521.sertain.boundPercent
+import org.sert2521.sertain.diffAngles
 import kotlin.math.*
 
 class Spline(
@@ -56,9 +60,9 @@ class Spline(
     }
 
     fun pointAt(percentage: Double): Point {
-        val pct = max(min(percentage, 1.0), 0.0)
-        val xHat = percentage * knotDistance
-        val yHat = (a * xHat * b) * xHat * xHat * xHat * xHat + c * xHat * xHat * xHat + d * xHat * xHat + e * xHat
+        val pct = boundPercent(percentage)
+        val xHat = pct * knotDistance
+        val yHat = (a * xHat * b) * xHat.pow(4) + c * xHat.pow(3) + d * xHat.pow(2) + e * xHat
         return Point(
                 xHat * cos(angOffset) - yHat * sin(angOffset) + xOffset,
                 xHat * sin(angOffset) + yHat * cos(angOffset) + yOffset
@@ -66,22 +70,22 @@ class Spline(
     }
 
     fun valueAt(percentage: Double): Double {
-        val pct = max(min(percentage, 1.0), 0.0)
-        val xHat = percentage * knotDistance
-        val yHat = (a * xHat * b) * xHat * xHat * xHat * xHat + c * xHat * xHat * xHat + d * xHat * xHat + e * xHat
+        val pct = boundPercent(percentage)
+        val xHat = pct * knotDistance
+        val yHat = (a * xHat * b) * xHat.pow(4) + c * xHat.pow(3) + d * xHat.pow(2) + e * xHat
         return (xHat * sin(angOffset) + yHat * cos(angOffset) + yOffset)
     }
 
     fun derivativeAt(percentage: Double): Double {
-        val pct = max(min(percentage, 1.0), 0.0)
-        val xHat = percentage * knotDistance
-        return (5 * a * xHat + 4 * b) * xHat * xHat * xHat + 3 * c * xHat * xHat + 2 * d * xHat * e
+        val pct = boundPercent(percentage)
+        val xHat = pct * knotDistance
+        return (5 * a * xHat + 4 * b) * xHat.pow(3) + 3 * c * xHat.pow(2) + 2 * d * xHat * e
     }
 
     fun secondDerivativeAt(percentage: Double): Double {
-        val pct = max(min(percentage, 1.0), 0.0)
-        val xHat = percentage * knotDistance
-        return (20 * a * xHat + 12 * b) * xHat * xHat + 6 * c * xHat + 2 * d
+        val pct = boundPercent(percentage)
+        val xHat = pct * knotDistance
+        return (20 * a * xHat + 12 * b) * xHat.pow(2) + 6 * c * xHat + 2 * d
     }
 
     fun angleAt(percentage: Double): Double {
@@ -98,7 +102,7 @@ sealed class SplineType
 object Cubic : SplineType()
 object Quintic : SplineType()
 
-fun createSpline(start: WayPoint, finish: WayPoint, type: SplineType): Spline {
+fun createSpline(start: Waypoint, finish: Waypoint, type: SplineType): Spline {
     val xFinishHat = sqrt((finish.x - start.x) * (finish.x - start.x) + (finish.y - start.y) * (finish.y - start.y))
 
     // Handle identical waypoints

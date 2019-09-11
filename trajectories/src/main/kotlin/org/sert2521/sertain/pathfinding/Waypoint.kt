@@ -5,7 +5,7 @@ data class Point(
         val y: Double
 )
 
-data class WayPoint(
+data class Waypoint(
         val x: Double,
         val y: Double,
         val angle: Double
