@@ -1,4 +1,4 @@
-package org.sert2521.sertain.trajectories
+package org.sert2521.sertain.animations
 
 import org.sert2521.sertain.root
 import org.sert2521.sertain.roundTo
