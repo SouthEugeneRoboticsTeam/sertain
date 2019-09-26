@@ -3,6 +3,7 @@ package org.sert2521.sertain
 import edu.wpi.first.hal.HAL
 import edu.wpi.first.wpilibj.DriverStation
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.sert2521.sertain.core.initializeWpiLib
 import org.sert2521.sertain.coroutines.RobotScope
 import org.sert2521.sertain.coroutines.periodic
@@ -15,7 +16,7 @@ import kotlin.reflect.KClass
 import kotlin.reflect.full.createInstance
 
 class Robot {
-    var mode: RobotMode = RobotMode.DISCONNECTED
+    var mode = RobotMode.DISCONNECTED
         internal set
 
     internal var subsystems = mutableMapOf<KClass<*>, Subsystem>()
@@ -58,7 +59,7 @@ enum class RobotMode {
     TEST
 }
 
-suspend fun robot(configure: Robot.() -> Unit) {
+fun robot(configure: Robot.() -> Unit) = runBlocking {
     initializeWpiLib()
 
     // tell the DS that robot is ready to enable
