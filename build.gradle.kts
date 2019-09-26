@@ -1,5 +1,7 @@
 plugins {
     kotlin("jvm") version "1.3.50"
+    application
+    id("org.openjfx.javafxplugin") version "0.0.7"
 }
 
 allprojects {
@@ -13,4 +15,3 @@ allprojects {
         maven("http://devsite.ctr-electronics.com/maven/release/")
     }
 }
-

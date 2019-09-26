@@ -1,4 +1,4 @@
-package org.sert2521.sertain.animations
+package org.sert2521.sertain.trajectories
 
 import kotlin.math.pow
 
