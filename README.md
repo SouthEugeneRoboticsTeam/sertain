@@ -1,6 +1,6 @@
 # sertain
 
-Library for FRC
+Framework for programming FRC robots, inspired by Sertain Legacy and Meanlib
 
 ### Setting Up
 
