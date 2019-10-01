@@ -15,7 +15,7 @@ dependencies {
 }
 
 application {
-    mainClassName = "org.sert2521.pathmaker.AppKt"
+    mainClassName = "org.sert2521.sertain.pathmaker.MainKt"
 }
 
 javafx {
