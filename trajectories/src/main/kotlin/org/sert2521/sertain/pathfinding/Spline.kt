@@ -62,7 +62,7 @@ class Spline(
     fun pointAt(percentage: Double): Point {
         val pct = boundPercent(percentage)
         val xHat = pct * knotDistance
-        val yHat = (a * xHat * b) * xHat.pow(4) + c * xHat.pow(3) + d * xHat.pow(2) + e * xHat
+        val yHat = (a * xHat + b) * xHat.pow(4) + c * xHat.pow(3) + d * xHat.pow(2) + e * xHat
         return Point(
                 xHat * cos(angOffset) - yHat * sin(angOffset) + xOffset,
                 xHat * sin(angOffset) + yHat * cos(angOffset) + yOffset
@@ -118,7 +118,7 @@ fun createSpline(start: Waypoint, finish: Waypoint, type: SplineType): Spline {
     require(!(almostEqual(abs(angStartHat), PI / 2) || almostEqual(abs(angFinishHat), PI / 2))) {
         "Angles cannot be 90 degrees from a strait line between two consecutive waypoints."
     }
-    require(abs(diffAngles(angStartHat, angFinishHat)) >= PI / 2) {
+    require(abs(diffAngles(angStartHat, angFinishHat)) <= PI / 2) {
         "Angles cannot change by more than 90 degrees"
     }
 
@@ -137,7 +137,7 @@ fun createSpline(start: Waypoint, finish: Waypoint, type: SplineType): Spline {
             derivativeStart,
             start.x,
             start.y,
-            xFinishHat,
-            angOffset
+            angOffset,
+            xFinishHat
     )
 }

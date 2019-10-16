@@ -4,6 +4,10 @@ import kotlinx.coroutines.CoroutineScope
 import org.sert2521.sertain.coroutines.RobotDispatcher
 import kotlin.coroutines.CoroutineContext
 
+@DslMarker
+annotation class TaskDsl
+
+@TaskDsl
 class TaskConfigure {
     internal val subsystems = mutableListOf<Subsystem>()
 

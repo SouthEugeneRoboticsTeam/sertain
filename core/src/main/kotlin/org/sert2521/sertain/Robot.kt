@@ -9,6 +9,7 @@ import org.sert2521.sertain.coroutines.periodic
 import org.sert2521.sertain.events.*
 import org.sert2521.sertain.subsystems.Subsystem
 import org.sert2521.sertain.subsystems.TaskConfigure
+import org.sert2521.sertain.subsystems.TaskDsl
 import org.sert2521.sertain.subsystems.manageSubsystems
 import java.lang.IllegalStateException
 import kotlin.reflect.KClass
@@ -43,11 +44,7 @@ class Robot {
 
     inline fun <reified S : Subsystem> access() = access(S::class)
 
-    inline fun <reified S : Subsystem> TaskConfigure.use(): S {
-        val subsystem = access(S::class)
-        this += subsystem
-        return subsystem
-    }
+
 }
 
 enum class RobotMode {
