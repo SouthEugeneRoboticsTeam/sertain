@@ -111,8 +111,8 @@ fun createSpline(start: Waypoint, finish: Waypoint, type: SplineType): Spline {
     }
 
     val angOffset = atan2(finish.y - start.y, finish.x - start.x)
-    val angStartHat = diffAngles(angOffset, start.angle)
-    val angFinishHat = diffAngles(angOffset, finish.angle)
+    val angStartHat = diffAngles(start.angle, angOffset)
+    val angFinishHat = diffAngles(finish.angle, angOffset)
 
     // Handle impossible changes in angle
     require(!(almostEqual(abs(angStartHat), PI / 2) || almostEqual(abs(angFinishHat), PI / 2))) {
