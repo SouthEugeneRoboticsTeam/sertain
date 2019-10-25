@@ -3,7 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 val ktlint by configurations.creating
 
 plugins {
-    kotlin("jvm") version "1.3.41"
+    kotlin("jvm") version "1.3.50"
 }
 
 group = "org.sert2521.sertain"
@@ -18,7 +18,7 @@ repositories {
 
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
-    implementation(kotlin("reflect", "1.3.41"))
+    implementation(kotlin("reflect", "1.3.50"))
     implementation("org.jetbrains.kotlinx", "kotlinx-coroutines-core", "1.3.1")
     implementation("edu.wpi.first.wpilibj", "wpilibj-java", "2019.4.1")
     implementation("edu.wpi.first.hal", "hal-java", "2019.4.1")

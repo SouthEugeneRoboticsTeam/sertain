@@ -21,7 +21,7 @@ import org.sert2521.sertain.subsystems.manageSubsystems
 import kotlin.reflect.KClass
 import kotlin.reflect.full.createInstance
 
-class Robot {
+class Robot : RobotScope() {
     var mode = RobotMode.DISCONNECTED
         internal set
 
