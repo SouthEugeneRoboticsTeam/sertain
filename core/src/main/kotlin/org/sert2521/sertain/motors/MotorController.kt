@@ -26,7 +26,6 @@ class MotorController<T : MotorId>(
             if (value != null) {
                 ctreMotorController.follow(value.ctreMotorController)
             }
-            println("Init 3")
             field = value
         }
 

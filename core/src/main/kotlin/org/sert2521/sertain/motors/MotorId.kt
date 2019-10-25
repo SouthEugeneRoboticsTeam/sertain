@@ -10,11 +10,8 @@ class TalonId(number: Int) : MotorId(number)
 class VictorId(number: Int) : MotorId(number)
 
 internal fun ctreMotorController(id: MotorId): BaseMotorController {
-    println("init 1")
     return when (id) {
-        is TalonId -> TalonSRX(id.number).also {
-            println("init 2")
-        }
+        is TalonId -> TalonSRX(id.number)
         is VictorId -> VictorSPX(id.number)
     }
 }
