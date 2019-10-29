@@ -59,7 +59,6 @@ class MotorController<T : MotorId>(
         eachMotor {
             @Suppress("unchecked_cast") // Will work because type of id is T
             (this as? MotorController<VictorId>)?.apply(configure)
-            Unit
         }
     }
 
@@ -77,7 +76,6 @@ class MotorController<T : MotorId>(
             set(value) {
                 eachMotor {
                     ctreMotorController.setNeutralMode(ctreNeutralMode(value))
-                    Unit
                 }
                 field = value
             }
