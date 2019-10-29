@@ -59,7 +59,6 @@ class MotorController<T : MotorId>(
         eachMotor {
             @Suppress("unchecked_cast") // Will work because type of id is T
             (this as? MotorController<VictorId>)?.apply(configure)
-            Unit
         }
     }
 
@@ -77,7 +76,6 @@ class MotorController<T : MotorId>(
             set(value) {
                 eachMotor {
                     ctreMotorController.setNeutralMode(ctreNeutralMode(value))
-                    Unit
                 }
                 field = value
             }
@@ -172,7 +170,7 @@ class MotorController<T : MotorId>(
     }
 
     fun <U : MetricUnit<Angular>> setPosition(position: MetricValue<Angular, U>) {
-        //setPosition(position.convertTo(encoder.ticks).value)
+        setPosition(position.convertTo(encoder.ticks).value)
     }
 
     fun setVelocity(velocity: Double) {
@@ -182,7 +180,7 @@ class MotorController<T : MotorId>(
     fun <U : MetricUnit<CompositeUnitType<Per, Angular, Chronic>>> setVelocity(
         velocity: MetricValue<CompositeUnitType<Per, Angular, Chronic>, U>
     ) {
-        //setVelocity(velocity.convertTo(encoder.ticksPerSecond).value)
+        setVelocity(velocity.convertTo(encoder.ticksPerSecond).value)
     }
 
     fun setCurrent(current: Double) {
