@@ -24,7 +24,7 @@ inline fun <reified E : Event> CoroutineScope.subscribe(noinline action: suspend
         }
 
 @UseExperimental(kotlinx.coroutines.ExperimentalCoroutinesApi::class, kotlinx.coroutines.FlowPreview::class)
-suspend inline fun <T, reified E : TargetedEvent<T>> CoroutineScope.subscribe(target: T, noinline action: suspend (E) -> Unit) =
+inline fun <T, reified E : TargetedEvent<T>> CoroutineScope.subscribe(target: T, noinline action: suspend (E) -> Unit) =
         launch {
             events.asFlow()
                     .filter { it is E && (it as? TargetedEvent<*>)?.target == target }
