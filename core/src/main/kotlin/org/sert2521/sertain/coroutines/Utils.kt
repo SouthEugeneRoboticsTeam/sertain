@@ -3,7 +3,7 @@ package org.sert2521.sertain.coroutines
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+
 
 suspend fun periodic(period: Long, delay: Long = 0, action: () -> Unit) {
     delay(delay)
