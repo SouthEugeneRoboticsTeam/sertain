@@ -20,6 +20,7 @@ dependencies {
     implementation(kotlin("stdlib-jdk8"))
     implementation(kotlin("reflect", "1.3.50"))
     implementation("org.jetbrains.kotlinx", "kotlinx-coroutines-core", "1.3.1")
+    implementation("org.jetbrains.kotlin", "kotlin-reflect", "1.3.50")
     implementation("edu.wpi.first.wpilibj", "wpilibj-java", "2019.4.1")
     implementation("edu.wpi.first.hal", "hal-java", "2019.4.1")
     implementation("edu.wpi.first.ntcore", "ntcore-java", "2019.4.1")
