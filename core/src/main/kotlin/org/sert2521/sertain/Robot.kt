@@ -2,19 +2,11 @@ package org.sert2521.sertain
 
 import edu.wpi.first.hal.HAL
 import edu.wpi.first.wpilibj.DriverStation
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import org.sert2521.sertain.core.initializeWpiLib
 import org.sert2521.sertain.coroutines.RobotScope
 import org.sert2521.sertain.coroutines.periodic
-import org.sert2521.sertain.events.Auto
-import org.sert2521.sertain.events.Connect
-import org.sert2521.sertain.events.Disable
-import org.sert2521.sertain.events.Enable
-import org.sert2521.sertain.events.Teleop
-import org.sert2521.sertain.events.Test
-import org.sert2521.sertain.events.Tick
-import org.sert2521.sertain.events.fire
+import org.sert2521.sertain.events.*
 import org.sert2521.sertain.subsystems.Subsystem
 import org.sert2521.sertain.subsystems.TaskConfigure
 import org.sert2521.sertain.subsystems.manageSubsystems
@@ -65,6 +57,7 @@ enum class RobotMode {
     TEST
 }
 
+@InternalCoroutinesApi
 fun robot(configure: Robot.() -> Unit) = runBlocking {
     initializeWpiLib()
 
@@ -74,11 +67,10 @@ fun robot(configure: Robot.() -> Unit) = runBlocking {
     val ds: DriverStation = DriverStation.getInstance()
     val running = true
 
-    manageSubsystems()
-
     val robot = Robot().apply(configure)
 
-    RobotScope.launch {
+    robot.launch {
+        manageSubsystems()
         periodic(20) {
             launch {
                 fire(Tick)

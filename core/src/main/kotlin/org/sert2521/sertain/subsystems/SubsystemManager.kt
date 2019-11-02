@@ -18,79 +18,74 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
-@UseExperimental(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
-fun manageSubsystems() {
-    RobotScope.launch {
-        subscribe<Use<Any?>> { use ->
-            // Subsystems used in parent coroutine
-            val prevSubsystems: Set<Subsystem> = use.context[Requirements] ?: emptySet()
-            // Subsystems used in new coroutine but not in parent coroutine
-            val newSubsystems = use.subsystems - prevSubsystems
-            // Subsystems from both parent and new coroutines
-            val allSubsystems = use.subsystems + prevSubsystems
+fun CoroutineScope.manageSubsystems() {
+    subscribe<Use<Any?>> { use ->
+        // Subsystems used in parent coroutine
+        val prevSubsystems: Set<Subsystem> = use.context[Requirements] ?: emptySet()
+        // Subsystems used in new coroutine but not in parent coroutine
+        val newSubsystems = use.subsystems - prevSubsystems
+        // Subsystems from both parent and new coroutines
+        val allSubsystems = use.subsystems + prevSubsystems
 
-            if (allSubsystems.any { !it.isEnabled }) {
-                use.continuation.resumeWithException(
-                        CancellationException(
-                                "Cannot execute action ${use.name} because the following subsystems are disabled:" +
-                                        " ${allSubsystems.filter { !it.isEnabled }.joinToString(" ")}."
-                        )
-                )
-            }
-
-            // Subsystems that are already occupied
-            val occupiedSubsystems = allSubsystems.filter { it.occupied }
-
-            if (!use.cancelConflicts && occupiedSubsystems.isNotEmpty()) {
-                use.continuation.resumeWithException(
-                        CancellationException(
-                                "Cannot execute unimportant action ${use.name} because the following subsystems are " +
-                                        "occupied: ${occupiedSubsystems.joinToString(" ")}"
-                        )
-                )
-            }
-
-            // Jobs of conflicting subsystems
-            val conflictingJobs = occupiedSubsystems.map { it.currentJob!! }
-
-            val newJob = CoroutineScope(use.context).launch(
-                    Requirements(allSubsystems),
-                    CoroutineStart.ATOMIC
-            ) {
-                try {
-                    // Suspend until all conflicting jobs are canceled and joined
-                    withContext(NonCancellable) {
-                        conflictingJobs.forEach { it.cancel() }
-                        conflictingJobs.forEach { it.join() }
-                    }
-
-                    val result = coroutineScope { use.action(this) }
-
-                    use.continuation.resume(result)
-                } catch (e: Throwable) {
-                    use.continuation.resumeWithException(e)
-                } finally {
-                    fire(Clean(newSubsystems, coroutineContext[Job]!!))
-                }
-            }
-
-            newSubsystems.forEach { it.currentJob = newJob }
+        if (allSubsystems.any { !it.isEnabled }) {
+            use.continuation.resumeWithException(
+                    CancellationException(
+                            "Cannot execute action ${use.name} because the following subsystems are disabled:" +
+                                    " ${allSubsystems.filter { !it.isEnabled }.joinToString(" ")}."
+                    )
+            )
         }
+
+        // Subsystems that are already occupied
+        val occupiedSubsystems = allSubsystems.filter { it.occupied }
+
+        if (!use.cancelConflicts && occupiedSubsystems.isNotEmpty()) {
+            use.continuation.resumeWithException(
+                    CancellationException(
+                            "Cannot execute unimportant action ${use.name} because the following subsystems are " +
+                                    "occupied: ${occupiedSubsystems.joinToString(" ")}"
+                    )
+            )
+        }
+
+        // Jobs of conflicting subsystems
+        val conflictingJobs = occupiedSubsystems.map { it.currentJob!! }
+
+        val newJob = CoroutineScope(use.context).launch(
+                Requirements(allSubsystems),
+                CoroutineStart.ATOMIC
+        ) {
+            try {
+                // Suspend until all conflicting jobs are canceled and joined
+                withContext(NonCancellable) {
+                    conflictingJobs.forEach { it.cancel() }
+                    conflictingJobs.forEach { it.join() }
+                }
+
+                val result = coroutineScope { use.action(this) }
+
+                use.continuation.resume(result)
+            } catch (e: Throwable) {
+                use.continuation.resumeWithException(e)
+            } finally {
+                fire(Clean(newSubsystems, coroutineContext[Job]!!))
+            }
+        }
+
+        newSubsystems.forEach { it.currentJob = newJob }
     }
 
-    RobotScope.launch {
-        subscribe<Clean> { clean ->
-            clean.subsystems
-                    .filter { it.currentJob == clean.job }
-                    .forEach {
-                        it.currentJob = null
-                        if (it.default != null) {
-                            RobotScope.launch {
-                                use(it, name = "DEFAULT") { it.default?.invoke(this) }
-                            }
+    subscribe<Clean> { clean ->
+        clean.subsystems
+                .filter { it.currentJob == clean.job }
+                .forEach {
+                    it.currentJob = null
+                    if (it.default != null) {
+                        RobotScope.launch {
+                            use(it, name = "DEFAULT") { it.default?.invoke(this) }
                         }
                     }
-        }
+                }
     }
 }
 
