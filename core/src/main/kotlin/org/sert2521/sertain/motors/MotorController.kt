@@ -17,7 +17,7 @@ class MotorController<T : MotorId>(
     val name: String = "ANONYMOUS_MOTOR",
     configure: MotorController<T>.() -> Unit = {}
 ) {
-    internal val ctreMotorController = ctreMotorController(id)
+    val ctreMotorController = ctreMotorController(id)
 
     val encoder = Encoder(4096)
 
@@ -51,7 +51,6 @@ class MotorController<T : MotorId>(
         eachMotor {
             @Suppress("unchecked_cast") // Will work because type of id is T
             (this as? MotorController<TalonId>)?.apply(configure)
-            Unit
         }
     }
 
@@ -221,7 +220,6 @@ class MotorController<T : MotorId>(
     }
 
     init {
-        eachMotor { ctreMotorController.setNeutralMode(ctreNeutralMode(neutralMode)) }
         ctreMotorController.apply {
             configClosedloopRamp(closedLoopRamp)
             configOpenloopRamp(openLoopRamp)
@@ -234,7 +232,11 @@ class MotorController<T : MotorId>(
                 updatePidf(it.key, it.value)
             }
             updateCurrentLimit(currentLimit)
-            configure()
+        }
+        configure()
+        eachFollower {
+            it.ctreMotorController.setNeutralMode(ctreNeutralMode(neutralMode))
+            it.inverted = inverted
         }
     }
 }
