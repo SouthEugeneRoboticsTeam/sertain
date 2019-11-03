@@ -74,11 +74,10 @@ fun robot(configure: Robot.() -> Unit) = runBlocking {
     val ds: DriverStation = DriverStation.getInstance()
     val running = true
 
-    manageSubsystems()
-
     val robot = Robot().apply(configure)
 
-    RobotScope.launch {
+    robot.launch {
+        manageSubsystems()
         periodic(20) {
             launch {
                 fire(Tick)

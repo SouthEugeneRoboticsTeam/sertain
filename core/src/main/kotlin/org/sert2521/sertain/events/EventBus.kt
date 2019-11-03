@@ -19,15 +19,23 @@ suspend fun <E : Event> fire(event: E) {
 
 @UseExperimental(kotlinx.coroutines.ExperimentalCoroutinesApi::class, kotlinx.coroutines.FlowPreview::class)
 inline fun <reified E : Event> CoroutineScope.subscribe(noinline action: suspend (E) -> Unit) =
-        launch {
-            events.asFlow().filter { it is E }.map { it as E }.apply { collect(action) }
-        }
+            launch {
+                events.asFlow().filter { it is E }.map { it as E }.apply {
+                    collect {
+                        launch { action(it) }
+                    }
+                }
+            }
 
 @UseExperimental(kotlinx.coroutines.ExperimentalCoroutinesApi::class, kotlinx.coroutines.FlowPreview::class)
-suspend inline fun <T, reified E : TargetedEvent<T>> CoroutineScope.subscribe(target: T, noinline action: suspend (E) -> Unit) =
-        launch {
-            events.asFlow()
-                    .filter { it is E && (it as? TargetedEvent<*>)?.target == target }
-                    .map { it as E }
-                    .apply { collect(action) }
-        }
+inline fun <T, reified E : TargetedEvent<T>> CoroutineScope.subscribe(target: T, noinline action: suspend (E) -> Unit) =
+            launch {
+                events.asFlow()
+                        .filter { it is E && (it as? TargetedEvent<*>)?.target == target }
+                        .map { it as E }
+                        .apply {
+                            collect {
+                                launch { action(it) }
+                            }
+                        }
+            }

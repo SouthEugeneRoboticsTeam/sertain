@@ -4,6 +4,8 @@ val ktlint by configurations.creating
 
 plugins {
     kotlin("jvm") version "1.3.50"
+    `java-library`
+    `maven-publish`
 }
 
 group = "org.sert2521.sertain"
@@ -20,6 +22,7 @@ dependencies {
     implementation(kotlin("stdlib-jdk8"))
     implementation(kotlin("reflect", "1.3.50"))
     implementation("org.jetbrains.kotlinx", "kotlinx-coroutines-core", "1.3.1")
+    implementation("org.jetbrains.kotlin", "kotlin-reflect", "1.3.50")
     implementation("edu.wpi.first.wpilibj", "wpilibj-java", "2019.4.1")
     implementation("edu.wpi.first.hal", "hal-java", "2019.4.1")
     implementation("edu.wpi.first.ntcore", "ntcore-java", "2019.4.1")
@@ -47,6 +50,21 @@ tasks {
         classpath = configurations["ktlint"]
         main = "com.pinterest.ktlint.Main"
         args = listOf("-F", "src/**/*.kt")
+    }
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("myLibrary") {
+            from(components["java"])
+        }
+    }
+
+    repositories {
+        maven {
+            name = "sertain"
+            url = uri("file://${buildDir}/libs")
+        }
     }
 }
 
