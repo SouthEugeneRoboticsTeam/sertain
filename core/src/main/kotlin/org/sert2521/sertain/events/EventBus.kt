@@ -22,9 +22,7 @@ inline fun <reified E : Event> CoroutineScope.subscribe(noinline action: suspend
             launch {
                 events.asFlow().filter { it is E }.map { it as E }.apply {
                     collect {
-                        launch {
-                            action(it)
-                        }
+                        launch { action(it) }
                     }
                 }
             }
@@ -37,9 +35,7 @@ inline fun <T, reified E : TargetedEvent<T>> CoroutineScope.subscribe(target: T,
                         .map { it as E }
                         .apply {
                             collect {
-                                launch {
-                                    action(it)
-                                }
+                                launch { action(it) }
                             }
                         }
             }
