@@ -35,5 +35,11 @@ inline fun <T, reified E : TargetedEvent<T>> CoroutineScope.subscribe(target: T,
                 events.asFlow()
                         .filter { it is E && (it as? TargetedEvent<*>)?.target == target }
                         .map { it as E }
-                        .apply { collect(action) }
+                        .apply {
+                            collect {
+                                launch {
+                                    action(it)
+                                }
+                            }
+                        }
             }
