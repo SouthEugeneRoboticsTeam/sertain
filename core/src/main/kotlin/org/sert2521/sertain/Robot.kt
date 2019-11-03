@@ -57,7 +57,6 @@ enum class RobotMode {
     TEST
 }
 
-@InternalCoroutinesApi
 fun robot(configure: Robot.() -> Unit) = runBlocking {
     initializeWpiLib()
 
