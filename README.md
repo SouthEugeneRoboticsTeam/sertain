@@ -1,6 +1,12 @@
-# sertain
+<p align="center">
+  <a href="#">
+    <img alt="Sertain" src="https://i.imgur.com/zd0squD.png" />
+  </a>
+</p>
 
-Framework for programming FRC robots, inspired by Sertain Legacy and Meanlib
+<h4 align="center">
+  Write more for your robot with less, and be absolutely <i>SERT</i>ain that your robot works.
+</h4>
 
 ### Setting Up
 
