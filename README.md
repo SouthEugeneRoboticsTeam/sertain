@@ -8,6 +8,14 @@
   Write more for your robot with less, and be absolutely <i>SERT</i>ain that your robot works.
 </h4>
 
+<p align="center">
+  <a href="https://travis-ci.org/SouthEugeneRoboticsTeam/sertain">
+    <img src="https://img.shields.io/travis/SouthEugeneRoboticsTeam/sertain/master?style=flat-square" />
+  </a>
+  
+  <img src="https://img.shields.io/badge/sert-2521-blueviolet?style=flat-square"/>
+</p>
+ 
 ### Setting Up
 
 To create a robot program, start by using the `robot` function. The function takes a lambda, which should serve as the entry point of the robot program. For example:
