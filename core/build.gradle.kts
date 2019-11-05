@@ -4,18 +4,7 @@ val ktlint by configurations.creating
 
 plugins {
     kotlin("jvm") version "1.3.50"
-    `java-library`
     `maven-publish`
-}
-
-group = "org.sert2521.sertain"
-version = "1.0-SNAPSHOT"
-
-repositories {
-    mavenCentral()
-    jcenter()
-    maven("http://first.wpi.edu/FRC/roborio/maven/release")
-    maven("http://devsite.ctr-electronics.com/maven/release/")
 }
 
 dependencies {
@@ -44,6 +33,10 @@ tasks {
         dependsOn(ktlint)
     }
 
+    "publishToMavenLocal" {
+        dependsOn(jar)
+    }
+
     create("ktlintFormat", JavaExec::class) {
         group = "formatting"
         description = "Fix Kotlin code style deviations."
@@ -53,22 +46,15 @@ tasks {
     }
 }
 
-publishing {
-    publications {
-        create<MavenPublication>("myLibrary") {
-            from(components["java"])
-        }
-    }
-
-    repositories {
-        maven {
-            name = "sertain"
-            url = uri("file://${buildDir}/libs")
-        }
-    }
-}
-
 tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "1.8"
     kotlinOptions.freeCompilerArgs += setOf("-Xuse-experimental=kotlin.Experimental")
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            artifact("$buildDir/libs/${project.name}-${project.version}.jar")
+        }
+    }
 }
