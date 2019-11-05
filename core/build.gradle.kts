@@ -5,7 +5,6 @@ val ktlint by configurations.creating
 plugins {
     kotlin("jvm") version "1.3.50"
     `maven-publish`
-    `maven`
 }
 
 dependencies {
