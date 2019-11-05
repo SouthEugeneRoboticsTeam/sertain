@@ -1,4 +1,3 @@
-import groovy.xml.QName
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val ktlint by configurations.creating
@@ -49,25 +48,6 @@ tasks.withType<KotlinCompile> {
 }
 
 publishing {
-    // By passing -Pcustom_local=/some/path and running the
-    // publishLibraryPublicationToCustomLocalRepository task you can publish this library to a
-    // custom maven repository location on your machine.
-    repositories {
-        maven {
-            name = "CustomLocal"
-            url = uri((if (project.hasProperty("custom_local")) project.property("custom_local") else "/tmp/")!!)
-        }
-    }
-
-    repositories {
-        maven {
-            name = "BuildLocal"
-            url = uri("$buildDir/repo")
-        }
-    }
-}
-
-publishing {
     publications {
         create<MavenPublication>("maven") {
             groupId = "org.sert2521.sertain"
@@ -77,15 +57,6 @@ publishing {
             from(components["java"])
 
             artifact("$buildDir/libs/${project.name}.jar")
-
-//            pom.withXml {
-//
-//                // Dependencies
-//                var dependenciesNode = asNode().getAt(QName.valueOf("dependencies"))[0]
-//                if (dependenciesNode == null) {
-//                    dependenciesNode = asNode().appendNode("dependencies")
-//                }
-//            }
         }
     }
 }
