@@ -33,6 +33,10 @@ tasks {
         dependsOn(ktlint)
     }
 
+    "publishToMavenLocal" {
+        dependsOn(jar)
+    }
+
     create("ktlintFormat", JavaExec::class) {
         group = "formatting"
         description = "Fix Kotlin code style deviations."
@@ -50,11 +54,7 @@ tasks.withType<KotlinCompile> {
 publishing {
     publications {
         create<MavenPublication>("maven") {
-//            groupId = "org.sert2521.sertain"
-//            artifactId = "sertain-core"
-//            version = "1.0.0"
-
-            from(components["java"])
+            artifact("$buildDir/libs/${project.name}-${project.version}.jar")
         }
     }
 }
