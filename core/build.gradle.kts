@@ -50,9 +50,9 @@ tasks.withType<KotlinCompile> {
 publishing {
     publications {
         create<MavenPublication>("maven") {
-            groupId = "org.sert2521.sertain"
-            artifactId = "sertain-core"
-            version = "1.0.0"
+//            groupId = "org.sert2521.sertain"
+//            artifactId = "sertain-core"
+//            version = "1.0.0"
 
             from(components["java"])
         }
