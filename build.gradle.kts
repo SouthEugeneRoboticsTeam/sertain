@@ -1,7 +1,7 @@
 
 subprojects {
     group = "org.sert2521.sertain"
-    version = "1.0-SNAPSHOT"
+    version = "1.0.0"
 
     repositories {
         mavenCentral()
