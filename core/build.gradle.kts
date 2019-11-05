@@ -47,15 +47,14 @@ tasks.withType<KotlinCompile> {
     kotlinOptions.freeCompilerArgs += setOf("-Xuse-experimental=kotlin.Experimental")
 }
 
-println(project.name)
-publishing {
-    publications {
-        create<MavenPublication>("maven") {
-//            groupId = "org.sert2521.sertain"
-//            artifactId = "sertain-core"
-//            version = "1.0.0"
-
-            artifact("$buildDir/libs/${project.name}-${project.version}.jar")
-        }
-    }
-}
+//publishing {
+//    publications {
+//        create<MavenPublication>("maven") {
+////            groupId = "org.sert2521.sertain"
+////            artifactId = "sertain-core"
+////            version = "1.0.0"
+//
+//            artifact("$buildDir/libs/${project.name}-${project.version}.jar")
+//        }
+//    }
+//}
