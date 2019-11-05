@@ -21,9 +21,6 @@ dependencies {
 }
 
 tasks {
-    "publishToMavenLocal" {
-        dependsOn("jar")
-    }
     val ktlint by creating(JavaExec::class) {
         group = "verification"
         description = "Check Kotlin code style."
@@ -34,6 +31,10 @@ tasks {
 
     "check" {
         dependsOn(ktlint)
+    }
+
+    "publishToMavenLocal" {
+        dependsOn(jar)
     }
 
     create("ktlintFormat", JavaExec::class) {
