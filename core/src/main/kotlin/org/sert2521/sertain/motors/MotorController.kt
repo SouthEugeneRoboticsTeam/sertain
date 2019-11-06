@@ -116,6 +116,9 @@ class MotorController<T : MotorId>(
             get() = ctreMotorController.inverted
             set(value) {
                 ctreMotorController.inverted = value
+                eachFollower {
+                    it.inverted = value
+                }
             }
 
     var sensorInverted: Boolean = false
@@ -233,11 +236,10 @@ class MotorController<T : MotorId>(
             }
             updateCurrentLimit(currentLimit)
         }
-        configure()
-        eachFollower {
-            it.ctreMotorController.setNeutralMode(ctreNeutralMode(neutralMode))
-            it.inverted = inverted
+        eachMotor {
+            ctreMotorController.setNeutralMode(ctreNeutralMode(neutralMode))
         }
+        configure()
     }
 }
 
