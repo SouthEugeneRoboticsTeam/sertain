@@ -22,8 +22,23 @@
   </a>
 </p>
  
-### Setting Up
+### Getting Started
 
+There are no releases yet, but if you would like to try out a development version of the library that you can just add these lines to your gradle build file:
+
+```gradle
+repositories {
+  // other repositories
+  maven { url 'https://jitpack.io' }
+}
+
+dependencies {
+  // other dependencies
+  implementation 'com.github.SouthEugeneRoboticsTeam:sertain:master-SNAPSHOT'
+}
+```
+
+### Creating a Robot Program
 To create a robot program, start by using the `robot` function. The function takes a lambda, which should serve as the entry point of the robot program. For example:
 
 ```kotlin
