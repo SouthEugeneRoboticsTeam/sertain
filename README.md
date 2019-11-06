@@ -17,7 +17,9 @@
     <img src="https://img.shields.io/jitpack/v/github/SouthEugeneRoboticsTeam/sertain?style=flat-square" />
   </a>
   
-  <img src="https://img.shields.io/badge/sert-2521-blueviolet?style=flat-square" />
+  <a href="https://sert2521.org">
+    <img src="https://img.shields.io/badge/sert-2521-blueviolet?style=flat-square" />
+  </a>
 </p>
  
 ### Setting Up
