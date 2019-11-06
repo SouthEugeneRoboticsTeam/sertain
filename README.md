@@ -24,7 +24,7 @@
  
 ### Getting Started
 
-There are no releases yet, but if you would like to try out a development version of the library that you can just add these lines to your gradle build file:
+There are no releases yet, but if you would like to try out the latest development version of the library, then you can just add these lines to your gradle build file:
 
 ```gradle
 repositories {
@@ -37,6 +37,8 @@ dependencies {
   implementation 'com.github.SouthEugeneRoboticsTeam:sertain:master-SNAPSHOT'
 }
 ```
+
+You can also replace `SNAPSHOT` any commit on master, and you can replace `master` with any branch. You can also use a commit as the version without a branch name.
 
 ### Creating a Robot Program
 To create a robot program, start by using the `robot` function. The function takes a lambda, which should serve as the entry point of the robot program. For example:
