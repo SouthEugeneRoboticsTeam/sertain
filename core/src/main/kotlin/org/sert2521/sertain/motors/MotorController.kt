@@ -40,11 +40,11 @@ class MotorController<T : MotorId>(
 
     fun eachMotor(configure: MotorController<*>.() -> Unit) {
         apply(configure)
-        followers.forEach { it.value.apply(configure) }
+        eachFollower(configure)
     }
 
-    fun eachFollower(action: (MotorController<*>) -> Unit) {
-        followers.forEach { action(it.value) }
+    fun eachFollower(configure: MotorController<*>.() -> Unit) {
+        followers.forEach { it.value.apply(configure) }
     }
 
     fun eachTalon(configure: MotorController<TalonId>.() -> Unit) {
@@ -117,7 +117,7 @@ class MotorController<T : MotorId>(
             set(value) {
                 ctreMotorController.inverted = value
                 eachFollower {
-                    it.inverted = value
+                    inverted = value
                 }
             }
 
