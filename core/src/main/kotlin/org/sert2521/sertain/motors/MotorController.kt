@@ -171,8 +171,6 @@ class MotorController<T : MotorId>(
         ctreMotorController.set(CtreControlMode.Position, position)
     }
 
-
-
     fun <U : MetricUnit<Angular>> setPosition(position: MetricValue<Angular, U>) {
         try {
             setPosition(position.convertTo(encoder!!.ticks).value)
