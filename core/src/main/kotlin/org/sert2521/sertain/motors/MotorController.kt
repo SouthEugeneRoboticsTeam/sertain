@@ -7,6 +7,7 @@ import org.sert2521.sertain.units.MetricUnit
 import org.sert2521.sertain.units.MetricValue
 import org.sert2521.sertain.units.Per
 import org.sert2521.sertain.units.convertTo
+import java.lang.NullPointerException
 import com.ctre.phoenix.motorcontrol.ControlMode as CtreControlMode
 import com.ctre.phoenix.motorcontrol.NeutralMode as CtreNeutralMode
 import com.ctre.phoenix.motorcontrol.can.TalonSRX as CtreTalon
@@ -15,11 +16,10 @@ class MotorController<T : MotorId>(
     val id: T,
     vararg followerIds: MotorId,
     val name: String = "ANONYMOUS_MOTOR",
+    val encoder: Encoder? = null,
     configure: MotorController<T>.() -> Unit = {}
 ) {
     val ctreMotorController = ctreMotorController(id)
-
-    val encoder = Encoder(4096)
 
     var master: MotorController<*>? = null
         internal set(value) {
@@ -172,7 +172,13 @@ class MotorController<T : MotorId>(
     }
 
     fun <U : MetricUnit<Angular>> setPosition(position: MetricValue<Angular, U>) {
-        setPosition(position.convertTo(encoder.ticks).value)
+        try {
+            setPosition(position.convertTo(encoder!!.ticks).value)
+        } catch (e: NullPointerException) {
+            throw java.lang.IllegalStateException(
+                    "You must configure your encoder to use units."
+            )
+        }
     }
 
     fun setVelocity(velocity: Double) {
@@ -182,7 +188,13 @@ class MotorController<T : MotorId>(
     fun <U : MetricUnit<CompositeUnitType<Per, Angular, Chronic>>> setVelocity(
         velocity: MetricValue<CompositeUnitType<Per, Angular, Chronic>, U>
     ) {
-        setVelocity(velocity.convertTo(encoder.ticksPerSecond).value)
+        try {
+            setVelocity(velocity.convertTo(encoder!!.ticksPerSecond).value)
+        } catch (e: NullPointerException) {
+            throw java.lang.IllegalStateException(
+                    "You must configure your encoder to use units."
+            )
+        }
     }
 
     fun setCurrent(current: Double) {
