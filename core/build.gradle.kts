@@ -56,6 +56,7 @@ publishing {
         create<MavenPublication>("maven") {
             println("$buildDir/libs/${project.name}-${project.version}.jar")
             artifact("$buildDir/libs/${project.name}-${project.version}.jar")
+            println("${rootProject.buildDir}/libs/${project.name}-${project.version}.jar")
         }
     }
 }
