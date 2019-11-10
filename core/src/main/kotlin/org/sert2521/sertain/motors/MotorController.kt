@@ -19,6 +19,8 @@ class MotorController<T : MotorId>(
 ) {
     val ctreMotorController = ctreMotorController(id)
 
+    var encoder: Encoder? = null
+
     var master: MotorController<*>? = null
         internal set(value) {
             if (value != null) {
@@ -35,8 +37,6 @@ class MotorController<T : MotorId>(
         }
         toMap()
     }
-
-    var encoder: Encoder? = null
 
     fun eachMotor(configure: MotorController<*>.() -> Unit) {
         apply(configure)
