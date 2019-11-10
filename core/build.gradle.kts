@@ -34,7 +34,6 @@ tasks {
     }
 
     "publishToMavenLocal" {
-        // change a thing
         dependsOn(jar)
     }
 
