@@ -15,8 +15,6 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX as CtreTalon
 class MotorController<T : MotorId>(
     val id: T,
     vararg followerIds: MotorId,
-    val name: String = "ANONYMOUS_MOTOR",
-    val encoder: Encoder? = null,
     configure: MotorController<T>.() -> Unit = {}
 ) {
     val ctreMotorController = ctreMotorController(id)
@@ -37,6 +35,8 @@ class MotorController<T : MotorId>(
         }
         toMap()
     }
+
+    val encoder: Encoder? = null
 
     fun eachMotor(configure: MotorController<*>.() -> Unit) {
         apply(configure)
