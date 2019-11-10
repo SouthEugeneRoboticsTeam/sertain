@@ -36,7 +36,7 @@ class MotorController<T : MotorId>(
         toMap()
     }
 
-    val encoder: Encoder? = null
+    var encoder: Encoder? = null
 
     fun eachMotor(configure: MotorController<*>.() -> Unit) {
         apply(configure)
