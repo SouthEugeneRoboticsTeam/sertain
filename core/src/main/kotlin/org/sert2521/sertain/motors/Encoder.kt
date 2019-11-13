@@ -1,11 +1,7 @@
 package org.sert2521.sertain.motors
 
 import org.sert2521.sertain.units.Angular
-import org.sert2521.sertain.units.Chronic
-import org.sert2521.sertain.units.CompositeUnit
-import org.sert2521.sertain.units.CompositeUnitType
 import org.sert2521.sertain.units.MetricUnit
-import org.sert2521.sertain.units.Per
 import org.sert2521.sertain.units.Seconds
 import org.sert2521.sertain.units.div
 import kotlin.math.PI

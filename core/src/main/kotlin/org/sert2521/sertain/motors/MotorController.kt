@@ -7,7 +7,6 @@ import org.sert2521.sertain.units.CompositeUnitType
 import org.sert2521.sertain.units.MetricUnit
 import org.sert2521.sertain.units.MetricValue
 import org.sert2521.sertain.units.Per
-import org.sert2521.sertain.units.convert
 import org.sert2521.sertain.units.convertTo
 import java.lang.NullPointerException
 import com.ctre.phoenix.motorcontrol.ControlMode as CtreControlMode
