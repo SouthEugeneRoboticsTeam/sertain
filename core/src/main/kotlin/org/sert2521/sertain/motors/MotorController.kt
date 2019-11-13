@@ -2,10 +2,12 @@ package org.sert2521.sertain.motors
 
 import org.sert2521.sertain.units.Angular
 import org.sert2521.sertain.units.Chronic
+import org.sert2521.sertain.units.CompositeUnit
 import org.sert2521.sertain.units.CompositeUnitType
 import org.sert2521.sertain.units.MetricUnit
 import org.sert2521.sertain.units.MetricValue
 import org.sert2521.sertain.units.Per
+import org.sert2521.sertain.units.convert
 import org.sert2521.sertain.units.convertTo
 import java.lang.NullPointerException
 import com.ctre.phoenix.motorcontrol.ControlMode as CtreControlMode
@@ -181,12 +183,15 @@ class MotorController<T : MotorId>(
         }
     }
 
+    fun position(unit: MetricUnit<Angular>) =
+        MetricValue(encoder!!.ticks, position.toDouble()).convertTo(unit)
+
     fun setVelocity(velocity: Double) {
         ctreMotorController.set(CtreControlMode.Velocity, velocity)
     }
 
-    fun <U : MetricUnit<CompositeUnitType<Per, Angular, Chronic>>> setVelocity(
-        velocity: MetricValue<CompositeUnitType<Per, Angular, Chronic>, U>
+    fun setVelocity(
+        velocity: MetricValue<CompositeUnitType<Per, Angular, Chronic>, CompositeUnit<Per, Angular, Chronic>>
     ) {
         try {
             setVelocity(velocity.convertTo(encoder!!.ticksPerSecond).value)
@@ -196,6 +201,9 @@ class MotorController<T : MotorId>(
             )
         }
     }
+
+    fun velocity(unit: CompositeUnit<Per, Angular, Chronic>) =
+        MetricValue(encoder!!.ticksPerSecond, velocity.toDouble()).convertTo(unit)
 
     fun setCurrent(current: Double) {
         ctreMotorController.set(CtreControlMode.Current, current)

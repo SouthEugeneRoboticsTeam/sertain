@@ -21,15 +21,3 @@ abstract class AngularUnit(radians: Double, symbol: String) : MetricUnit<Angular
 object Degrees : AngularUnit(PI / 180, "°")
 object Radians : AngularUnit(1.0, " rad")
 object Revolutions : AngularUnit(PI * 2, " rev")
-
-abstract class LinearVelocityUnit(metersPerSecond: Double, symbol: String) : MetricUnit<LinearVelocity>(LinearVelocity, metersPerSecond, symbol)
-
-object MetersPerSecond : LinearVelocityUnit(1.0, " m/s")
-object MillimetersPerSecond : LinearVelocityUnit(0.001, " mm/s")
-
-abstract class AngularVelocityUnit(radiansPerSecond: Double, symbol: String) : MetricUnit<AngularVelocity>(AngularVelocity, radiansPerSecond, symbol)
-
-object RadiansPerSecond : AngularVelocityUnit(1.0, " rad/s")
-object DegreesPerSecond : AngularVelocityUnit(PI / 180, "°/s")
-object RevolutionsPerSecond : AngularVelocityUnit(PI * 2, " rev/s")
-object RevolutionsPerMinute : AngularVelocityUnit((PI * 2) / 60, " rev/min")
