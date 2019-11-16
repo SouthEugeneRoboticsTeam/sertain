@@ -4,6 +4,11 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.sert2521.sertain.Robot
+import org.sert2521.sertain.events.Change
+import org.sert2521.sertain.events.fire
+import org.sert2521.sertain.events.onTick
+import org.sert2521.sertain.events.subscribe
 
 suspend fun periodic(period: Long, delay: Long = 0, action: () -> Unit) {
     delay(delay)
@@ -61,3 +66,22 @@ suspend fun delayForever() {
         delay(2000)
     }
 }
+
+open class Observable<T>(val get: () -> T) {
+    val value get() = get()
+    
+    init {
+        var lastValue = value
+        Robot.onTick {
+            if (lastValue != value) fire(Change(this, value))
+            lastValue = value
+        }
+    }
+
+    operator fun invoke(configure: Observable<T>.() -> Unit) = apply(configure)
+
+    fun CoroutineScope.onChange(action: suspend (event: Change<T>) -> Unit) =
+            subscribe(this@Observable, action)
+}
+
+fun <T> (() -> T).watch(configure: Observable<T>.() -> Unit = {}) = Observable(this).apply(configure)
