@@ -69,7 +69,7 @@ suspend fun delayForever() {
     }
 }
 
-open class Observable<T>(val get: () -> T) {
+abstract class Observable<T>(val get: () -> T) {
     val value get() = get()
 
     var lastValue = value
@@ -84,10 +84,12 @@ open class Observable<T>(val get: () -> T) {
         }
     }
 
-    operator fun invoke(configure: Observable<T>.() -> Unit) = apply(configure)
-
     fun CoroutineScope.onChange(action: suspend (event: Change<T>) -> Unit) =
             subscribe(this@Observable, action)
+}
+
+open class ObservableValue<T>(get: () -> T) : Observable<T>(get) {
+    open operator fun invoke(configure: Observable<T>.() -> Unit) = apply(configure)
 }
 
 class ObservableBoolean(get: () -> Boolean) : Observable<Boolean>(get) {
@@ -100,6 +102,8 @@ class ObservableBoolean(get: () -> Boolean) : Observable<Boolean>(get) {
         }
     }
 
+    operator fun invoke(configure: ObservableBoolean.() -> Unit) = apply(configure)
+
     fun CoroutineScope.whenTrue(action: suspend (event: True) -> Unit) =
             subscribe(this@ObservableBoolean as Observable<Boolean>, action)
 
@@ -108,4 +112,4 @@ class ObservableBoolean(get: () -> Boolean) : Observable<Boolean>(get) {
 }
 
 fun (() -> Boolean).watch(configure: ObservableBoolean.() -> Unit = {}) = ObservableBoolean(this).apply(configure)
-fun <T> (() -> T).watch(configure: Observable<T>.() -> Unit = {}) = Observable(this).apply(configure)
+fun <T> (() -> T).watch(configure: ObservableValue<T>.() -> Unit = {}) = ObservableValue(this).apply(configure)
