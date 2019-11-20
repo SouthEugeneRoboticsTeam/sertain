@@ -6,11 +6,13 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.sert2521.sertain.Robot
 import org.sert2521.sertain.events.Change
+import org.sert2521.sertain.events.Event
 import org.sert2521.sertain.events.False
 import org.sert2521.sertain.events.True
 import org.sert2521.sertain.events.fire
 import org.sert2521.sertain.events.onTick
 import org.sert2521.sertain.events.subscribe
+import kotlin.coroutines.coroutineContext
 
 suspend fun periodic(period: Long, delay: Long = 0, action: () -> Unit) {
     delay(delay)
@@ -67,6 +69,16 @@ suspend fun delayForever() {
     while (true) {
         delay(2000)
     }
+}
+
+suspend inline fun <reified E : Event> delayUntil() {
+    val job = CoroutineScope(coroutineContext).launch {
+        delayForever()
+    }
+    CoroutineScope(coroutineContext).subscribe<E> {
+        job.cancel()
+    }
+    job.join()
 }
 
 abstract class Observable<T>(val get: () -> T) {
