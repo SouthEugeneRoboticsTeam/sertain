@@ -2,11 +2,13 @@ package org.sert2521.sertain.motors
 
 import org.sert2521.sertain.units.Angular
 import org.sert2521.sertain.units.Chronic
+import org.sert2521.sertain.units.CompositeUnit
 import org.sert2521.sertain.units.CompositeUnitType
 import org.sert2521.sertain.units.MetricUnit
 import org.sert2521.sertain.units.MetricValue
 import org.sert2521.sertain.units.Per
 import org.sert2521.sertain.units.convertTo
+import java.lang.NullPointerException
 import com.ctre.phoenix.motorcontrol.ControlMode as CtreControlMode
 import com.ctre.phoenix.motorcontrol.NeutralMode as CtreNeutralMode
 import com.ctre.phoenix.motorcontrol.can.TalonSRX as CtreTalon
@@ -14,12 +16,11 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX as CtreTalon
 class MotorController<T : MotorId>(
     val id: T,
     vararg followerIds: MotorId,
-    val name: String = "ANONYMOUS_MOTOR",
     configure: MotorController<T>.() -> Unit = {}
 ) {
-    internal val ctreMotorController = ctreMotorController(id)
+    val ctreMotorController = ctreMotorController(id)
 
-    val encoder = Encoder(4096)
+    var encoder: Encoder? = null
 
     var master: MotorController<*>? = null
         internal set(value) {
@@ -40,18 +41,17 @@ class MotorController<T : MotorId>(
 
     fun eachMotor(configure: MotorController<*>.() -> Unit) {
         apply(configure)
-        followers.forEach { it.value.apply(configure) }
+        eachFollower(configure)
     }
 
-    fun eachFollower(action: (MotorController<*>) -> Unit) {
-        followers.forEach { action(it.value) }
+    fun eachFollower(configure: MotorController<*>.() -> Unit) {
+        followers.forEach { it.value.apply(configure) }
     }
 
     fun eachTalon(configure: MotorController<TalonId>.() -> Unit) {
         eachMotor {
             @Suppress("unchecked_cast") // Will work because type of id is T
             (this as? MotorController<TalonId>)?.apply(configure)
-            Unit
         }
     }
 
@@ -117,6 +117,9 @@ class MotorController<T : MotorId>(
             get() = ctreMotorController.inverted
             set(value) {
                 ctreMotorController.inverted = value
+                eachFollower {
+                    inverted = value
+                }
             }
 
     var sensorInverted: Boolean = false
@@ -170,18 +173,36 @@ class MotorController<T : MotorId>(
     }
 
     fun <U : MetricUnit<Angular>> setPosition(position: MetricValue<Angular, U>) {
-        setPosition(position.convertTo(encoder.ticks).value)
+        try {
+            setPosition(position.convertTo(encoder!!.ticks).value)
+        } catch (e: NullPointerException) {
+            throw java.lang.IllegalStateException(
+                    "You must configure your encoder to use units."
+            )
+        }
     }
+
+    fun position(unit: MetricUnit<Angular>) =
+        MetricValue(encoder!!.ticks, position.toDouble()).convertTo(unit)
 
     fun setVelocity(velocity: Double) {
         ctreMotorController.set(CtreControlMode.Velocity, velocity)
     }
 
-    fun <U : MetricUnit<CompositeUnitType<Per, Angular, Chronic>>> setVelocity(
-        velocity: MetricValue<CompositeUnitType<Per, Angular, Chronic>, U>
+    fun setVelocity(
+        velocity: MetricValue<CompositeUnitType<Per, Angular, Chronic>, CompositeUnit<Per, Angular, Chronic>>
     ) {
-        setVelocity(velocity.convertTo(encoder.ticksPerSecond).value)
+        try {
+            setVelocity(velocity.convertTo(encoder!!.ticksPerSecond).value)
+        } catch (e: NullPointerException) {
+            throw java.lang.IllegalStateException(
+                    "You must configure your encoder to use units."
+            )
+        }
     }
+
+    fun velocity(unit: CompositeUnit<Per, Angular, Chronic>) =
+        MetricValue(encoder!!.ticksPerSecond, velocity.toDouble()).convertTo(unit)
 
     fun setCurrent(current: Double) {
         ctreMotorController.set(CtreControlMode.Current, current)
@@ -221,7 +242,6 @@ class MotorController<T : MotorId>(
     }
 
     init {
-        eachMotor { ctreMotorController.setNeutralMode(ctreNeutralMode(neutralMode)) }
         ctreMotorController.apply {
             configClosedloopRamp(closedLoopRamp)
             configOpenloopRamp(openLoopRamp)
@@ -234,8 +254,11 @@ class MotorController<T : MotorId>(
                 updatePidf(it.key, it.value)
             }
             updateCurrentLimit(currentLimit)
-            configure()
         }
+        eachMotor {
+            ctreMotorController.setNeutralMode(ctreNeutralMode(neutralMode))
+        }
+        configure()
     }
 }
 
