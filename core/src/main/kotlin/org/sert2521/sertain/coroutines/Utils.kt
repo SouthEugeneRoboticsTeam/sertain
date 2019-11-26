@@ -4,6 +4,13 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.sert2521.sertain.Robot
+import org.sert2521.sertain.events.Change
+import org.sert2521.sertain.events.False
+import org.sert2521.sertain.events.True
+import org.sert2521.sertain.events.fire
+import org.sert2521.sertain.events.onTick
+import org.sert2521.sertain.events.subscribe
 
 suspend fun periodic(period: Long, delay: Long = 0, action: () -> Unit) {
     delay(delay)
@@ -61,3 +68,48 @@ suspend fun delayForever() {
         delay(2000)
     }
 }
+
+abstract class Observable<T>(val get: () -> T) {
+    val value get() = get()
+
+    var lastValue = value
+        private set
+
+    init {
+        Robot.onTick {
+            when {
+                lastValue != value -> fire(Change(this, value))
+            }
+            lastValue = value
+        }
+    }
+
+    fun CoroutineScope.onChange(action: suspend (event: Change<T>) -> Unit) =
+            subscribe(this@Observable, action)
+}
+
+open class ObservableValue<T>(get: () -> T) : Observable<T>(get) {
+    open operator fun invoke(configure: Observable<T>.() -> Unit) = apply(configure)
+}
+
+class ObservableBoolean(get: () -> Boolean) : Observable<Boolean>(get) {
+    init {
+        Robot.onChange {
+            when (it.value) {
+                true -> fire(True(this, it.value))
+                false -> fire(False(this, it.value))
+            }
+        }
+    }
+
+    operator fun invoke(configure: ObservableBoolean.() -> Unit) = apply(configure)
+
+    fun CoroutineScope.whenTrue(action: suspend (event: True) -> Unit) =
+            subscribe(this@ObservableBoolean as Observable<Boolean>, action)
+
+    fun CoroutineScope.whenFalse(action: suspend (event: False) -> Unit) =
+            subscribe(this@ObservableBoolean as Observable<Boolean>, action)
+}
+
+fun (() -> Boolean).watch(configure: ObservableBoolean.() -> Unit = {}) = ObservableBoolean(this).apply(configure)
+fun <T> (() -> T).watch(configure: ObservableValue<T>.() -> Unit = {}) = ObservableValue(this).apply(configure)
