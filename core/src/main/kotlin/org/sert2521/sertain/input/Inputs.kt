@@ -9,6 +9,9 @@ import org.sert2521.sertain.coroutines.ObservableValue
 fun stickButton(portId: Int, buttonId: Int, configure: ObservableBoolean.() -> Unit = {}) =
         ObservableBoolean { DriverStation.getInstance().getStickButton(portId, buttonId) }.apply(configure)
 
+fun stickAxis(portId: Int, axisId: Int) =
+        ObservableValue { DriverStation.getInstance().getStickAxis(portId, axisId) }
+
 fun digitalInput(dioId: Int, configure: ObservableBoolean.() -> Unit = {}) = DigitalInput(dioId).run {
     ObservableBoolean { get() }
 }
