@@ -5,5 +5,3 @@ abstract class MetricUnitType
 object Chronic : MetricUnitType()
 object Linear : MetricUnitType()
 object Angular : MetricUnitType()
-object LinearVelocity : MetricUnitType()
-object AngularVelocity : MetricUnitType()
