@@ -125,6 +125,12 @@ class ObservableBoolean(get: () -> Boolean) : Observable<Boolean>(get) {
 
     fun CoroutineScope.whenFalse(action: suspend CoroutineScope.(event: False) -> Unit) =
             subscribe(this@ObservableBoolean as Observable<Boolean>, action)
+
+    fun CoroutineScope.whileTrue(action: suspend CoroutineScope.(event: True) -> Unit) =
+            subscribeBetween<Observable<Boolean>, True, False>(this@ObservableBoolean, action)
+
+    fun CoroutineScope.whileFalse(action: suspend CoroutineScope.(event: False) -> Unit) =
+            subscribeBetween<Observable<Boolean>, False, True>(this@ObservableBoolean, action)
 }
 
 fun (() -> Boolean).watch(configure: ObservableBoolean.() -> Unit = {}) = ObservableBoolean(this).apply(configure)
