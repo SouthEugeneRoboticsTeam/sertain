@@ -9,7 +9,7 @@ class TaskConfigure {
         subsystems += subsystem
     }
 
-    internal var action: (suspend CoroutineScope.() -> Unit)? = null
+    internal var action: (suspend CoroutineScope.() -> Unit) = {}
 
     fun action(action: suspend CoroutineScope.() -> Unit) {
         this.action = action
@@ -18,7 +18,7 @@ class TaskConfigure {
 
 suspend fun doTask(name: String = "ANONYMOUS_TASK", configure: TaskConfigure.() -> Unit) {
     with(TaskConfigure().apply(configure)) {
-        action?.let {
+        action.let {
             @Suppress("unchecked_cast") // Will work, ActionConfigure extends CoroutineScope
             (use(*subsystems.toTypedArray(), name = name, action = it))
         }
