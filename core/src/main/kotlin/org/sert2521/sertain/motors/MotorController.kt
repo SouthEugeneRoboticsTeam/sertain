@@ -72,11 +72,12 @@ class MotorController<T : MotorId>(
                 else -> throw IllegalStateException("Invalid control mode.")
             }
 
-    var neutralMode: NeutralMode = NeutralMode.COAST
+    var brakeMode: Boolean = false
             set(value) {
-                eachMotor {
-                    ctreMotorController.setNeutralMode(ctreNeutralMode(value))
+                eachFollower {
+                    brakeMode = value
                 }
+                ctreMotorController.setNeutralMode(ctreNeutralMode(value))
                 field = value
             }
 
@@ -242,6 +243,7 @@ class MotorController<T : MotorId>(
     }
 
     init {
+        eachMotor { ctreMotorController.setNeutralMode(ctreNeutralMode(brakeMode)) }
         ctreMotorController.apply {
             configClosedloopRamp(closedLoopRamp)
             configOpenloopRamp(openLoopRamp)
@@ -256,7 +258,7 @@ class MotorController<T : MotorId>(
             updateCurrentLimit(currentLimit)
         }
         eachMotor {
-            ctreMotorController.setNeutralMode(ctreNeutralMode(neutralMode))
+            ctreMotorController.setNeutralMode(ctreNeutralMode(brakeMode))
         }
         configure()
     }
@@ -275,13 +277,9 @@ enum class ControlMode {
 }
 
 enum class NeutralMode {
-    BREAK,
+    BRAKE,
     COAST
 }
 
-fun ctreNeutralMode(mode: NeutralMode): CtreNeutralMode {
-    return when (mode) {
-        NeutralMode.COAST -> CtreNeutralMode.Coast
-        NeutralMode.BREAK -> CtreNeutralMode.Brake
-    }
-}
+fun ctreNeutralMode(brakeMode: Boolean): CtreNeutralMode =
+        if (brakeMode) CtreNeutralMode.Brake else CtreNeutralMode.Coast
