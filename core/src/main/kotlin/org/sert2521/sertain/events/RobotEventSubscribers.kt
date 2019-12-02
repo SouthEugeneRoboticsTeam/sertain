@@ -2,23 +2,23 @@ package org.sert2521.sertain.events
 
 import kotlinx.coroutines.CoroutineScope
 
-fun CoroutineScope.onConnect(action: suspend (event: Connect) -> Unit) =
+fun CoroutineScope.onConnect(action: suspend CoroutineScope.(event: Connect) -> Unit) =
         subscribe(action)
 
-fun CoroutineScope.onDisable(action: suspend (event: Disable) -> Unit) =
+fun CoroutineScope.onDisable(action: suspend CoroutineScope.(event: Disable) -> Unit) =
         subscribe(action)
 
-fun CoroutineScope.onEnable(action: suspend (event: Enable) -> Unit) =
+fun CoroutineScope.onEnable(action: suspend CoroutineScope.(event: Enable) -> Unit) =
         subscribe(action)
 
-fun CoroutineScope.onTeleop(action: suspend (event: Teleop) -> Unit) =
+fun CoroutineScope.onTeleop(action: suspend CoroutineScope.(event: Teleop) -> Unit) =
         subscribe(action)
 
-fun CoroutineScope.onAuto(action: suspend (event: Auto) -> Unit) =
+fun CoroutineScope.onAuto(action: suspend CoroutineScope.(event: Auto) -> Unit) =
         subscribe(action)
 
-fun CoroutineScope.onTest(action: suspend (event: Test) -> Unit) =
+fun CoroutineScope.onTest(action: suspend CoroutineScope.(event: Test) -> Unit) =
         subscribe(action)
 
-fun CoroutineScope.onTick(action: suspend (event: Tick) -> Unit) =
+fun CoroutineScope.onTick(action: suspend CoroutineScope.(event: Tick) -> Unit) =
         subscribe(action)
