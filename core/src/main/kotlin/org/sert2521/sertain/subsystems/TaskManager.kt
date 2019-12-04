@@ -3,7 +3,6 @@ package org.sert2521.sertain.subsystems
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.coroutineScope
@@ -18,11 +17,8 @@ import kotlin.coroutines.AbstractCoroutineContextElement
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
-import kotlin.reflect.KClass
-import kotlin.reflect.full.createInstance
 
-@ExperimentalCoroutinesApi
-fun CoroutineScope.manageSubsystems() {
+fun CoroutineScope.manageTasks() {
     subscribe<Use<Any?>> { use ->
         // Subsystems used in parent coroutine
         val prevSubsystems: Set<Subsystem> = use.context[Requirements] ?: emptySet()
@@ -30,6 +26,10 @@ fun CoroutineScope.manageSubsystems() {
         val newSubsystems = use.subsystems - prevSubsystems
         // Subsystems from both parent and new coroutines
         val allSubsystems = use.subsystems + prevSubsystems
+
+        allSubsystems.forEach {
+            println("Using subsystem ${it.name}")
+        }
 
         if (allSubsystems.any { !it.isEnabled }) {
             use.continuation.resumeWithException(
@@ -80,6 +80,7 @@ fun CoroutineScope.manageSubsystems() {
     }
 
     subscribe<Clean> { clean ->
+        println("Cleaning subsystems ${clean.subsystems.size}")
         clean.subsystems
                 .filter { it.currentJob == clean.job }
                 .forEach {
@@ -97,35 +98,4 @@ private class Requirements(
     requirements: Set<Subsystem>
 ) : Set<Subsystem> by requirements, AbstractCoroutineContextElement(Key) {
     companion object Key : CoroutineContext.Key<Requirements>
-}
-
-internal var subsystems = mutableMapOf<KClass<*>, Subsystem>()
-
-fun <S : Subsystem> add(reference: KClass<*>, subsystem: S) {
-    subsystems[reference] = subsystem
-}
-
-fun <S : Subsystem> add(subsystem: S) {
-    add(subsystem::class, subsystem)
-}
-
-inline fun <reified S : Subsystem> add() {
-    add(S::class, S::class.createInstance())
-}
-
-fun <S : Subsystem> access(reference: KClass<S>): S {
-    @Suppress("unchecked_cast") // Safe because subsystems is internally managed
-    subsystems[reference]?.let {
-        return it as S
-    }
-    throw IllegalStateException("Subsystem with type ${reference.qualifiedName} does not exist." +
-            " Did you forget to add it?")
-}
-
-inline fun <reified S : Subsystem> access() = access(S::class)
-
-inline fun <reified S : Subsystem> TaskConfigure.use(): S {
-    val subsystem = access(S::class)
-    this += subsystem
-    return subsystem
 }

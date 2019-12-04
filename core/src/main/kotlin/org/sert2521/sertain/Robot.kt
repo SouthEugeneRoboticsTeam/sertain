@@ -14,7 +14,7 @@ import org.sert2521.sertain.events.Teleop
 import org.sert2521.sertain.events.Test
 import org.sert2521.sertain.events.Tick
 import org.sert2521.sertain.events.fire
-import org.sert2521.sertain.subsystems.manageSubsystems
+import org.sert2521.sertain.subsystems.manageTasks
 
 object Robot {
     var mode = RobotMode.DISCONNECTED
@@ -41,7 +41,7 @@ suspend fun robot(configure: RobotScope.() -> Unit) {
     RobotScope.apply(configure)
 
     RobotScope.launch {
-        manageSubsystems()
+        manageTasks()
         periodic(20) {
             launch {
                 fire(Tick)
