@@ -5,6 +5,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -20,6 +21,7 @@ import kotlin.coroutines.resumeWithException
 
 fun CoroutineScope.manageTasks() {
     subscribe<Use<Any?>> { use ->
+        println("processing task ${use.name}")
         // Subsystems used in parent coroutine
         val prevSubsystems: Set<Subsystem> = use.context[Requirements] ?: emptySet()
         // Subsystems used in new coroutine but not in parent coroutine
@@ -41,7 +43,7 @@ fun CoroutineScope.manageTasks() {
         }
 
         // Subsystems that are already occupied
-        val occupiedSubsystems = allSubsystems.filter { it.occupied }
+        val occupiedSubsystems = newSubsystems.filter { it.occupied }
 
         if (!use.cancelConflicts && occupiedSubsystems.isNotEmpty()) {
             use.continuation.resumeWithException(
@@ -53,25 +55,39 @@ fun CoroutineScope.manageTasks() {
         }
 
         // Jobs of conflicting subsystems
-        val conflictingJobs = occupiedSubsystems.map { it.currentJob!! }
+        val conflictingJobs = occupiedSubsystems.map { it.currentJob!! }.toSet()
 
+        println("Creating new job for ${use.name}")
         val newJob = CoroutineScope(use.context).launch(
                 Requirements(allSubsystems),
                 CoroutineStart.ATOMIC
         ) {
+            println("Trying to run task ${use.name}")
             try {
+                println("A'ight I'm boutta do it")
                 // Suspend until all conflicting jobs are canceled and joined
                 withContext(NonCancellable) {
-                    conflictingJobs.forEach { it.cancel() }
-                    conflictingJobs.forEach { it.join() }
+                    println("Joining and cancelling ${conflictingJobs.size}")
+                    conflictingJobs.forEach {
+                        println("Cancelling job")
+                        it.cancelAndJoin()
+                    }
+                    println("Canceled conflicting jobs")
                 }
 
-                val result = coroutineScope { use.action(this) }
+                println("About to run task ${use.name}")
+
+                val result = coroutineScope {
+                    println("Running task ${use.name}")
+                    use.action(this)
+                }
 
                 use.continuation.resume(result)
             } catch (e: Throwable) {
+                println(e)
                 use.continuation.resumeWithException(e)
             } finally {
+                println("Cleaning task ${use.name}")
                 fire(Clean(newSubsystems, coroutineContext[Job]!!))
             }
         }
@@ -91,6 +107,7 @@ fun CoroutineScope.manageTasks() {
                         }
                     }
                 }
+
     }
 }
 
