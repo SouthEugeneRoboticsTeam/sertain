@@ -1,6 +1,11 @@
 package org.sert2521.sertain.subsystems
 
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
+import org.sert2521.sertain.events.Use
+import org.sert2521.sertain.events.fire
+import kotlin.coroutines.coroutineContext
 
 class TaskConfigure {
     internal val subsystems = mutableListOf<Subsystem>()
@@ -25,7 +30,23 @@ suspend fun doTask(name: String = "ANONYMOUS_TASK", configure: TaskConfigure.() 
     }
 }
 
-fun <S : Subsystem> TaskConfigure.use(subsystem: S): S {
-    this += subsystem
-    return subsystem
+suspend fun <R> use(
+    vararg subsystems: Subsystem,
+    cancelConflicts: Boolean = true,
+    name: String = "ANONYMOUS_TASK",
+    action: suspend CoroutineScope.() -> R
+): R {
+    val context = coroutineContext
+    return suspendCancellableCoroutine { continuation ->
+        CoroutineScope(context).launch {
+            fire(Use(
+                    subsystems.toSet(),
+                    cancelConflicts,
+                    name,
+                    context,
+                    continuation,
+                    action
+            ))
+        }
+    }
 }

@@ -3,7 +3,6 @@ package org.sert2521.sertain
 import edu.wpi.first.hal.HAL
 import edu.wpi.first.wpilibj.DriverStation
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import org.sert2521.sertain.core.initializeWpiLib
 import org.sert2521.sertain.coroutines.RobotScope
 import org.sert2521.sertain.coroutines.periodic
@@ -15,46 +14,13 @@ import org.sert2521.sertain.events.Teleop
 import org.sert2521.sertain.events.Test
 import org.sert2521.sertain.events.Tick
 import org.sert2521.sertain.events.fire
-import org.sert2521.sertain.subsystems.Subsystem
-import org.sert2521.sertain.subsystems.TaskConfigure
-import org.sert2521.sertain.subsystems.manageSubsystems
-import kotlin.reflect.KClass
-import kotlin.reflect.full.createInstance
+import org.sert2521.sertain.subsystems.manageTasks
+import org.sert2521.sertain.subsystems.subsystems
+import org.sert2521.sertain.subsystems.use
 
-object Robot : RobotScope() {
+object Robot {
     var mode = RobotMode.DISCONNECTED
         internal set
-
-    internal var subsystems = mutableMapOf<KClass<*>, Subsystem>()
-
-    fun <S : Subsystem> add(reference: KClass<*>, subsystem: S) {
-        subsystems[reference] = subsystem
-    }
-
-    fun <S : Subsystem> add(subsystem: S) {
-        add(subsystem::class, subsystem)
-    }
-
-    inline fun <reified S : Subsystem> add() {
-        add(S::class, S::class.createInstance())
-    }
-
-    fun <S : Subsystem> access(reference: KClass<S>): S {
-        @Suppress("unchecked_cast") // Safe because subsystems is internally managed
-        subsystems[reference]?.let {
-            return it as S
-        }
-        throw IllegalStateException("Subsystem with type ${reference.qualifiedName} does not exist." +
-                " Did you forget to add it?")
-    }
-
-    inline fun <reified S : Subsystem> access() = access(S::class)
-
-    inline fun <reified S : Subsystem> TaskConfigure.use(): S {
-        val subsystem = access(S::class)
-        this += subsystem
-        return subsystem
-    }
 }
 
 enum class RobotMode {
@@ -65,7 +31,7 @@ enum class RobotMode {
     TEST
 }
 
-fun robot(configure: Robot.() -> Unit) = runBlocking {
+suspend fun robot(configure: RobotScope.() -> Unit) {
     initializeWpiLib()
 
     // tell the DS that robot is ready to enable
@@ -74,16 +40,27 @@ fun robot(configure: Robot.() -> Unit) = runBlocking {
     val ds: DriverStation = DriverStation.getInstance()
     val running = true
 
-    Robot.apply(configure)
+    RobotScope.apply(configure)
 
-    Robot.launch {
-        manageSubsystems()
+    RobotScope.launch {
+        manageTasks()
         periodic(20) {
             launch {
                 fire(Tick)
             }
         }
     }
+
+    subsystems
+            .forEach {
+                it.value.default?.apply {
+                    RobotScope.launch {
+                        use(it.value, name = "Default") {
+                            invoke()
+                        }
+                    }
+                }
+            }
 
     while (running) {
         val hasNewData = ds.waitForData(0.02)

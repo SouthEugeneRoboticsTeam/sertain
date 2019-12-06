@@ -4,7 +4,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.sert2521.sertain.Robot
 import org.sert2521.sertain.events.Change
 import org.sert2521.sertain.events.onTick
 import org.sert2521.sertain.events.subscribe
@@ -100,7 +99,7 @@ abstract class Observable<T>(val get: () -> T) {
         private set
 
     init {
-        Robot.onTick {
+        RobotScope.onTick {
             when {
                 lastValue != value -> fire(Change(this@Observable, value))
             }
@@ -118,7 +117,7 @@ open class ObservableValue<T>(get: () -> T) : Observable<T>(get) {
 
 class ObservableBoolean(get: () -> Boolean) : Observable<Boolean>(get) {
     init {
-        Robot.onChange {
+        RobotScope.onChange {
             when (it.value) {
                 true -> fire(True(this@ObservableBoolean, it.value))
                 false -> fire(False(this@ObservableBoolean, it.value))

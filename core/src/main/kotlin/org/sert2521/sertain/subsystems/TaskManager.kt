@@ -18,7 +18,7 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
-fun CoroutineScope.manageSubsystems() {
+fun CoroutineScope.manageTasks() {
     subscribe<Use<Any?>> { use ->
         // Subsystems used in parent coroutine
         val prevSubsystems: Set<Subsystem> = use.context[Requirements] ?: emptySet()
@@ -37,7 +37,7 @@ fun CoroutineScope.manageSubsystems() {
         }
 
         // Subsystems that are already occupied
-        val occupiedSubsystems = allSubsystems.filter { it.occupied }
+        val occupiedSubsystems = newSubsystems.filter { it.occupied }
 
         if (!use.cancelConflicts && occupiedSubsystems.isNotEmpty()) {
             use.continuation.resumeWithException(
@@ -49,7 +49,7 @@ fun CoroutineScope.manageSubsystems() {
         }
 
         // Jobs of conflicting subsystems
-        val conflictingJobs = occupiedSubsystems.map { it.currentJob!! }
+        val conflictingJobs = occupiedSubsystems.map { it.currentJob!! }.filter { !it.isCompleted }.toSet()
 
         val newJob = CoroutineScope(use.context).launch(
                 Requirements(allSubsystems),
@@ -58,11 +58,19 @@ fun CoroutineScope.manageSubsystems() {
             try {
                 // Suspend until all conflicting jobs are canceled and joined
                 withContext(NonCancellable) {
-                    conflictingJobs.forEach { it.cancel() }
-                    conflictingJobs.forEach { it.join() }
+                    conflictingJobs.toSet().forEach {
+                        it.cancel()
+                    }
+                    conflictingJobs.forEach {
+                        it.join()
+                    }
                 }
 
-                val result = coroutineScope { use.action(this) }
+                val result = coroutineScope {
+                    launch {
+                        use.action(this)
+                    }
+                }
 
                 use.continuation.resume(result)
             } catch (e: Throwable) {
@@ -82,7 +90,7 @@ fun CoroutineScope.manageSubsystems() {
                     it.currentJob = null
                     if (it.default != null) {
                         RobotScope.launch {
-                            use(it, name = "DEFAULT") { it.default?.invoke(this) }
+                            use(it, name = "DEFAULT") { it.default.invoke() }
                         }
                     }
                 }
