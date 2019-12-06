@@ -21,17 +21,12 @@ import kotlin.coroutines.resumeWithException
 
 fun CoroutineScope.manageTasks() {
     subscribe<Use<Any?>> { use ->
-        println("processing task ${use.name}")
         // Subsystems used in parent coroutine
         val prevSubsystems: Set<Subsystem> = use.context[Requirements] ?: emptySet()
         // Subsystems used in new coroutine but not in parent coroutine
         val newSubsystems = use.subsystems - prevSubsystems
         // Subsystems from both parent and new coroutines
         val allSubsystems = use.subsystems + prevSubsystems
-
-        allSubsystems.forEach {
-            println("Using subsystem ${it.name}")
-        }
 
         if (allSubsystems.any { !it.isEnabled }) {
             use.continuation.resumeWithException(
@@ -55,39 +50,33 @@ fun CoroutineScope.manageTasks() {
         }
 
         // Jobs of conflicting subsystems
-        val conflictingJobs = occupiedSubsystems.map { it.currentJob!! }.toSet()
+        val conflictingJobs = occupiedSubsystems.map { it.currentJob!! }.filter { !it.isCompleted }.toSet()
 
-        println("Creating new job for ${use.name}")
         val newJob = CoroutineScope(use.context).launch(
                 Requirements(allSubsystems),
                 CoroutineStart.ATOMIC
         ) {
-            println("Trying to run task ${use.name}")
             try {
-                println("A'ight I'm boutta do it")
                 // Suspend until all conflicting jobs are canceled and joined
                 withContext(NonCancellable) {
-                    println("Joining and cancelling ${conflictingJobs.size}")
-                    conflictingJobs.forEach {
-                        println("Cancelling job")
-                        it.cancelAndJoin()
+                    conflictingJobs.toSet().forEach {
+                        it.cancel()
                     }
-                    println("Canceled conflicting jobs")
+                    conflictingJobs.forEach {
+                        it.join()
+                    }
                 }
 
-                println("About to run task ${use.name}")
-
                 val result = coroutineScope {
-                    println("Running task ${use.name}")
-                    use.action(this)
+                    launch {
+                        use.action(this)
+                    }
                 }
 
                 use.continuation.resume(result)
             } catch (e: Throwable) {
-                println(e)
                 use.continuation.resumeWithException(e)
             } finally {
-                println("Cleaning task ${use.name}")
                 fire(Clean(newSubsystems, coroutineContext[Job]!!))
             }
         }
@@ -96,7 +85,6 @@ fun CoroutineScope.manageTasks() {
     }
 
     subscribe<Clean> { clean ->
-        println("Cleaning subsystems ${clean.subsystems.size}")
         clean.subsystems
                 .filter { it.currentJob == clean.job }
                 .forEach {
@@ -107,7 +95,6 @@ fun CoroutineScope.manageTasks() {
                         }
                     }
                 }
-
     }
 }
 

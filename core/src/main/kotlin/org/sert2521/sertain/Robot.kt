@@ -15,6 +15,8 @@ import org.sert2521.sertain.events.Test
 import org.sert2521.sertain.events.Tick
 import org.sert2521.sertain.events.fire
 import org.sert2521.sertain.subsystems.manageTasks
+import org.sert2521.sertain.subsystems.subsystems
+import org.sert2521.sertain.subsystems.use
 
 object Robot {
     var mode = RobotMode.DISCONNECTED
@@ -48,6 +50,17 @@ suspend fun robot(configure: RobotScope.() -> Unit) {
             }
         }
     }
+
+    subsystems
+            .forEach {
+                it.value.default?.apply {
+                    RobotScope.launch {
+                        use(it.value, name = "Default") {
+                            invoke()
+                        }
+                    }
+                }
+            }
 
     while (running) {
         val hasNewData = ds.waitForData(0.02)
