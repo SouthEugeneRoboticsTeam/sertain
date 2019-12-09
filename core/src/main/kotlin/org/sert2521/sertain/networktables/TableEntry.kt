@@ -5,7 +5,7 @@ import edu.wpi.first.networktables.NetworkTableInstance
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
-class TableEntry<T>(val value: T, val location: List<String>) : ReadWriteProperty<Any?, T> {
+class TableEntry<T>(val value: T, val location: List<String> = emptyList()) : ReadWriteProperty<Any?, T> {
     var initialized = false
 
     private val wpiTable: WpiNetworkTable get() {
