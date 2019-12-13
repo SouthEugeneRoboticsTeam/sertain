@@ -169,8 +169,8 @@ class MotorController<T : MotorId>(
         ctreMotorController.set(CtreControlMode.PercentOutput, output)
     }
 
-    fun setPosition(position: Double) {
-        ctreMotorController.set(CtreControlMode.Position, position)
+    fun setPosition(position: Int) {
+        ctreMotorController.set(CtreControlMode.Position, position.toDouble())
     }
 
     fun <U : MetricUnit<Angular>> setPosition(position: MetricValue<Angular, U>) {
