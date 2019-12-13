@@ -132,13 +132,13 @@ class MotorController<T : MotorId>(
     val percentOutput: Double
             get() = ctreMotorController.motorOutputPercent
 
-    var position: Int
+    var sensorPosition: Int
             get() = ctreMotorController.getSelectedSensorPosition(0)
             set(value) {
                 ctreMotorController.selectedSensorPosition = value
             }
 
-    val velocity: Int
+    val sensorVelocity: Int
             get() = ctreMotorController.getSelectedSensorVelocity(0)
 
     var openLoopRamp: Double = 0.0
@@ -169,13 +169,13 @@ class MotorController<T : MotorId>(
         ctreMotorController.set(CtreControlMode.PercentOutput, output)
     }
 
-    fun setPosition(position: Double) {
-        ctreMotorController.set(CtreControlMode.Position, position)
+    fun setPosition(position: Int) {
+        ctreMotorController.set(CtreControlMode.Position, position.toDouble())
     }
 
     fun <U : MetricUnit<Angular>> setPosition(position: MetricValue<Angular, U>) {
         try {
-            setPosition(position.convertTo(encoder!!.ticks).value)
+            setPosition(position.convertTo(encoder!!.ticks).value.toInt())
         } catch (e: NullPointerException) {
             throw java.lang.IllegalStateException(
                     "You must configure your encoder to use units."
@@ -184,7 +184,7 @@ class MotorController<T : MotorId>(
     }
 
     fun position(unit: MetricUnit<Angular>) =
-        MetricValue(encoder!!.ticks, position.toDouble()).convertTo(unit)
+        MetricValue(encoder!!.ticks, sensorPosition.toDouble()).convertTo(unit)
 
     fun setVelocity(velocity: Double) {
         ctreMotorController.set(CtreControlMode.Velocity, velocity)
@@ -203,7 +203,7 @@ class MotorController<T : MotorId>(
     }
 
     fun velocity(unit: CompositeUnit<Per, Angular, Chronic>) =
-        MetricValue(encoder!!.ticksPerSecond, velocity.toDouble()).convertTo(unit)
+        MetricValue(encoder!!.ticksPerSecond, sensorVelocity.toDouble()).convertTo(unit)
 
     fun setCurrent(current: Double) {
         ctreMotorController.set(CtreControlMode.Current, current)
