@@ -175,7 +175,7 @@ class MotorController<T : MotorId>(
 
     fun <U : MetricUnit<Angular>> setPosition(position: MetricValue<Angular, U>) {
         try {
-            setPosition(position.convertTo(encoder!!.ticks).value)
+            setPosition(position.convertTo(encoder!!.ticks).value.toInt())
         } catch (e: NullPointerException) {
             throw java.lang.IllegalStateException(
                     "You must configure your encoder to use units."
