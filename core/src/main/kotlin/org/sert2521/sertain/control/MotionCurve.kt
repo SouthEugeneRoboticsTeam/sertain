@@ -12,6 +12,9 @@ data class MotionCurveConfig(
 )
 
 class MotionCurve(config: MotionCurveConfig) {
+    constructor(distance: Double, maxVelocity: Double, maxAcceleration: Double, maxJerk: Double) :
+            this(MotionCurveConfig(distance, maxVelocity, maxAcceleration, maxJerk))
+
     val d = config.distance
     val vm = config.maxVelocity
     val am = config.maxAcceleration
