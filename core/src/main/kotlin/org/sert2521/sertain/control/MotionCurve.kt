@@ -5,7 +5,7 @@ import org.sert2521.sertain.utils.roundTo
 import kotlin.math.*
 
 data class MotionCurveConfig(
-        val distance: Int,
+        val distance: Double,
         val maxVelocity: Double,
         val maxAcceleration: Double,
         val maxJerk: Double
