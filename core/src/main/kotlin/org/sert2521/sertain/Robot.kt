@@ -14,6 +14,8 @@ import org.sert2521.sertain.events.Teleop
 import org.sert2521.sertain.events.Test
 import org.sert2521.sertain.events.Tick
 import org.sert2521.sertain.events.fire
+import org.sert2521.sertain.motors.MotorController
+import org.sert2521.sertain.motors.TalonId
 import org.sert2521.sertain.subsystems.manageTasks
 import org.sert2521.sertain.subsystems.subsystems
 import org.sert2521.sertain.subsystems.use
@@ -50,6 +52,9 @@ suspend fun robot(configure: RobotScope.() -> Unit) {
             }
         }
     }
+
+    val mc = MotorController(TalonId(0))
+    mc.toPercentOutput(0.01)
 
     subsystems
             .forEach {
