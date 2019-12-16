@@ -7,7 +7,7 @@ open class PidfConfig {
     var kf = 0.0
 }
 
-class Pidf(config: PidfConfig, val dt: Double) {
+class PidfController(config: PidfConfig, val dt: Double) {
     private val kp = config.kp
     private val ki = config.ki
     private val kd = config.kd
