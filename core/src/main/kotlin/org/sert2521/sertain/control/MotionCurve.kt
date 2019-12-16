@@ -2,13 +2,15 @@ package org.sert2521.sertain.control
 
 import org.sert2521.sertain.utils.root
 import org.sert2521.sertain.utils.roundTo
-import kotlin.math.*
+import kotlin.math.min
+import kotlin.math.pow
+import kotlin.math.sqrt
 
 data class MotionCurveConfig(
-        val distance: Double,
-        val maxVelocity: Double,
-        val maxAcceleration: Double,
-        val maxJerk: Double
+    var distance: Double,
+    var maxVelocity: Double,
+    var maxAcceleration: Double,
+    var maxJerk: Double
 )
 
 class MotionCurve(config: MotionCurveConfig) {
@@ -44,11 +46,10 @@ class MotionCurve(config: MotionCurveConfig) {
     val t6 = t2 + t4
     val t7 = t3 + t4
 
-    val isValid = (
-            d >= 0 && vm >= 0 && am >= 0 && j >= 0
-                    && t2.roundTo(4) - t1.roundTo(4) >= 0
-                    && t4.roundTo(4) - t3.roundTo(4) >= 0
-            )
+    val isValid =
+            d >= 0 && vm >= 0 && am >= 0 && j >= 0 &&
+                    t2.roundTo(4) - t1.roundTo(4) >= 0 &&
+                    t4.roundTo(4) - t3.roundTo(4) >= 0
 
     private fun j1() = j
     private fun j2() = 0.0
