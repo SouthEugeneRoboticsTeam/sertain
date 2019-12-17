@@ -1,5 +1,5 @@
 package org.sert2521.sertain.events
 
-abstract class Event
+interface Event
 
-abstract class TargetedEvent<T>(val target: T) : Event()
+abstract class TargetedEvent<T>(val target: T) : Event
