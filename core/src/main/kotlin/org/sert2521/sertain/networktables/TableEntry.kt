@@ -6,6 +6,8 @@ import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
 class TableEntry<T>(val value: T, val location: List<String> = emptyList()) : ReadWriteProperty<Any?, T> {
+    constructor(value: T, vararg location: String) : this(value, location.toList())
+
     var initialized = false
 
     private val wpiTable: WpiNetworkTable get() {
