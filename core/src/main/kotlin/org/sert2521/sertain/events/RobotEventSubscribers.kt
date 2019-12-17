@@ -30,7 +30,7 @@ fun CoroutineScope.whileEnabled(action: suspend CoroutineScope.(event: Enable) -
         subscribeBetween<Enable, Disable>(action)
 
 fun CoroutineScope.whileTeleop(action: suspend CoroutineScope.(event: Teleop) -> Unit) =
-        subscribeBetween<Teleop, Disable>(action)
+        subscribeBetween<Teleop, TeleopOver>(action)
 
 fun CoroutineScope.whileAuto(action: suspend CoroutineScope.(event: Auto) -> Unit) =
         subscribeBetween<Auto, Disable>(action)
