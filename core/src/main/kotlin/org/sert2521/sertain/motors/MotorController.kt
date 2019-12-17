@@ -171,17 +171,17 @@ class MotorController<T : MotorId>(
     fun velocity(unit: CompositeUnit<Per, Angular, Chronic>) =
             MetricValue(encoder!!.ticksPerSecond, velocity.toDouble()).convertTo(unit)
 
-    fun toPercentOutput(output: Double) {
+    fun targetPercentOutput(output: Double) {
         ctreMotorController.set(CtreControlMode.PercentOutput, output)
     }
 
-    fun toPosition(position: Int) {
+    fun targetPosition(position: Int) {
         ctreMotorController.set(CtreControlMode.Position, position.toDouble())
     }
 
-    fun <U : MetricUnit<Angular>> toPosition(position: MetricValue<Angular, U>) {
+    fun <U : MetricUnit<Angular>> targetPosition(position: MetricValue<Angular, U>) {
         try {
-            toPosition(position.convertTo(encoder!!.ticks).value.toInt())
+            targetPosition(position.convertTo(encoder!!.ticks).value.toInt())
         } catch (e: NullPointerException) {
             throw java.lang.IllegalStateException(
                     "You must configure your encoder to use units."
@@ -189,15 +189,15 @@ class MotorController<T : MotorId>(
         }
     }
 
-    fun toVelocity(velocity: Int) {
+    fun targetVelocity(velocity: Int) {
         ctreMotorController.set(CtreControlMode.Velocity, velocity.toDouble())
     }
 
-    fun toVelocity(
+    fun targetVelocity(
         velocity: MetricValue<CompositeUnitType<Per, Angular, Chronic>, CompositeUnit<Per, Angular, Chronic>>
     ) {
         try {
-            toVelocity(velocity.convertTo(encoder!!.ticksPerSecond).value.toInt())
+            targetVelocity(velocity.convertTo(encoder!!.ticksPerSecond).value.toInt())
         } catch (e: NullPointerException) {
             throw java.lang.IllegalStateException(
                     "You must configure your encoder to use units."
@@ -205,11 +205,11 @@ class MotorController<T : MotorId>(
         }
     }
 
-    fun toCurrent(current: Double) {
+    fun targetCurrent(current: Double) {
         ctreMotorController.set(CtreControlMode.Current, current)
     }
 
-    fun stop() {
+    fun disable() {
         ctreMotorController.neutralOutput()
     }
 
