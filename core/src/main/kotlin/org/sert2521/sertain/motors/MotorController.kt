@@ -180,13 +180,8 @@ class MotorController<T : MotorId>(
     }
 
     fun <U : MetricUnit<Angular>> setTargetPosition(position: MetricValue<Angular, U>) {
-        try {
-            setTargetPosition(position.convertTo(encoder!!.ticks).value.toInt())
-        } catch (e: NullPointerException) {
-            throw java.lang.IllegalStateException(
-                    "You must configure your encoder to use units."
-            )
-        }
+        checkNotNull(encoder) { "You must configure your encoder to use units." }
+        setTargetPosition(position.convertTo(encoder!!.ticks).value.toInt())
     }
 
     fun setTargetVelocity(velocity: Int) {
@@ -196,13 +191,8 @@ class MotorController<T : MotorId>(
     fun setTargetVelocity(
         velocity: MetricValue<CompositeUnitType<Per, Angular, Chronic>, CompositeUnit<Per, Angular, Chronic>>
     ) {
-        try {
-            setTargetVelocity(velocity.convertTo(encoder!!.ticksPerSecond).value.toInt())
-        } catch (e: NullPointerException) {
-            throw java.lang.IllegalStateException(
-                    "You must configure your encoder to use units."
-            )
-        }
+        checkNotNull(encoder) { "You must configure your encoder to use units." }
+        setTargetVelocity(velocity.convertTo(encoder!!.ticksPerSecond).value.toInt())
     }
 
     fun setCurrent(current: Double) {
