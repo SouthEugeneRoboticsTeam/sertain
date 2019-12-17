@@ -53,9 +53,6 @@ suspend fun robot(configure: RobotScope.() -> Unit) {
         }
     }
 
-    val mc = MotorController(TalonId(0))
-    mc.setPercentOutput(0.01)
-
     subsystems
             .forEach {
                 it.value.default?.apply {
