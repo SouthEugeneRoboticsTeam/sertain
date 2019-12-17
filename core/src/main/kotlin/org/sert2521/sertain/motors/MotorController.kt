@@ -8,7 +8,6 @@ import org.sert2521.sertain.units.MetricUnit
 import org.sert2521.sertain.units.MetricValue
 import org.sert2521.sertain.units.Per
 import org.sert2521.sertain.units.convertTo
-import java.lang.NullPointerException
 import com.ctre.phoenix.motorcontrol.ControlMode as CtreControlMode
 import com.ctre.phoenix.motorcontrol.NeutralMode as CtreNeutralMode
 import com.ctre.phoenix.motorcontrol.can.TalonSRX as CtreTalon
@@ -129,18 +128,6 @@ class MotorController<T : MotorId>(
                 field = value
             }
 
-    val percentOutput: Double
-            get() = ctreMotorController.motorOutputPercent
-
-    var position: Int
-            get() = ctreMotorController.getSelectedSensorPosition(0)
-            set(value) {
-                ctreMotorController.selectedSensorPosition = value
-            }
-
-    val velocity: Int
-            get() = ctreMotorController.getSelectedSensorVelocity(0)
-
     var openLoopRamp: Double = 0.0
             set(value) {
                 ctreMotorController.configOpenloopRamp(value, 20)
@@ -165,45 +152,47 @@ class MotorController<T : MotorId>(
                 field = value
             }
 
+    val percentOutput: Double
+        get() = ctreMotorController.motorOutputPercent
+
+    var position: Int
+        get() = ctreMotorController.getSelectedSensorPosition(0)
+        set(value) {
+            ctreMotorController.selectedSensorPosition = value
+        }
+
+    fun position(unit: MetricUnit<Angular>) =
+            MetricValue(encoder!!.ticks, position.toDouble()).convertTo(unit)
+
+    val velocity: Int
+        get() = ctreMotorController.getSelectedSensorVelocity(0)
+
+    fun velocity(unit: CompositeUnit<Per, Angular, Chronic>) =
+            MetricValue(encoder!!.ticksPerSecond, velocity.toDouble()).convertTo(unit)
+
     fun setPercentOutput(output: Double) {
         ctreMotorController.set(CtreControlMode.PercentOutput, output)
     }
 
-    fun setPosition(position: Double) {
-        ctreMotorController.set(CtreControlMode.Position, position)
+    fun setTargetPosition(position: Int) {
+        ctreMotorController.set(CtreControlMode.Position, position.toDouble())
     }
 
-    fun <U : MetricUnit<Angular>> setPosition(position: MetricValue<Angular, U>) {
-        try {
-            setPosition(position.convertTo(encoder!!.ticks).value)
-        } catch (e: NullPointerException) {
-            throw java.lang.IllegalStateException(
-                    "You must configure your encoder to use units."
-            )
-        }
+    fun <U : MetricUnit<Angular>> setTargetPosition(position: MetricValue<Angular, U>) {
+        checkNotNull(encoder) { "You must configure your encoder to use units." }
+        setTargetPosition(position.convertTo(encoder!!.ticks).value.toInt())
     }
 
-    fun position(unit: MetricUnit<Angular>) =
-        MetricValue(encoder!!.ticks, position.toDouble()).convertTo(unit)
-
-    fun setVelocity(velocity: Double) {
-        ctreMotorController.set(CtreControlMode.Velocity, velocity)
+    fun setTargetVelocity(velocity: Int) {
+        ctreMotorController.set(CtreControlMode.Velocity, velocity.toDouble())
     }
 
-    fun setVelocity(
+    fun setTargetVelocity(
         velocity: MetricValue<CompositeUnitType<Per, Angular, Chronic>, CompositeUnit<Per, Angular, Chronic>>
     ) {
-        try {
-            setVelocity(velocity.convertTo(encoder!!.ticksPerSecond).value)
-        } catch (e: NullPointerException) {
-            throw java.lang.IllegalStateException(
-                    "You must configure your encoder to use units."
-            )
-        }
+        checkNotNull(encoder) { "You must configure your encoder to use units." }
+        setTargetVelocity(velocity.convertTo(encoder!!.ticksPerSecond).value.toInt())
     }
-
-    fun velocity(unit: CompositeUnit<Per, Angular, Chronic>) =
-        MetricValue(encoder!!.ticksPerSecond, velocity.toDouble()).convertTo(unit)
 
     fun setCurrent(current: Double) {
         ctreMotorController.set(CtreControlMode.Current, current)
@@ -230,14 +219,12 @@ class MotorController<T : MotorId>(
     }
 
     private fun updateCurrentLimit(limit: CurrentLimit) {
-        with(limit) {
-            eachTalon {
-                (ctreMotorController as CtreTalon).apply {
-                    configContinuousCurrentLimit(currentLimit.continuousLimit)
-                    configPeakCurrentLimit(currentLimit.maxLimit)
-                    configPeakCurrentDuration(currentLimit.maxDuration)
-                    enableCurrentLimit(currentLimit.enabled)
-                }
+        eachTalon {
+            (ctreMotorController as CtreTalon).apply {
+                configContinuousCurrentLimit(limit.continuousLimit)
+                configPeakCurrentLimit(limit.maxLimit)
+                configPeakCurrentDuration(limit.maxDuration)
+                enableCurrentLimit(limit.enabled)
             }
         }
     }
@@ -274,11 +261,6 @@ enum class ControlMode {
     VELOCITY,
     CURRENT,
     DISABLED
-}
-
-enum class NeutralMode {
-    BRAKE,
-    COAST
 }
 
 fun ctreNeutralMode(brakeMode: Boolean): CtreNeutralMode =
