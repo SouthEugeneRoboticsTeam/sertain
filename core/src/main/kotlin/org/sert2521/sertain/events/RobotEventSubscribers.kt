@@ -22,3 +22,18 @@ fun CoroutineScope.onTest(action: suspend CoroutineScope.(event: Test) -> Unit) 
 
 fun CoroutineScope.onTick(action: suspend CoroutineScope.(event: Tick) -> Unit) =
         subscribe(action)
+
+fun CoroutineScope.whileDisabled(action: suspend CoroutineScope.(event: Disable) -> Unit) =
+        subscribeBetween<Disable, Enable>(action)
+
+fun CoroutineScope.whileEnabled(action: suspend CoroutineScope.(event: Enable) -> Unit) =
+        subscribeBetween<Enable, Disable>(action)
+
+fun CoroutineScope.whileTeleop(action: suspend CoroutineScope.(event: Teleop) -> Unit) =
+        subscribeBetween<Teleop, TeleopOver>(action)
+
+fun CoroutineScope.whileAuto(action: suspend CoroutineScope.(event: Auto) -> Unit) =
+        subscribeBetween<Auto, Disable>(action)
+
+fun CoroutineScope.whileTest(action: suspend CoroutineScope.(event: Test) -> Unit) =
+        subscribeBetween<Test, Disable>(action)
