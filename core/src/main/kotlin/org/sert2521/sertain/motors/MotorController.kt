@@ -171,17 +171,17 @@ class MotorController<T : MotorId>(
     fun velocity(unit: CompositeUnit<Per, Angular, Chronic>) =
             MetricValue(encoder!!.ticksPerSecond, velocity.toDouble()).convertTo(unit)
 
-    fun targetPercentOutput(output: Double) {
+    fun setPercentOutput(output: Double) {
         ctreMotorController.set(CtreControlMode.PercentOutput, output)
     }
 
-    fun targetPosition(position: Int) {
+    fun setTargetPosition(position: Int) {
         ctreMotorController.set(CtreControlMode.Position, position.toDouble())
     }
 
-    fun <U : MetricUnit<Angular>> targetPosition(position: MetricValue<Angular, U>) {
+    fun <U : MetricUnit<Angular>> setTargetPosition(position: MetricValue<Angular, U>) {
         try {
-            targetPosition(position.convertTo(encoder!!.ticks).value.toInt())
+            setTargetPosition(position.convertTo(encoder!!.ticks).value.toInt())
         } catch (e: NullPointerException) {
             throw java.lang.IllegalStateException(
                     "You must configure your encoder to use units."
@@ -189,15 +189,15 @@ class MotorController<T : MotorId>(
         }
     }
 
-    fun targetVelocity(velocity: Int) {
+    fun setTargetVelocity(velocity: Int) {
         ctreMotorController.set(CtreControlMode.Velocity, velocity.toDouble())
     }
 
-    fun targetVelocity(
+    fun setTargetVelocity(
         velocity: MetricValue<CompositeUnitType<Per, Angular, Chronic>, CompositeUnit<Per, Angular, Chronic>>
     ) {
         try {
-            targetVelocity(velocity.convertTo(encoder!!.ticksPerSecond).value.toInt())
+            setTargetVelocity(velocity.convertTo(encoder!!.ticksPerSecond).value.toInt())
         } catch (e: NullPointerException) {
             throw java.lang.IllegalStateException(
                     "You must configure your encoder to use units."
@@ -205,7 +205,7 @@ class MotorController<T : MotorId>(
         }
     }
 
-    fun targetCurrent(current: Double) {
+    fun setCurrent(current: Double) {
         ctreMotorController.set(CtreControlMode.Current, current)
     }
 
@@ -232,10 +232,10 @@ class MotorController<T : MotorId>(
     private fun updateCurrentLimit(limit: CurrentLimit) {
         eachTalon {
             (ctreMotorController as CtreTalon).apply {
-                configContinuousCurrentLimit(currentLimit.continuousLimit)
-                configPeakCurrentLimit(currentLimit.maxLimit)
-                configPeakCurrentDuration(currentLimit.maxDuration)
-                enableCurrentLimit(currentLimit.enabled)
+                configContinuousCurrentLimit(limit.continuousLimit)
+                configPeakCurrentLimit(limit.maxLimit)
+                configPeakCurrentDuration(limit.maxDuration)
+                enableCurrentLimit(limit.enabled)
             }
         }
     }
