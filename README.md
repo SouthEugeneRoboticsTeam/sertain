@@ -24,7 +24,7 @@
  
 ### Getting Started
 
-There are no releases yet, but if you would like to try out the latest development version of the library, then you can just add these lines to your gradle build file:
+Sertain is still in pre-release, but you can use the latest version by adding this to your gradle build script:
 
 ```gradle
 repositories {
@@ -34,11 +34,11 @@ repositories {
 
 dependencies {
   // other dependencies
-  implementation 'com.github.SouthEugeneRoboticsTeam:sertain:master-SNAPSHOT'
+  implementation 'com.github.SouthEugeneRoboticsTeam:sertain:0.0.1'
 }
 ```
 
-You can also replace `SNAPSHOT` any commit on master, and you can replace `master` with any branch. You can also use a commit as the version without a branch name.
+You can also replace the any commit on master, and you can replace `master` with any branch. You can also use a commit as the version without a branch name.
 
 ### Creating a Robot Program
 To create a robot program, start by using the `robot` function. The function takes a lambda, which should serve as the entry point of the robot program. For example:
@@ -51,7 +51,7 @@ fun main() = robot {
 
 ### Coroutines
 
-Note that this library is built using coroutines. However, the RobotRIO only has access to two threads, so if you should need to create a global coroutine, you need to use `Robot` as the coroutine scope. `Robot` can be accessed through the `robot` block. Follow this example:
+Note that this library is built using coroutines. However, the RobotRIO only has access to two threads, so if you should need to create a global coroutine, you need to use `RobotScope` as the coroutine scope. `RobotScope` can be accessed through the `robot` block. Follow this example:
 
 ```kotlin
 robot {
