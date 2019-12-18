@@ -50,14 +50,14 @@ class MotorController<T : MotorId>(
     fun eachTalon(configure: MotorController<TalonId>.() -> Unit) {
         eachMotor {
             @Suppress("unchecked_cast") // Will work because type of id is T
-            (this as? MotorController<TalonId>)?.apply(configure)
+            if (id is TalonId) (this as MotorController<TalonId>).apply(configure)
         }
     }
 
     fun eachVictor(configure: MotorController<VictorId>.() -> Unit) {
         eachMotor {
             @Suppress("unchecked_cast") // Will work because type of id is T
-            (this as? MotorController<VictorId>)?.apply(configure)
+            if (id is VictorId) (this as MotorController<VictorId>).apply(configure)
         }
     }
 
