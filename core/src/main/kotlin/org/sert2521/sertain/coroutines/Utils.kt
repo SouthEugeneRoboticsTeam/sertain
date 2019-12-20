@@ -14,6 +14,8 @@ import org.sert2521.sertain.events.True
 import org.sert2521.sertain.events.fire
 import org.sert2521.sertain.events.subscribeBetween
 import kotlin.coroutines.coroutineContext
+import kotlin.properties.ReadOnlyProperty
+import kotlin.reflect.KProperty
 
 suspend fun periodic(period: Long, delay: Long = 0, action: () -> Unit) {
     delay(delay)
@@ -92,7 +94,7 @@ suspend inline fun <T, reified E : TargetedEvent<T>> delayUntil(target: T) {
     job.join()
 }
 
-abstract class Observable<T>(val get: () -> T) {
+abstract class Observable<T>(val get: () -> T) : ReadOnlyProperty<Any?, T> {
     val value get() = get()
 
     var lastValue = value
@@ -109,6 +111,8 @@ abstract class Observable<T>(val get: () -> T) {
 
     fun CoroutineScope.onChange(action: suspend CoroutineScope.(event: Change<T>) -> Unit) =
             subscribe(this@Observable, action)
+
+    override fun getValue(thisRef: Any?, property: KProperty<*>) = value
 }
 
 open class ObservableValue<T>(get: () -> T) : Observable<T>(get) {

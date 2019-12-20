@@ -1,33 +1,27 @@
 package org.sert2521.sertain.networktables
 
-import edu.wpi.first.networktables.NetworkTable as WpiNetworkTable
+import edu.wpi.first.networktables.NetworkTable
 import edu.wpi.first.networktables.NetworkTableInstance
-import kotlin.properties.ReadWriteProperty
-import kotlin.reflect.KProperty
 
-class TableEntry<T>(val value: T, val location: List<String> = emptyList()) : ReadWriteProperty<Any?, T> {
-    constructor(value: T, vararg location: String) : this(value, location.toList())
-
-    var initialized = false
-
-    private val wpiTable: WpiNetworkTable get() {
-        var table = NetworkTableInstance.getDefault().getTable(location.first())
-        location.drop(1).dropLast(0).forEach {
-            table = table.getSubTable(it)
-        }
-        return table
+fun wpiTable(location: List<String>): NetworkTable {
+    var table = NetworkTableInstance.getDefault().getTable(location.first())
+    location.drop(1).dropLast(0).forEach {
+        table = table.getSubTable(it)
     }
+    return table
+}
+
+class TableEntry<T>(val name: String, initialValue: T, val location: List<String> = emptyList()) {
+    init {
+        wpiTable(location).getEntry(name).setValue(initialValue)
+    }
+
+    val wpiProperty get() = wpiTable(location).getEntry(name)
 
     @Suppress("UNCHECKED_CAST")
-    override fun getValue(thisRef: Any?, property: KProperty<*>): T {
-        if (!initialized) {
-            setValue(thisRef, property, value)
-            initialized = true
+    var value: T
+        get() = wpiProperty.value.value as T
+        set(value) {
+            wpiProperty.setValue(value)
         }
-        return wpiTable.getEntry(property.name).value.value as T
-    }
-
-    override fun setValue(thisRef: Any?, property: KProperty<*>, value: T) {
-        wpiTable.getEntry(property.name).setValue(value)
-    }
 }
