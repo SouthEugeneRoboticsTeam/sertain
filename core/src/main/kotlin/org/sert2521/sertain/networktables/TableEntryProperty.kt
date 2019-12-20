@@ -1,6 +1,5 @@
 package org.sert2521.sertain.networktables
 
-import org.sert2521.sertain.Robot
 import org.sert2521.sertain.coroutines.RobotScope
 import org.sert2521.sertain.coroutines.watch
 import kotlin.properties.ReadWriteProperty
