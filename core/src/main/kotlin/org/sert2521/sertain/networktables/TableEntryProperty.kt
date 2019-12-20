@@ -24,7 +24,7 @@ class TableEntryProperty<T>(private val initialValue: T, val location: List<Stri
 fun <T> tableEntry(value: T, vararg location: String) = TableEntryProperty(value, location.toList())
 
 fun <T> RobotScope.linkTableEntry(name: String, location: List<String> = emptyList(), get: () -> T) = run {
-    val entry = TableEntry(name, get())
+    val entry = TableEntry(name, get(), location)
     get.watch {
         onChange {
             entry.value = value
