@@ -252,9 +252,6 @@ class MotorController<T : MotorId>(
             }
             updateCurrentLimit(currentLimit)
         }
-        eachMotor {
-            ctreMotorController.setNeutralMode(ctreNeutralMode(brakeMode))
-        }
         configure()
     }
 }
