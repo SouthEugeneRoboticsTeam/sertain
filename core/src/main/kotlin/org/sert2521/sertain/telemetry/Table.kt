@@ -1,4 +1,4 @@
-package org.sert2521.sertain.networktables
+package org.sert2521.sertain.telemetry
 
 import org.sert2521.sertain.coroutines.RobotScope
 

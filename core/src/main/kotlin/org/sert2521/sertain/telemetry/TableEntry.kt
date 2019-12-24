@@ -1,4 +1,4 @@
-package org.sert2521.sertain.networktables
+package org.sert2521.sertain.telemetry
 
 import edu.wpi.first.networktables.NetworkTable
 import edu.wpi.first.networktables.NetworkTableInstance
