@@ -25,3 +25,5 @@ class TableEntry<T>(val name: String, initialValue: T, val location: List<String
             wpiProperty.setValue(value)
         }
 }
+
+fun groundControlToMajorTom() = Unit
