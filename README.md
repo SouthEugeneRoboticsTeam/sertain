@@ -38,7 +38,7 @@ dependencies {
 }
 ```
 
-You can also replace the any commit on master, and you can replace `master` with any branch. You can also use a commit as the version without a branch name.
+You can also replace the any commit on master, and you can replace `0.0.1` with `any-branch-SNAPSHOT`. You can also use a commit hash as the version without a branch name.
 
 ### Creating a Robot Program
 To create a robot program, start by using the `robot` function. The function takes a lambda, which should serve as the entry point of the robot program. For example:
@@ -51,7 +51,7 @@ fun main() = robot {
 
 ### Coroutines
 
-Note that this library is built using coroutines. However, the RobotRIO only has access to two threads, so if you should need to create a global coroutine, you need to use `RobotScope` as the coroutine scope. `RobotScope` can be accessed through the `robot` block. Follow this example:
+Note that this library is built using coroutines. However, the RoboRIO only has access to two threads, so if you should need to create a global coroutine, you need to use `RobotScope` as the coroutine scope. `RobotScope` can be accessed through the `robot` block. Follow this example:
 
 ```kotlin
 robot {
