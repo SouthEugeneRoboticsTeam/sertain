@@ -34,11 +34,11 @@ repositories {
 
 dependencies {
   // other dependencies
-  implementation 'com.github.SouthEugeneRoboticsTeam:sertain:0.0.1'
+  implementation 'com.github.SouthEugeneRoboticsTeam:sertain:0.0.7'
 }
 ```
 
-You can also replace the any commit on master, and you can replace `0.0.1` with `any-branch-SNAPSHOT`. You can also use a commit hash as the version without a branch name.
+You can also replace the any commit on master, and you can replace `0.0.7` with `any-branch-SNAPSHOT`. You can also use a commit hash as the version without a branch name.
 
 ### Creating a Robot Program
 To create a robot program, start by using the `robot` function. The function takes a lambda, which should serve as the entry point of the robot program. For example:
