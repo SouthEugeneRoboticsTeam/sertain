@@ -44,7 +44,7 @@ You can also replace the any commit on master, and you can replace `0.0.7` with 
 To create a robot program, start by using the `robot` function. The function takes a lambda, which should serve as the entry point of the robot program. For example:
 
 ```kotlin
-fun main() = robot {
+suspend fun main() = robot {
   // Your code goes here
 }
 ```
