@@ -66,7 +66,7 @@ robot {
 It is also possible to subscribe to events. Events are the core component of sertain, and run almost everything. To create an event, do:
 
 ```kotlin
-class MyEvent : Event()
+class MyEvent : Event
 ```
 
 Then subscribe to the event by calling `subscribe`, like so:
