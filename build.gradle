@@ -64,7 +64,7 @@ jar {
     from configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
     manifest {
         attributes(
-                "Main-Class": "org.sert2521.bunnybots2019.MainKt"
+                "Main-Class": "org.org.infiniterecharge2020.MainKt"
         )
     }
 }
