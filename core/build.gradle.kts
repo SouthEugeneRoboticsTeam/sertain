@@ -1,10 +1,23 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.61")
+    }
+}
+
 plugins {
-    kotlin("jvm") version "1.3.61"
     `maven-publish`
     java
     maven
+}
+
+apply {
+    plugin("kotlin")
 }
 
 dependencies {
