@@ -33,10 +33,10 @@ compileKotlin.kotlinOptions {
     freeCompilerArgs = listOf("-XXLanguage:+InlineClasses", "-Xuse-experimental=kotlin.Experimental")
 }
 
-publishing {
-    publications {
-        create<MavenPublication>("maven") {
-            artifact("$buildDir/libs/${project.name}-${project.version}.jar")
-        }
-    }
-}
+//publishing {
+//    publications {
+//        create<MavenPublication>("maven") {
+//            artifact("$buildDir/libs/${project.name}-${project.version}.jar")
+//        }
+//    }
+//}
