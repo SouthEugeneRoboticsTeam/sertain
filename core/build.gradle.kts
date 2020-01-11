@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.3.61"
+    kotlin("jvm") version "1.3.50"
     `maven-publish`
     java
     maven
@@ -33,10 +33,10 @@ compileKotlin.kotlinOptions {
     freeCompilerArgs = listOf("-XXLanguage:+InlineClasses", "-Xuse-experimental=kotlin.Experimental")
 }
 
-//publishing {
-//    publications {
-//        create<MavenPublication>("maven") {
-//            artifact("$buildDir/libs/${project.name}-${project.version}.jar")
-//        }
-//    }
-//}
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            artifact("$buildDir/libs/${project.name}-${project.version}.jar")
+        }
+    }
+}
