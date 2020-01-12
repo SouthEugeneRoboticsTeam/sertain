@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    id("kotlin") version "1.3.61"
+    kotlin("jvm")
     `maven-publish`
     java
     maven

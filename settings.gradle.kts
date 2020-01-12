@@ -3,6 +3,9 @@ rootProject.name = "sertain"
 include(":core")
 
 pluginManagement {
+    plugins {
+        kotlin("jvm") version "1.3.61"
+    }
     repositories {
         mavenCentral()
         jcenter()
@@ -11,9 +14,9 @@ pluginManagement {
     resolutionStrategy {
         eachPlugin {
             when (requested.id.id) {
-                "kotlin" -> {
+                "org.jetbrains.kotlin.jvm" -> {
                     println("Lol you are trash")
-                    useModule("org.jetbrains.kotlin:kotlin-gradle-plugin:${requested.version}")
+                    useModule("org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.61")
                 }
             }
         }
