@@ -14,7 +14,7 @@
   </a>
   
   <a href="https://jitpack.io/#SouthEugeneRoboticsTeam/org.sert2521.sertain">
-    <img src="https://img.shields.io/jitpack/v/github/SouthEugeneRoboticsTeam/org.sert2521.sertain?style=flat-square" />
+    <img src="https://img.shields.io/jitpack/v/github/SouthEugeneRoboticsTeam/sertain?style=flat-square" />
   </a>
   
   <a href="https://sert2521.org">
