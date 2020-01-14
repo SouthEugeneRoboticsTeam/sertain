@@ -9,12 +9,12 @@
 </h4>
 
 <p align="center">
-  <a href="https://travis-ci.org/SouthEugeneRoboticsTeam/sertain">
-    <img src="https://img.shields.io/travis/SouthEugeneRoboticsTeam/sertain/master?style=flat-square" />
+  <a href="https://travis-ci.org/SouthEugeneRoboticsTeam/org.sert2521.sertain">
+    <img src="https://img.shields.io/travis/SouthEugeneRoboticsTeam/org.sert2521.sertain/master?style=flat-square" />
   </a>
   
-  <a href="https://jitpack.io/#SouthEugeneRoboticsTeam/sertain">
-    <img src="https://img.shields.io/jitpack/v/github/SouthEugeneRoboticsTeam/sertain?style=flat-square" />
+  <a href="https://jitpack.io/#SouthEugeneRoboticsTeam/org.sert2521.sertain">
+    <img src="https://img.shields.io/jitpack/v/github/SouthEugeneRoboticsTeam/org.sert2521.sertain?style=flat-square" />
   </a>
   
   <a href="https://sert2521.org">
@@ -34,7 +34,7 @@ repositories {
 
 dependencies {
   // other dependencies
-  implementation 'com.github.SouthEugeneRoboticsTeam:sertain:0.0.7'
+  implementation 'com.github.SouthEugeneRoboticsTeam:org.sert2521.sertain:0.0.7'
 }
 ```
 
@@ -63,7 +63,7 @@ robot {
 
 ### Events
 
-It is also possible to subscribe to events. Events are the core component of sertain, and run almost everything. To create an event, do:
+It is also possible to subscribe to events. Events are the core component of org.sert2521.sertain, and run almost everything. To create an event, do:
 
 ```kotlin
 class MyEvent : Event
