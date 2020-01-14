@@ -6,6 +6,12 @@ plugins {
     `maven-publish`
 }
 
+repositories {
+    mavenCentral()
+    maven("https://dl.bintray.com/kotlin/kotlin-eap")
+    maven("https://dl.bintray.com/kotlin/kotlin-dev")
+}
+
 subprojects {
     group = "org.sert2521.sertain"
     version = "0.0.8"
