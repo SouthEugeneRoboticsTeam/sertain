@@ -1,19 +1,10 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm")
+    id("org.jetbrains.kotlin.jvm") version "1.3.61"
     `maven-publish`
     java
     maven
-}
-
-repositories {
-    jcenter()
-    mavenCentral()
-    maven("https://frcmaven.wpi.edu/artifactory/release/")
-    maven("https://plugins.gradle.org/m2/")
-    maven("http://devsite.ctr-electronics.com/maven/release/")
-    maven("http://www.revrobotics.com/content/sw/max/sdk/maven/")
 }
 
 dependencies {
