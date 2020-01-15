@@ -1,15 +1,9 @@
 
 plugins {
-    kotlin("jvm") version "1.3.61"
+    kotlin("jvm") version "1.3.50"
     application
     java
     `maven-publish`
-}
-
-repositories {
-    mavenCentral()
-    maven("https://dl.bintray.com/kotlin/")
-    maven("https://dl.bintray.com/kotlin/kotlin-dev")
 }
 
 subprojects {
