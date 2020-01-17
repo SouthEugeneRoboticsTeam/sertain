@@ -1,10 +1,9 @@
 
 plugins {
-//    id("org.jlleitschuh.gradle.ktlint") version "8.2.0"
     kotlin("jvm") version "1.3.61"
-    application
     java
     `maven-publish`
+    maven
 }
 
 allprojects {
