@@ -7,15 +7,6 @@ plugins {
     maven
 }
 
-repositories {
-    jcenter()
-    mavenCentral()
-    maven("https://frcmaven.wpi.edu/artifactory/release/")
-    maven("https://plugins.gradle.org/m2/")
-    maven("http://devsite.ctr-electronics.com/maven/release/")
-    maven("http://www.revrobotics.com/content/sw/max/sdk/maven/")
-}
-
 dependencies {
     implementation(kotlin("stdlib-jdk8", "1.3.61"))
     implementation(kotlin("reflect", "1.3.61"))
