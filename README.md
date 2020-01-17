@@ -9,8 +9,8 @@
 </h4>
 
 <p align="center">
-  <a href="https://travis-ci.org/SouthEugeneRoboticsTeam/org.sert2521.sertain">
-    <img src="https://img.shields.io/travis/SouthEugeneRoboticsTeam/org.sert2521.sertain/master?style=flat-square" />
+  <a href="https://github.com/SouthEugeneRoboticsTeam/sertain/actions">
+    <img src="https://img.shields.io/github/workflow/status/SouthEugeneRoboticsTeam/sertain/Java CI?style=flat-square" />
   </a>
   
   <a href="https://jitpack.io/#SouthEugeneRoboticsTeam/org.sert2521.sertain">
