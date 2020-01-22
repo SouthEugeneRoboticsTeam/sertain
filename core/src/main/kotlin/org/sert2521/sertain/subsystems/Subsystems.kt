@@ -28,7 +28,7 @@ fun <S : Subsystem> access(reference: KClass<S>): S {
 
 inline fun <reified S : Subsystem> access() = access(S::class)
 
-inline fun <reified S : Subsystem> TaskConfigure.use(): S {
+inline fun <reified S : Subsystem> TaskConfigure<*>.use(): S {
     val subsystem = access(S::class)
     this += subsystem
     return subsystem
