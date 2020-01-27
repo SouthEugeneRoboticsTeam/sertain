@@ -31,3 +31,15 @@ fun <T> RobotScope.linkTableEntry(name: String, location: List<String> = emptyLi
         }
     }
 }
+
+fun <T> RobotScope.withTableEntry(name: String, value: T, vararg location: String, action: (T) -> Unit) =
+        withTableEntry(TableEntry(name, value, location.toList()), action)
+
+fun <T> RobotScope.withTableEntry(entry: TableEntry<T>, action: (T) -> Unit) = run {
+    action(entry.value)
+    ({ entry.value }).watch {
+        onChange {
+            action(value)
+        }
+    }
+}
