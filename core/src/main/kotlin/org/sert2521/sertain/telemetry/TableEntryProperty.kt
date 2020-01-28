@@ -3,8 +3,11 @@ package org.sert2521.sertain.telemetry
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
-class TableEntryProperty<T>(private val initialValue: T, vararg location: String, val name: String? = null) : ReadWriteProperty<Any?, T> {
-    val location = location.toList()
+class TableEntryProperty<T>(private val initialValue: T, parent: Table? = null, val name: String? = null) : ReadWriteProperty<Any?, T> {
+    constructor(initialValue: T, vararg location: String, name: String?) :
+            this(initialValue, Table(location.last(), *location.dropLast(1).toTypedArray()), name)
+
+    val location = parent?.let { it.location + it.name } ?: emptyList()
 
     var entry: TableEntry<T>? = null
         private set
@@ -21,4 +24,5 @@ class TableEntryProperty<T>(private val initialValue: T, vararg location: String
     }
 }
 
+fun <T> tableEntry(value: T, parent: Table?, name: String? = null) = TableEntryProperty(value, parent, name = name)
 fun <T> tableEntry(value: T, vararg location: String, name: String? = null) = TableEntryProperty(value, *location, name = name)
