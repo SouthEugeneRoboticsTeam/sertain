@@ -11,11 +11,11 @@ fun wpiTable(vararg location: String): NetworkTable {
     return table
 }
 
-class TableEntry<T>(val name: String, initialValue: T, val parent: Table? = null) {
+class TableEntry<T>(val name: String, initialValue: T, val parent: Table) {
     constructor(name: String, initialValue: T, vararg location: String) :
-            this(name, initialValue, Table(location.last(), *location.dropLast(1).toTypedArray()))
+            this(name, initialValue, if (location.isNotEmpty()) Table(location.last(), *location.dropLast(1).toTypedArray()) else Table("Global"))
 
-    val location: List<String> = parent?.let { it.location + it.name } ?: emptyList()
+    val location: List<String> = parent.location + parent.name
 
     init {
         wpiTable(*location.toTypedArray()).getEntry(name).setValue(initialValue)
