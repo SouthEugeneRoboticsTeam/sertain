@@ -3,7 +3,7 @@ package org.sert2521.sertain.telemetry
 import edu.wpi.first.networktables.NetworkTable
 import edu.wpi.first.networktables.NetworkTableInstance
 
-fun wpiTable(location: List<String>): NetworkTable {
+fun wpiTable(vararg location: String): NetworkTable {
     var table = NetworkTableInstance.getDefault().getTable(location.first())
     location.drop(1).dropLast(0).forEach {
         table = table.getSubTable(it)
@@ -11,12 +11,14 @@ fun wpiTable(location: List<String>): NetworkTable {
     return table
 }
 
-class TableEntry<T>(val name: String, initialValue: T, val location: List<String> = emptyList()) {
+class TableEntry<T>(val name: String, initialValue: T, vararg location: String) {
+    val location = location.toList()
+
     init {
-        wpiTable(location).getEntry(name).setValue(initialValue)
+        wpiTable(*location).getEntry(name).setValue(initialValue)
     }
 
-    val wpiProperty get() = wpiTable(location).getEntry(name)
+    val wpiProperty get() = wpiTable(*location.toTypedArray()).getEntry(name)
 
     @Suppress("UNCHECKED_CAST")
     var value: T
