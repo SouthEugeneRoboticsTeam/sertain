@@ -99,12 +99,15 @@ class MotorController<T : MotorId>(
     fun pidf(slot: Int = pidfSlot, configure: MotorPidfConfig.() -> Unit) {
         with(MotorPidfConfig().apply(configure)) {
             pidf[slot] = MotorPidf(
-                kp, ki, kd, kf,
-                integralZone,
-                allowedError,
-                maxIntegral,
-                maxOutput,
-                period
+                kp ?: pidf[slot]?.kp ?: 0.0,
+                ki ?: pidf[slot]?.ki ?: 0.0,
+                kd ?: pidf[slot]?.kd ?: 0.0,
+                kf ?: pidf[slot]?.kf ?: 0.0,
+                integralZone ?: pidf[slot]?.integralZone ?: 0,
+                allowedError ?: pidf[slot]?.allowedError ?: 0,
+                maxIntegral ?: pidf[slot]?.maxIntegral ?: 0.0,
+                maxOutput ?: pidf[slot]?.maxIntegral ?: 0.0,
+                period ?: pidf[slot]?.period ?: 0
             )
         }
     }

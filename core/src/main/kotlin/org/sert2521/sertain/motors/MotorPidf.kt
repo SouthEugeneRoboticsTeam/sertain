@@ -15,11 +15,11 @@ data class MotorPidf(
 )
 
 class MotorPidfConfig : PidfConfig() {
-    var integralZone: Int = 0
-    var allowedError: Int = 0
-    var maxIntegral: Double = 0.0
-    var maxOutput: Double = 1.0
-    var period: Int = 0
+    var integralZone: Int? = null
+    var allowedError: Int? = null
+    var maxIntegral: Double? = null
+    var maxOutput: Double? = null
+    var period: Int? = null
 }
 
 class MotorPidfCollection(val motor: MotorController<*>, vararg initialPidf: Pair<Int, MotorPidf>) {
