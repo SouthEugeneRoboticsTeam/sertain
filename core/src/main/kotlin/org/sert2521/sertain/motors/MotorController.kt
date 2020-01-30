@@ -106,7 +106,7 @@ class MotorController<T : MotorId>(
                 integralZone ?: pidf[slot]?.integralZone ?: 0,
                 allowedError ?: pidf[slot]?.allowedError ?: 0,
                 maxIntegral ?: pidf[slot]?.maxIntegral ?: 0.0,
-                maxOutput ?: pidf[slot]?.maxIntegral ?: 0.0,
+                maxOutput ?: pidf[slot]?.maxOutput ?: 1.0.also { println("Using backup") },
                 period ?: pidf[slot]?.period ?: 0
             )
         }
