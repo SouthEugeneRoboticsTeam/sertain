@@ -30,7 +30,11 @@ tasks.withType<KotlinCompile> {
 val compileKotlin: KotlinCompile by tasks
 
 compileKotlin.kotlinOptions {
-    freeCompilerArgs = listOf("-XXLanguage:+InlineClasses", "-Xuse-experimental=kotlin.Experimental")
+    freeCompilerArgs = listOf(
+            "-XXLanguage:+InlineClasses",
+            "-Xuse-experimental=kotlin.Experimental",
+            "-Xallow-result-return-type"
+    )
 }
 
 publishing {

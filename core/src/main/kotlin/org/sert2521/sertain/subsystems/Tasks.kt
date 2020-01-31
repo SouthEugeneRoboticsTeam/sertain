@@ -8,37 +8,48 @@ import org.sert2521.sertain.events.fire
 import java.lang.IllegalStateException
 import kotlin.coroutines.coroutineContext
 
-class TaskConfigure<R> {
+class TaskConfigure {
     internal val subsystems = mutableListOf<Subsystem>()
 
     operator fun plusAssign(subsystem: Subsystem) {
         subsystems += subsystem
     }
 
-    internal var action: (suspend CoroutineScope.() -> R)? = null
+    internal var action: (suspend CoroutineScope.() -> Any?)? = null
 
-    fun action(action: suspend CoroutineScope.() -> R) {
+    fun <R> action(action: suspend CoroutineScope.() -> R): R {
         this.action = action
+        return Result.failure<R>(Throwable("Sad days exeption")).getOrThrow()
     }
 }
 
-suspend fun doTask(name: String = "ANONYMOUS_TASK", configure: TaskConfigure<Unit>.() -> Unit) {
-    with(TaskConfigure<Unit>().apply(configure)) {
-        action?.let {
-            (use(*subsystems.toTypedArray(), name = name, action = it))
+suspend fun <T> doTask(name: String = "ANONYMOUS_TASK", configure: TaskConfigure.() -> T): T {
+    val conf = TaskConfigure()
+    try {
+        conf.apply { configure() }
+    } catch (e: Throwable) {
+        return conf.action?.let {
+            (use(*conf.subsystems.toTypedArray(), name = name, action = it))
+        } as T
+    }
+    error("Lol")
+}
+
+suspend fun x() {
+    val x = doTask {
+        action {
         }
-        (use(*subsystems.toTypedArray(), name = name, action = {}))
     }
 }
 
-suspend fun <T> doTaskAndReturn(name: String = "ANONYMOUS_TASK", configure: TaskConfigure<T>.() -> Unit): T {
-    with(TaskConfigure<T>().apply { configure() }) {
-        action?.let {
-            return (use(*subsystems.toTypedArray(), name = name, action = it))
-        }
-        throw IllegalStateException("An action block must be present in `doTaskAndReturn`.")
-    }
-}
+//suspend fun <T> doTaskAndReturn(name: String = "ANONYMOUS_TASK", configure: TaskConfigure<T>.() -> Unit): T {
+//    with(TaskConfigure<T>().apply { configure() }) {
+//        action?.let {
+//            return (use(*subsystems.toTypedArray(), name = name, action = it))
+//        }
+//        throw IllegalStateException("An action block must be present in `doTaskAndReturn`.")
+//    }
+//}
 
 suspend inline fun <reified S1: Subsystem> use(
         cancelConflicts: Boolean = true,
