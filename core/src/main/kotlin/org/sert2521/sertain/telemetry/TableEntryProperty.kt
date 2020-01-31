@@ -1,17 +1,20 @@
 package org.sert2521.sertain.telemetry
 
-import org.sert2521.sertain.coroutines.RobotScope
-import org.sert2521.sertain.coroutines.watch
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
-class TableEntryProperty<T>(private val initialValue: T, val location: List<String> = emptyList()) : ReadWriteProperty<Any?, T> {
+class TableEntryProperty<T>(private val initialValue: T, parent: Table, val name: String? = null) : ReadWriteProperty<Any?, T> {
+    constructor(initialValue: T, vararg location: String, name: String? = null) :
+            this(initialValue, if (location.isNotEmpty()) Table(location.last(), *location.dropLast(1).toTypedArray()) else Table("Global"), name)
+
+    val location = parent.location + parent.name
+
     var entry: TableEntry<T>? = null
         private set
 
     override fun getValue(thisRef: Any?, property: KProperty<*>): T {
         if (entry == null) {
-            entry = TableEntry(property.name, initialValue, location)
+            entry = TableEntry(name ?: property.name, initialValue, *location.toTypedArray())
         }
         return entry?.value ?: initialValue
     }
@@ -21,13 +24,5 @@ class TableEntryProperty<T>(private val initialValue: T, val location: List<Stri
     }
 }
 
-fun <T> tableEntry(value: T, vararg location: String) = TableEntryProperty(value, location.toList())
-
-fun <T> RobotScope.linkTableEntry(name: String, location: List<String> = emptyList(), get: () -> T) = run {
-    val entry = TableEntry(name, get(), location)
-    get.watch {
-        onChange {
-            entry.value = value
-        }
-    }
-}
+fun <T> tableEntry(value: T, parent: Table, name: String? = null) = TableEntryProperty(value, parent, name = name)
+fun <T> tableEntry(value: T, vararg location: String, name: String? = null) = TableEntryProperty(value, *location, name = name)
