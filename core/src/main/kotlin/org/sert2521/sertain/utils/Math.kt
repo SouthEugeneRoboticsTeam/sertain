@@ -19,3 +19,7 @@ fun Double.root(n: Int): Double {
 
 fun Double.roundTo(decimalPlaces: Int) =
         round(this * 10.0.pow(decimalPlaces)) / 10.0.pow(decimalPlaces)
+
+open class Point(open val x: Double, open val y: Double)
+
+fun p(x: Double, y: Double) = Point(x, y)
