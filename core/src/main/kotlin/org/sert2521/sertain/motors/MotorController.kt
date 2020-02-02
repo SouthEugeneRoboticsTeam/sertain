@@ -1,6 +1,7 @@
 package org.sert2521.sertain.motors
 
 import org.sert2521.sertain.units.Angular
+import org.sert2521.sertain.units.AngularVelocity
 import org.sert2521.sertain.units.Chronic
 import org.sert2521.sertain.units.CompositeUnit
 import org.sert2521.sertain.units.CompositeUnitType
@@ -99,12 +100,15 @@ class MotorController<T : MotorId>(
     fun pidf(slot: Int = pidfSlot, configure: MotorPidfConfig.() -> Unit) {
         with(MotorPidfConfig().apply(configure)) {
             pidf[slot] = MotorPidf(
-                kp, ki, kd, kf,
-                integralZone,
-                allowedError,
-                maxIntegral,
-                maxOutput,
-                period
+                kp ?: pidf[slot]?.kp ?: 0.0,
+                ki ?: pidf[slot]?.ki ?: 0.0,
+                kd ?: pidf[slot]?.kd ?: 0.0,
+                kf ?: pidf[slot]?.kf ?: 0.0,
+                integralZone ?: pidf[slot]?.integralZone ?: 0,
+                allowedError ?: pidf[slot]?.allowedError ?: 0,
+                maxIntegral ?: pidf[slot]?.maxIntegral ?: 0.0,
+                maxOutput ?: pidf[slot]?.maxIntegral ?: 0.0,
+                period ?: pidf[slot]?.period ?: 0
             )
         }
     }
@@ -186,7 +190,7 @@ class MotorController<T : MotorId>(
         ctreMotorController.set(CtreControlMode.Position, position.toDouble())
     }
 
-    fun <U : MetricUnit<Angular>> setTargetPosition(position: MetricValue<Angular, U>) {
+    fun setTargetPosition(position: MetricValue<Angular>) {
         checkNotNull(encoder) { "You must configure your encoder to use units." }
         setTargetPosition(position.convertTo(encoder!!.ticks).value.toInt())
     }
@@ -195,9 +199,7 @@ class MotorController<T : MotorId>(
         ctreMotorController.set(CtreControlMode.Velocity, velocity.toDouble())
     }
 
-    fun setTargetVelocity(
-        velocity: MetricValue<CompositeUnitType<Per, Angular, Chronic>, CompositeUnit<Per, Angular, Chronic>>
-    ) {
+    fun setTargetVelocity(velocity: MetricValue<AngularVelocity>) {
         checkNotNull(encoder) { "You must configure your encoder to use units." }
         setTargetVelocity(velocity.convertTo(encoder!!.ticksPerSecond).value.toInt())
     }

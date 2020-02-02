@@ -1,17 +1,17 @@
 package org.sert2521.sertain.control
 
 open class PidfConfig {
-    var kp = 0.0
-    var ki = 0.0
-    var kd = 0.0
-    var kf = 0.0
+    var kp: Double? = null
+    var ki: Double? = null
+    var kd: Double? = null
+    var kf: Double? = null
 }
 
 class PidfController(config: PidfConfig, val dt: Double) {
-    private val kp = config.kp
-    private val ki = config.ki
-    private val kd = config.kd
-    private val kf = config.kf
+    private val kp = config.kp ?: 0.0
+    private val ki = config.ki ?: 0.0
+    private val kd = config.kd ?: 0.0
+    private val kf = config.kf ?: 0.0
 
     private var integral = 0.0
     private var lastError = 0.0

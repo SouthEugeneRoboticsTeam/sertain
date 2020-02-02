@@ -4,6 +4,6 @@ fun <T : MetricUnitType, U1 : MetricUnit<T>, U2 : MetricUnit<T>> Double.convert(
     return this * units.first.base / units.second.base
 }
 
-fun <T : MetricUnitType, U1 : MetricUnit<T>, U2 : MetricUnit<T>> MetricValue<T, U1>.convertTo(other: U2): MetricValue<T, U2> {
+fun <T : MetricUnitType> MetricValue<T>.convertTo(other: MetricUnit<T>): MetricValue<T> {
     return MetricValue(other, value.convert(unit to other))
 }
