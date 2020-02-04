@@ -4,24 +4,20 @@ import kotlin.math.PI
 
 open class MetricUnit<T : MetricUnitType>(val type: T, val base: Double, val symbol: String)
 
-// abstract class ChronicUnit(seconds: Double, symbol: String) : MetricUnit<Chronic>(Chronic, seconds, symbol)
-typealias ChronicUnit = MetricUnit<Chronic>
-fun chronicUnit(seconds: Double, symbol: String): ChronicUnit = MetricUnit(Chronic, seconds, symbol)
+abstract class ChronicUnit(seconds: Double, symbol: String) : MetricUnit<Chronic>(Chronic, seconds, symbol)
 
-val seconds = chronicUnit(1.0, " s")
-val minutes =  chronicUnit(60.0, " min")
-val milliseconds = chronicUnit(0.001, " ms")
+object Seconds : ChronicUnit(1.0, " s")
+object Minutes : ChronicUnit(60.0, " min")
+object Milliseconds : ChronicUnit(0.001, " ms")
 
-typealias LinearUnit = MetricUnit<Linear>
-fun linearUnit(meters: Double, symbol: String): LinearUnit = MetricUnit(Linear, meters, symbol)
+abstract class LinearUnit(meters: Double, symbol: String) : MetricUnit<Linear>(Linear, meters, symbol)
 
-val meters = linearUnit(1.0, " m")
-val centimeters = linearUnit(0.01, " cm")
-val millimeters = linearUnit(0.001, " mm")
+object Meters : LinearUnit(1.0, " m")
+object Centimeters : LinearUnit(0.01, " cm")
+object Millimeters : LinearUnit(0.001, " mm")
 
-typealias AngularUnit = MetricUnit<Angular>
-fun angularUnit(radians: Double, symbol: String): AngularUnit = MetricUnit(Angular, radians, symbol)
+abstract class AngularUnit(meters: Double, symbol: String) : MetricUnit<Angular>(Angular, meters, symbol)
 
-val degrees = angularUnit(PI / 180, "°")
-val radians = angularUnit(1.0, " rad")
-val revolutions = angularUnit(PI * 2, " rev")
+object Degrees : AngularUnit(PI / 180, "°")
+object Radians : AngularUnit(1.0, " rad")
+object Revolutions : AngularUnit(PI * 2, " rev")
