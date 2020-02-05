@@ -2,7 +2,7 @@ package org.sert2521.sertain.units
 
 import kotlin.math.PI
 
-abstract class MetricUnit<T : MetricUnitType>(val type: T, val base: Double, val symbol: String)
+open class MetricUnit<T : MetricUnitType>(val type: T, val base: Double, val symbol: String)
 
 abstract class ChronicUnit(seconds: Double, symbol: String) : MetricUnit<Chronic>(Chronic, seconds, symbol)
 
@@ -16,7 +16,7 @@ object Meters : LinearUnit(1.0, " m")
 object Centimeters : LinearUnit(0.01, " cm")
 object Millimeters : LinearUnit(0.001, " mm")
 
-abstract class AngularUnit(radians: Double, symbol: String) : MetricUnit<Angular>(Angular, radians, symbol)
+abstract class AngularUnit(meters: Double, symbol: String) : MetricUnit<Angular>(Angular, meters, symbol)
 
 object Degrees : AngularUnit(PI / 180, "°")
 object Radians : AngularUnit(1.0, " rad")
