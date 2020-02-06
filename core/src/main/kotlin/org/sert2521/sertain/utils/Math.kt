@@ -19,12 +19,3 @@ fun Double.root(n: Int): Double {
 
 fun Double.roundTo(decimalPlaces: Int) =
         round(this * 10.0.pow(decimalPlaces)) / 10.0.pow(decimalPlaces)
-
-interface Coordinates {
-    val x: Double
-    val y: Double
-}
-
-data class Point(override val x: Double, override val y: Double) : Coordinates
-
-fun p(x: Double, y: Double) = Point(x, y)
