@@ -11,6 +11,15 @@ class PathFollowerConfig {
     internal var getPose = { Pose2d(0.0, 0.0, Rotation2d(0.0)) }
     internal var outputVelocity = { l: Double, r: Double -> Unit }
 
+    var constraints = DriveSettings(0.0)
+        private set
+
+    var trackWidth
+        get() = constraints.trackWidth
+        set(value) {
+            constraints = constraints.copy(trackWidth = value)
+        }
+
     fun pose(get: () -> Pose2d) {
         getPose = get
     }
@@ -20,7 +29,11 @@ class PathFollowerConfig {
     }
 }
 
-data class PathFollower(val getPose: () -> Pose2d, val outputVelocity: (left: Double, right: Double) -> Unit) {
+data class DriveSettings(
+        val trackWidth: Double
+)
+
+class PathFollower(val settings: DriveSettings, val getPose: () -> Pose2d, val outputVelocity: (left: Double, right: Double) -> Unit) {
     suspend fun follow(path: Path) {
         runWpilibPath(
                 path.toWpilibTrajectory(),
@@ -31,15 +44,15 @@ data class PathFollower(val getPose: () -> Pose2d, val outputVelocity: (left: Do
         )
     }
 
-    suspend fun followPath(settings: RobotConfig, constraints: PathConstraints, configure: WaypointPathConfig.() -> Unit) {
-        val waypoints = WaypointPathConfig().apply(configure).waypoints
+    suspend fun followPath(configure: WaypointPathConfig.() -> Unit) {
+        val config = WaypointPathConfig().apply(configure)
         val kinematics = DifferentialDriveKinematics(settings.trackWidth)
         runWpilibPath(
                 TrajectoryGenerator.generateTrajectory(
-                        waypoints,
+                        config.waypoints,
                         TrajectoryConfig(
-                                constraints.maxVel,
-                                constraints.maxAcc
+                                config.maxVel,
+                                config.maxAcc
                         ).setKinematics(kinematics)
                 ),
                 getPose,
@@ -49,17 +62,17 @@ data class PathFollower(val getPose: () -> Pose2d, val outputVelocity: (left: Do
         )
     }
 
-    suspend fun followPath(settings: RobotConfig, constraints: PathConstraints, start: Pose2d, finish: Pose2d, configure: PointPathConfig.() -> Unit) {
-        val points = PointPathConfig().apply(configure).points
+    suspend fun followPath(start: Pose2d, finish: Pose2d, configure: PointPathConfig.() -> Unit) {
+        val config = PointPathConfig().apply(configure)
         val kinematics = DifferentialDriveKinematics(settings.trackWidth)
         runWpilibPath(
                 TrajectoryGenerator.generateTrajectory(
                         start,
-                        points,
+                        config.points,
                         finish,
                         TrajectoryConfig(
-                                constraints.maxVel,
-                                constraints.maxAcc
+                                config.maxVel,
+                                config.maxAcc
                         ).setKinematics(kinematics)
                 ),
                 getPose,
@@ -70,6 +83,6 @@ data class PathFollower(val getPose: () -> Pose2d, val outputVelocity: (left: Do
     }
 }
 
-fun pathFollower(configure: PathFollowerConfig.() -> Unit) = with(PathFollowerConfig().apply(configure)) {
-    PathFollower(getPose, outputVelocity)
+fun follower(configure: PathFollowerConfig.() -> Unit) = with(PathFollowerConfig().apply(configure)) {
+    PathFollower(DriveSettings(trackWidth), getPose, outputVelocity)
 }

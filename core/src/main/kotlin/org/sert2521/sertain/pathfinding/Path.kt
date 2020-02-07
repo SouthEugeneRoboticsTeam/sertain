@@ -8,17 +8,13 @@ import edu.wpi.first.wpilibj.trajectory.Trajectory
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator
 
-data class RobotConfig(
-        val trackWidth: Double
-)
-
 data class PathConstraints(
         val maxVel: Double,
         val maxAcc: Double
 )
 
-class Path private constructor(val settings: RobotConfig, val constraints: PathConstraints, private val wpilibTrajectory: Trajectory) {
-    constructor(settings: RobotConfig, constraints: PathConstraints, vararg waypoints: Pose2d) : this(
+class Path private constructor(val settings: DriveSettings, val constraints: PathConstraints, private val wpilibTrajectory: Trajectory) {
+    constructor(settings: DriveSettings, constraints: PathConstraints, vararg waypoints: Pose2d) : this(
             settings,
             constraints,
             TrajectoryGenerator.generateTrajectory(
@@ -30,7 +26,7 @@ class Path private constructor(val settings: RobotConfig, val constraints: PathC
             )
     )
 
-    constructor(settings: RobotConfig, constraints: PathConstraints, start: Pose2d, finish: Pose2d, vararg points: Translation2d) : this(
+    constructor(settings: DriveSettings, constraints: PathConstraints, start: Pose2d, finish: Pose2d, vararg points: Translation2d) : this(
             settings,
             constraints,
             TrajectoryGenerator.generateTrajectory(
