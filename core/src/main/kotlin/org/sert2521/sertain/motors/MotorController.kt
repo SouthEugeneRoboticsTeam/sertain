@@ -99,11 +99,11 @@ abstract class MotorController {
     internal abstract fun updatePidf(slot: Int, pidf: MotorPidf)
 }
 
-fun<T: MotorId> motorController(id: T, configure: MotorController.() -> Unit = {}): MotorController? {
+fun<T: MotorId> motorController(id: T, configure: MotorController.() -> Unit = {}): MotorController {
     return when (id) {
         is TalonId  -> TalonMotorController(id,  configure = configure)
         is VictorId -> VictorMotorController(id, configure = configure)
-        else        -> null
+        else        -> throw NotImplementedError("A Motor Controller is not implemented for this ID")
     }
 }
 

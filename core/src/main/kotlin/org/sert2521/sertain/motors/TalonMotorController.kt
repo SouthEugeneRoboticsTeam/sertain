@@ -1,6 +1,7 @@
 package org.sert2521.sertain.motors
 
 import com.ctre.phoenix.motorcontrol.can.TalonSRX
+import com.ctre.phoenix.motorcontrol.ControlMode as PhoenixControlMode
 
 class TalonMotorController(
         id: TalonId,
@@ -19,7 +20,7 @@ class TalonMotorController(
 
     val followers: MutableMap<MotorId, MotorController> = with(mutableMapOf<MotorId, MotorController>()) {
         followerIds.forEach {
-            set(it, motorController(it)!!.apply {
+            set(it, motorController(it).apply {
                 master = this
             })
         }
@@ -41,11 +42,11 @@ class TalonMotorController(
 
     override val controlMode: ControlMode
         get() = when (srx.controlMode) {
-            com.ctre.phoenix.motorcontrol.ControlMode.PercentOutput -> ControlMode.PERCENT_OUTPUT
-            com.ctre.phoenix.motorcontrol.ControlMode.Position -> ControlMode.POSITION
-            com.ctre.phoenix.motorcontrol.ControlMode.Velocity -> ControlMode.VELOCITY
-            com.ctre.phoenix.motorcontrol.ControlMode.Current -> ControlMode.CURRENT
-            com.ctre.phoenix.motorcontrol.ControlMode.Disabled -> ControlMode.DISABLED
+            PhoenixControlMode.PercentOutput -> ControlMode.PERCENT_OUTPUT
+            PhoenixControlMode.Position -> ControlMode.POSITION
+            PhoenixControlMode.Velocity -> ControlMode.VELOCITY
+            PhoenixControlMode.Current -> ControlMode.CURRENT
+            PhoenixControlMode.Disabled -> ControlMode.DISABLED
             else -> throw IllegalStateException("Invalid control mode.")
         }
     override var brakeMode: Boolean = false
@@ -119,19 +120,19 @@ class TalonMotorController(
         get() = srx.getSelectedSensorVelocity(0)
 
     override fun setPercentOutput(output: Double) {
-        srx.set(com.ctre.phoenix.motorcontrol.ControlMode.PercentOutput, output)
+        srx.set(PhoenixControlMode.PercentOutput, output)
     }
 
     override fun setTargetPosition(position: Int) {
-        srx.set(com.ctre.phoenix.motorcontrol.ControlMode.Position, position.toDouble())
+        srx.set(PhoenixControlMode.Position, position.toDouble())
     }
 
     override fun setTargetVelocity(velocity: Int) {
-        srx.set(com.ctre.phoenix.motorcontrol.ControlMode.Velocity, velocity.toDouble())
+        srx.set(PhoenixControlMode.Velocity, velocity.toDouble())
     }
 
     override fun setCurrent(current: Double) {
-        srx.set(com.ctre.phoenix.motorcontrol.ControlMode.Current, current)
+        srx.set(PhoenixControlMode.Current, current)
     }
 
     override fun disable() {
