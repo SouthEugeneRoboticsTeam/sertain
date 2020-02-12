@@ -7,18 +7,18 @@ class TalonMotorController(
         id: TalonId,
         vararg followerIds: MotorId,
         configure: MotorController.() -> Unit = {}
-) : MotorController() {
-    val srx = TalonSRX(id.number)
+) : PhoenixMotorController() {
+    private val srx = TalonSRX(id.number)
 
-    var master: MotorController? = null
+    private var master: MotorController? = null
         set(value) {
-            if (value != null) {
-                srx.follow(value.baseController!!)
+            if (value is PhoenixMotorController) {
+                srx.follow(value.baseController)
             }
             field = value
         }
 
-    val followers: MutableMap<MotorId, MotorController> = with(mutableMapOf<MotorId, MotorController>()) {
+    private val followers: MutableMap<MotorId, MotorController> = with(mutableMapOf<MotorId, MotorController>()) {
         followerIds.forEach {
             set(it, motorController(it).apply {
                 master = this

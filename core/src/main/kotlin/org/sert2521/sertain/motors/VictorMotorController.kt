@@ -5,20 +5,20 @@ import com.ctre.phoenix.motorcontrol.can.VictorSPX
 
 class VictorMotorController(
         id: VictorId,
-        vararg followerIds: VictorId,
+        vararg followerIds: MotorId,
         configure: MotorController.() -> Unit = {}
-) : MotorController() {
-    val spx = VictorSPX(id.number)
+) : PhoenixMotorController() {
+    private val spx = VictorSPX(id.number)
 
-    var master: MotorController? = null
+    private var master: MotorController? = null
         set(value) {
-            if (value != null) {
-                spx.follow(value.baseController!!)
+            if (value is PhoenixMotorController) {
+                spx.follow(value.baseController)
             }
             field = value
         }
 
-    val followers: MutableMap<MotorId, MotorController> = with(mutableMapOf<MotorId, MotorController>()) {
+    private val followers: MutableMap<MotorId, MotorController> = with(mutableMapOf<MotorId, MotorController>()) {
         followerIds.forEach {
             set(it, motorController(it).apply {
                 master = this
