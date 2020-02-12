@@ -64,6 +64,4 @@ abstract class PhoenixMotorController : MotorController() {
     }
 
     abstract fun setCurrent(current: Double)
-
-    internal abstract fun updatePidf(slot: Int, pidf: MotorPidf)
 }

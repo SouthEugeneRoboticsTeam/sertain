@@ -34,6 +34,8 @@ abstract class MotorController {
     abstract fun <U1 : AngularUnit, U2 : ChronicUnit, V : AngularVelocityValue<U1, U2>> setTargetVelocity(velocity: V)
 
     abstract fun disable()
+
+    internal abstract fun updatePidf(slot: Int, pidf: MotorPidf)
 }
 
 fun<T: MotorId> motorController(id: T, configure: MotorController.() -> Unit = {}): MotorController {
