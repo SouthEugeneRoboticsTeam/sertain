@@ -3,16 +3,9 @@ package org.sert2521.sertain.pathfinding
 import edu.wpi.first.wpilibj.geometry.Pose2d
 import edu.wpi.first.wpilibj.geometry.Rotation2d
 import edu.wpi.first.wpilibj.geometry.Translation2d
-import org.sert2521.sertain.units.AngularUnit
-import org.sert2521.sertain.units.AngularValue
-import org.sert2521.sertain.units.LinearUnit
-import org.sert2521.sertain.units.LinearValue
-import org.sert2521.sertain.units.Meters
-import org.sert2521.sertain.units.Radians
-import org.sert2521.sertain.units.convertTo
 
 class WaypointPathConfig {
-    var constraints = PathConstraints(0.0, 0.0)
+    var constraints = PathConstraints(1.0, 1.0)
         private set
 
     var maxVel
@@ -29,15 +22,15 @@ class WaypointPathConfig {
 
     val waypoints = mutableListOf<Pose2d>()
 
-    fun <L : LinearUnit, A : AngularUnit> wp(x: LinearValue<L>, y: LinearValue<L>, ang: AngularValue<A>) {
-        waypoints += Pose2d(x.convertTo(Meters).value, y.convertTo(Meters).value, Rotation2d(ang.convertTo(Radians).value))
+    fun wp(x: Double, y: Double, ang: Double) {
+        waypoints += Pose2d(x, y, Rotation2d(ang))
     }
 
-    fun <L : LinearUnit> p(x: LinearValue<L>, y: LinearValue<L>) =
-            Translation2d(x.convertTo(Meters).value, y.convertTo(Meters).value)
+    fun p(x: Double, y: Double) =
+            Translation2d(x, y)
 
-    infix fun <A : AngularUnit> Translation2d.ang(angle: AngularValue<A>) {
-        waypoints += Pose2d(this, Rotation2d(angle.convertTo(Radians).value))
+    infix fun Translation2d.ang(angle: Double) {
+        waypoints += Pose2d(this, Rotation2d(angle))
     }
 }
 
@@ -59,7 +52,7 @@ class PointPathConfig {
 
     internal val points = mutableListOf<Translation2d>()
 
-    fun <L : LinearUnit> p(x: LinearValue<L>, y: LinearValue<L>) {
-        points += Translation2d(x.convertTo(Meters).value, y.convertTo(Meters).value)
+    fun p(x: Double, y: Double) {
+        points += Translation2d(x, y)
     }
 }

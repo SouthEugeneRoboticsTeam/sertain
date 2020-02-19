@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics
 import edu.wpi.first.wpilibj.trajectory.Trajectory
 import org.sert2521.sertain.utils.timer
 
-suspend fun runWpilibPath(
+suspend fun followWpilibPath(
         trajectory: Trajectory,
         getPose: () -> Pose2d,
         follower: RamseteController,
