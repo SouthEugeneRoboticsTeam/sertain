@@ -5,135 +5,29 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import org.sert2521.sertain.events.Use
 import org.sert2521.sertain.events.fire
-import java.lang.IllegalStateException
 import kotlin.coroutines.coroutineContext
 
-class TaskConfigure {
-    internal val subsystems = mutableListOf<Subsystem>()
+suspend fun <S1 : Subsystem, R> use(s1: Accessor<S1>, cancelConflicts: Boolean = true, name: String = "Anonymous Task", action: suspend CoroutineScope.(S1) -> R) =
+        use(s1.access(), cancelConflicts = cancelConflicts, name = name) { action(s1.access()) }
+suspend fun <S1 : Subsystem, S2 : Subsystem, R> use(s1: Accessor<S1>, s2: Accessor<S2>, cancelConflicts: Boolean = true, name: String = "Anonymous Task", action: suspend CoroutineScope.(S1, S2) -> R) =
+        use(s1.access(), s2.access(), cancelConflicts = cancelConflicts, name = name) { action(s1.access(), s2.access()) }
+suspend fun <S1 : Subsystem, S2 : Subsystem, S3 : Subsystem, R> use(s1: Accessor<S1>, s2: Accessor<S2>, s3: Accessor<S3>, cancelConflicts: Boolean = true, name: String = "Anonymous Task", action: suspend CoroutineScope.(S1, S2, S3) -> R) =
+        use(s1.access(), s2.access(), s3.access(), cancelConflicts = cancelConflicts, name = name) { action(s1.access(), s2.access(), s3.access()) }
+suspend fun <S1 : Subsystem, S2 : Subsystem, S3 : Subsystem, S4 : Subsystem, R> use(s1: Accessor<S1>, s2: Accessor<S2>, s3: Accessor<S3>, s4: Accessor<S4>, cancelConflicts: Boolean = true, name: String = "Anonymous Task", action: suspend CoroutineScope.(S1, S2, S3, S4) -> R) =
+        use(s1.access(), s2.access(), s3.access(), s4.access(), cancelConflicts = cancelConflicts, name = name) { action(s1.access(), s2.access(), s3.access(), s4.access()) }
+suspend fun <S1 : Subsystem, S2 : Subsystem, S3 : Subsystem, S4 : Subsystem, S5 : Subsystem, R> use(s1: Accessor<S1>, s2: Accessor<S2>, s3: Accessor<S3>, s4: Accessor<S4>, s5: Accessor<S5>, cancelConflicts: Boolean = true, name: String = "Anonymous Task", action: suspend CoroutineScope.(S1, S2, S3, S4, S5) -> R) =
+        use(s1.access(), s2.access(), s3.access(), s4.access(), s5.access(), cancelConflicts = cancelConflicts, name = name) { action(s1.access(), s2.access(), s3.access(), s4.access(), s5.access()) }
+suspend fun <S1 : Subsystem, S2 : Subsystem, S3 : Subsystem, S4 : Subsystem, S5 : Subsystem, S6 : Subsystem, R> use(s1: Accessor<S1>, s2: Accessor<S2>, s3: Accessor<S3>, s4: Accessor<S4>, s5: Accessor<S5>, s6: Accessor<S6>, cancelConflicts: Boolean = true, name: String = "Anonymous Task", action: suspend CoroutineScope.(S1, S2, S3, S4, S5, S6) -> R) =
+        use(s1.access(), s2.access(), s3.access(), s4.access(), s5.access(), s6.access(), cancelConflicts = cancelConflicts, name = name) { action(s1.access(), s2.access(), s3.access(), s4.access(), s5.access(), s6.access()) }
+suspend fun <S1 : Subsystem, S2 : Subsystem, S3 : Subsystem, S4 : Subsystem, S5 : Subsystem, S6 : Subsystem, S7 : Subsystem, R> use(s1: Accessor<S1>, s2: Accessor<S2>, s3: Accessor<S3>, s4: Accessor<S4>, s5: Accessor<S5>, s6: Accessor<S6>, s7: Accessor<S7>, cancelConflicts: Boolean = true, name: String = "Anonymous Task", action: suspend CoroutineScope.(S1, S2, S3, S4, S5, S6, S7) -> R) =
+        use(s1.access(), s2.access(), s3.access(), s4.access(), s5.access(), s6.access(), s7.access(), cancelConflicts = cancelConflicts, name = name) { action(s1.access(), s2.access(), s3.access(), s4.access(), s5.access(), s6.access(), s7.access()) }
+suspend fun <S1 : Subsystem, S2 : Subsystem, S3 : Subsystem, S4 : Subsystem, S5 : Subsystem, S6 : Subsystem, S7 : Subsystem, S8 : Subsystem, R> use(s1: Accessor<S1>, s2: Accessor<S2>, s3: Accessor<S3>, s4: Accessor<S4>, s5: Accessor<S5>, s6: Accessor<S6>, s7: Accessor<S7>, s8: Accessor<S8>, cancelConflicts: Boolean = true, name: String = "Anonymous Task", action: suspend CoroutineScope.(S1, S2, S3, S4, S5, S6, S7, S8) -> R) =
+        use(s1.access(), s2.access(), s3.access(), s4.access(), s5.access(), s6.access(), s7.access(), s8.access(), cancelConflicts = cancelConflicts, name = name) { action(s1.access(), s2.access(), s3.access(), s4.access(), s5.access(), s6.access(), s7.access(), s8.access()) }
 
-    operator fun plusAssign(subsystem: Subsystem) {
-        subsystems += subsystem
-    }
-
-    internal var action: (suspend CoroutineScope.() -> Any?)? = null
-
-    fun <R> action(action: suspend CoroutineScope.() -> R): R {
-        this.action = action
-        return Result.failure<R>(Throwable("Sad days exeption")).getOrThrow()
-    }
-}
-
-suspend fun <T> doTask(name: String = "ANONYMOUS_TASK", configure: TaskConfigure.() -> T): T {
-    val conf = TaskConfigure()
-    try {
-        conf.apply { configure() }
-    } catch (e: Throwable) {
-        return conf.action?.let {
-            (use(*conf.subsystems.toTypedArray(), name = name, action = it))
-        } as T
-    }
-    error("Lol")
-}
-
-suspend fun x() {
-    val x = doTask {
-        action {
-        }
-    }
-}
-
-//suspend fun <T> doTaskAndReturn(name: String = "ANONYMOUS_TASK", configure: TaskConfigure<T>.() -> Unit): T {
-//    with(TaskConfigure<T>().apply { configure() }) {
-//        action?.let {
-//            return (use(*subsystems.toTypedArray(), name = name, action = it))
-//        }
-//        throw IllegalStateException("An action block must be present in `doTaskAndReturn`.")
-//    }
-//}
-
-suspend inline fun <reified S1: Subsystem> use(
-        cancelConflicts: Boolean = true,
-        name: String = "ANONYMOUS_TASK",
-        crossinline action: suspend CoroutineScope.(s1: S1) -> Unit
-) {
-    val s1 = access<S1>()
-    use(s1, cancelConflicts = cancelConflicts, name = name) { action(s1) }
-}
-
-suspend inline fun <reified S1: Subsystem, reified S2: Subsystem> use(
-        cancelConflicts: Boolean = true,
-        name: String = "ANONYMOUS_TASK",
-        crossinline action: suspend CoroutineScope.(s1: S1, s2: S2) -> Unit
-) {
-    val s1 = access<S1>()
-    val s2 = access<S2>()
-    use(s1, s2, cancelConflicts = cancelConflicts, name = name) { action(s1, s2) }
-}
-
-suspend inline fun <reified S1: Subsystem, reified S2: Subsystem, reified S3: Subsystem> use(
-        cancelConflicts: Boolean = true,
-        name: String = "ANONYMOUS_TASK",
-        crossinline action: suspend CoroutineScope.(s1: S1, s2: S2, s3: S3) -> Unit
-) {
-    val s1 = access<S1>()
-    val s2 = access<S2>()
-    val s3 = access<S3>()
-    use(s1, s2, s3, cancelConflicts = cancelConflicts, name = name) { action(s1, s2, s3) }
-}
-
-suspend inline fun <reified S1: Subsystem, reified S2: Subsystem, reified S3: Subsystem, reified S4: Subsystem> use(
-        cancelConflicts: Boolean = true,
-        name: String = "ANONYMOUS_TASK",
-        crossinline action: suspend CoroutineScope.(s1: S1, s2: S2, s3: S3, s4: S4) -> Unit
-) {
-    val s1 = access<S1>()
-    val s2 = access<S2>()
-    val s3 = access<S3>()
-    val s4 = access<S4>()
-    use(s1, s2, s3, s4, cancelConflicts = cancelConflicts, name = name) { action(s1, s2, s3, s4) }
-}
-
-suspend inline fun <reified S1: Subsystem, R> borrow(
-        cancelConflicts: Boolean = true,
-        name: String = "ANONYMOUS_TASK",
-        crossinline action: suspend CoroutineScope.(s1: S1) -> R
-): R {
-    val s1 = access<S1>()
-    return use(s1, cancelConflicts = cancelConflicts, name = name) { action(s1) }
-}
-
-suspend inline fun <reified S1: Subsystem, reified S2: Subsystem, R> borrow(
-        cancelConflicts: Boolean = true,
-        name: String = "ANONYMOUS_TASK",
-        crossinline action: suspend CoroutineScope.(s1: S1, s2: S2) -> R
-): R {
-    val s1 = access<S1>()
-    val s2 = access<S2>()
-    return use(s1, s2, cancelConflicts = cancelConflicts, name = name) { action(s1, s2) }
-}
-
-suspend inline fun <reified S1: Subsystem, reified S2: Subsystem, reified S3: Subsystem, R> borrow(
-        cancelConflicts: Boolean = true,
-        name: String = "ANONYMOUS_TASK",
-        crossinline action: suspend CoroutineScope.(s1: S1, s2: S2, s3: S3) -> R
-): R {
-    val s1 = access<S1>()
-    val s2 = access<S2>()
-    val s3 = access<S3>()
-    return use(s1, s2, s3, cancelConflicts = cancelConflicts, name = name) { action(s1, s2, s3) }
-}
-
-suspend inline fun <reified S1: Subsystem, reified S2: Subsystem, reified S3: Subsystem, reified S4: Subsystem, R> borrow(
-        cancelConflicts: Boolean = true,
-        name: String = "ANONYMOUS_TASK",
-        crossinline action: suspend CoroutineScope.(s1: S1, s2: S2, s3: S3, s4: S4) -> R
-): R {
-    val s1 = access<S1>()
-    val s2 = access<S2>()
-    val s3 = access<S3>()
-    val s4 = access<S4>()
-    return use(s1, s2, s3, s4, cancelConflicts = cancelConflicts, name = name) { action(s1, s2, s3, s4) }
-}
+suspend fun reserve(vararg subsystems: Accessor<*>) =
+        use(*subsystems.map { it.access() }.toTypedArray()) {}
+suspend fun <R> reserve(vararg subsystems: Accessor<*>, action: suspend CoroutineScope.() -> R) =
+    use(*subsystems.map { it.access() }.toTypedArray()) { action() }
 
 suspend fun <R> use(
     vararg subsystems: Subsystem,

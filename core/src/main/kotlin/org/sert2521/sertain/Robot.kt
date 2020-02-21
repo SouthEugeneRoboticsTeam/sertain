@@ -14,8 +14,6 @@ import org.sert2521.sertain.events.Teleop
 import org.sert2521.sertain.events.Test
 import org.sert2521.sertain.events.Tick
 import org.sert2521.sertain.events.fire
-import org.sert2521.sertain.subsystems.doTask
-import org.sert2521.sertain.subsystems.doTaskAndReturn
 import org.sert2521.sertain.subsystems.manageTasks
 import org.sert2521.sertain.subsystems.subsystems
 import org.sert2521.sertain.subsystems.use

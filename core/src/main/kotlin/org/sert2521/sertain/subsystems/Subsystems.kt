@@ -1,5 +1,6 @@
 package org.sert2521.sertain.subsystems
 
+import kotlinx.coroutines.CoroutineScope
 import kotlin.reflect.KClass
 import kotlin.reflect.full.createInstance
 
@@ -28,8 +29,15 @@ fun <S : Subsystem> access(reference: KClass<S>): S {
 
 inline fun <reified S : Subsystem> access() = access(S::class)
 
-inline fun <reified S : Subsystem> TaskConfigure<*>.use(): S {
-    val subsystem = access(S::class)
-    this += subsystem
-    return subsystem
+data class Accessor<S : Subsystem>(
+        internal val getSubsystem: () -> S
+) {
+    suspend operator fun <R> invoke(action: suspend CoroutineScope.(subsystem: S) -> R) = use(this, action = action)
+
+    fun access() = getSubsystem()
+}
+
+inline fun <reified S : Subsystem> create(): Accessor<S> {
+    add<S>()
+    return Accessor(::access)
 }
