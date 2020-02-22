@@ -37,7 +37,7 @@ data class Accessor<S : Subsystem>(
     fun access() = getSubsystem()
 }
 
-inline fun <reified S : Subsystem> create(): Accessor<S> {
+inline fun <reified S : Subsystem> register(): Accessor<S> {
     add<S>()
     return Accessor(::access)
 }
