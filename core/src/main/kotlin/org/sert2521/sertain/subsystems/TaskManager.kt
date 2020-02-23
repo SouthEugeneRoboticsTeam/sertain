@@ -66,11 +66,7 @@ fun CoroutineScope.manageTasks() {
                     }
                 }
 
-                val result = coroutineScope {
-                    launch {
-                        use.action(this)
-                    }
-                }
+                val result = coroutineScope { use.action(this) }
 
                 use.continuation.resume(result)
             } catch (e: Throwable) {
