@@ -8,12 +8,12 @@ class TalonMotorController(
         vararg followerIds: MotorId,
         configure: MotorController.() -> Unit = {}
 ) : PhoenixMotorController() {
-    private val srx = TalonSRX(id.number)
+    override val baseController = TalonSRX(id.number)
 
     private var master: MotorController? = null
         set(value) {
             if (value is PhoenixMotorController) {
-                srx.follow(value.baseController)
+                baseController.follow(value.baseController)
             }
             field = value
         }
@@ -27,8 +27,6 @@ class TalonMotorController(
         toMutableMap()
     }
 
-    override val baseController = srx
-
     override fun eachMotor(configure: MotorController.() -> Unit) {
         apply(configure)
         eachFollower(configure)
@@ -41,7 +39,7 @@ class TalonMotorController(
     }
 
     override val controlMode: ControlMode
-        get() = when (srx.controlMode) {
+        get() = when (baseController.controlMode) {
             PhoenixControlMode.PercentOutput -> ControlMode.PERCENT_OUTPUT
             PhoenixControlMode.Position -> ControlMode.POSITION
             PhoenixControlMode.Velocity -> ControlMode.VELOCITY
@@ -54,12 +52,12 @@ class TalonMotorController(
             eachFollower {
                 brakeMode = value
             }
-            srx.setNeutralMode(ctreNeutralMode(value))
+            baseController.setNeutralMode(ctreNeutralMode(value))
             field = value
         }
     override var pidfSlot: Int = 0
         set(value) {
-            srx.selectProfileSlot(value, 0)
+            baseController.selectProfileSlot(value, 0)
             field = value
         }
 
@@ -70,78 +68,78 @@ class TalonMotorController(
         }
 
     override var inverted: Boolean
-        get() = srx.inverted
+        get() = baseController.inverted
         set(value) {
-            srx.inverted = value
+            baseController.inverted = value
             eachFollower {
                 inverted = value
             }
         }
     override var sensorInverted: Boolean = false
         set(value) {
-            srx.setSensorPhase(value)
+            baseController.setSensorPhase(value)
             field = value
         }
 
     override var openLoopRamp: Double = 0.0
         set(value) {
-            srx.configOpenloopRamp(value, 20)
+            baseController.configOpenloopRamp(value, 20)
         }
 
     override var closedLoopRamp: Double = 0.0
         set(value) {
-            srx.configClosedloopRamp(value, 20)
+            baseController.configClosedloopRamp(value, 20)
         }
 
     override var minOutputRange: ClosedRange<Double> = 0.0..0.0
         set(value) {
-            srx.configNominalOutputForward(value.endInclusive, 20)
-            srx.configNominalOutputReverse(value.endInclusive, 20)
+            baseController.configNominalOutputForward(value.endInclusive, 20)
+            baseController.configNominalOutputReverse(value.endInclusive, 20)
             field = value
         }
 
     override var maxOutputRange: ClosedRange<Double> = -1.0..1.0
         set(value) {
-            srx.configPeakOutputForward(value.endInclusive, 20)
-            srx.configPeakOutputReverse(value.start, 20)
+            baseController.configPeakOutputForward(value.endInclusive, 20)
+            baseController.configPeakOutputReverse(value.start, 20)
             field = value
         }
 
     override val percentOutput: Double
-        get() = srx.motorOutputPercent
+        get() = baseController.motorOutputPercent
 
     override var position: Int
-        get() = srx.getSelectedSensorPosition(0)
+        get() = baseController.getSelectedSensorPosition(0)
         set(value) {
-            srx.selectedSensorPosition = value
+            baseController.selectedSensorPosition = value
         }
 
     override val velocity: Int
-        get() = srx.getSelectedSensorVelocity(0)
+        get() = baseController.getSelectedSensorVelocity(0)
 
     override fun setPercentOutput(output: Double) {
-        srx.set(PhoenixControlMode.PercentOutput, output)
+        baseController.set(PhoenixControlMode.PercentOutput, output)
     }
 
     override fun setTargetPosition(position: Int) {
-        srx.set(PhoenixControlMode.Position, position.toDouble())
+        baseController.set(PhoenixControlMode.Position, position.toDouble())
     }
 
     override fun setTargetVelocity(velocity: Int) {
-        srx.set(PhoenixControlMode.Velocity, velocity.toDouble())
+        baseController.set(PhoenixControlMode.Velocity, velocity.toDouble())
     }
 
     override fun setCurrent(current: Double) {
-        srx.set(PhoenixControlMode.Current, current)
+        baseController.set(PhoenixControlMode.Current, current)
     }
 
     override fun disable() {
-        srx.neutralOutput()
+        baseController.neutralOutput()
     }
 
     override fun updatePidf(slot: Int, pidf: MotorPidf) {
         with(pidf) {
-            srx.apply {
+            baseController.apply {
                 config_kP(slot, kp)
                 config_kI(slot, ki)
                 config_kD(slot, kd)
@@ -157,7 +155,7 @@ class TalonMotorController(
 
     private fun updateCurrentLimit(limit: CurrentLimit) {
         eachMotor {
-            srx.apply {
+            baseController.apply {
                 configContinuousCurrentLimit(limit.continuousLimit)
                 configPeakCurrentLimit(limit.maxLimit)
                 configPeakCurrentDuration(limit.maxDuration)
@@ -167,8 +165,8 @@ class TalonMotorController(
     }
 
     init {
-        eachMotor { srx.setNeutralMode(ctreNeutralMode(brakeMode)) }
-        srx.apply {
+        eachMotor { baseController.setNeutralMode(ctreNeutralMode(brakeMode)) }
+        baseController.apply {
             configClosedloopRamp(closedLoopRamp)
             configOpenloopRamp(openLoopRamp)
             configNominalOutputReverse(minOutputRange.start)

@@ -8,12 +8,12 @@ class VictorMotorController(
         vararg followerIds: MotorId,
         configure: MotorController.() -> Unit = {}
 ) : PhoenixMotorController() {
-    private val spx = VictorSPX(id.number)
+    override val baseController = VictorSPX(id.number)
 
     private var master: MotorController? = null
         set(value) {
             if (value is PhoenixMotorController) {
-                spx.follow(value.baseController)
+                baseController.follow(value.baseController)
             }
             field = value
         }
@@ -27,8 +27,6 @@ class VictorMotorController(
         toMutableMap()
     }
 
-    override val baseController = spx
-
     override fun eachMotor(configure: MotorController.() -> Unit) {
         apply(configure)
         eachFollower(configure)
@@ -41,7 +39,7 @@ class VictorMotorController(
     }
 
     override val controlMode: ControlMode
-        get() = when (spx.controlMode) {
+        get() = when (baseController.controlMode) {
             PhoenixControlMode.PercentOutput -> ControlMode.PERCENT_OUTPUT
             PhoenixControlMode.Position -> ControlMode.POSITION
             PhoenixControlMode.Velocity -> ControlMode.VELOCITY
@@ -54,88 +52,88 @@ class VictorMotorController(
             eachFollower {
                 brakeMode = value
             }
-            spx.setNeutralMode(ctreNeutralMode(value))
+            baseController.setNeutralMode(ctreNeutralMode(value))
             field = value
         }
     override var pidfSlot: Int = 0
         set(value) {
-            spx.selectProfileSlot(value, 0)
+            baseController.selectProfileSlot(value, 0)
             field = value
         }
 
     override var inverted: Boolean
-        get() = spx.inverted
+        get() = baseController.inverted
         set(value) {
-            spx.inverted = value
+            baseController.inverted = value
             eachFollower {
                 inverted = value
             }
         }
     override var sensorInverted: Boolean = false
         set(value) {
-            spx.setSensorPhase(value)
+            baseController.setSensorPhase(value)
             field = value
         }
 
     override var openLoopRamp: Double = 0.0
         set(value) {
-            spx.configOpenloopRamp(value, 20)
+            baseController.configOpenloopRamp(value, 20)
         }
 
     override var closedLoopRamp: Double = 0.0
         set(value) {
-            spx.configClosedloopRamp(value, 20)
+            baseController.configClosedloopRamp(value, 20)
         }
 
     override var minOutputRange: ClosedRange<Double> = 0.0..0.0
         set(value) {
-            spx.configNominalOutputForward(value.endInclusive, 20)
-            spx.configNominalOutputReverse(value.endInclusive, 20)
+            baseController.configNominalOutputForward(value.endInclusive, 20)
+            baseController.configNominalOutputReverse(value.endInclusive, 20)
             field = value
         }
 
     override var maxOutputRange: ClosedRange<Double> = -1.0..1.0
         set(value) {
-            spx.configPeakOutputForward(value.endInclusive, 20)
-            spx.configPeakOutputReverse(value.start, 20)
+            baseController.configPeakOutputForward(value.endInclusive, 20)
+            baseController.configPeakOutputReverse(value.start, 20)
             field = value
         }
 
     override val percentOutput: Double
-        get() = spx.motorOutputPercent
+        get() = baseController.motorOutputPercent
 
     override var position: Int
-        get() = spx.getSelectedSensorPosition(0)
+        get() = baseController.getSelectedSensorPosition(0)
         set(value) {
-            spx.selectedSensorPosition = value
+            baseController.selectedSensorPosition = value
         }
 
     override val velocity: Int
-        get() = spx.getSelectedSensorVelocity(0)
+        get() = baseController.getSelectedSensorVelocity(0)
 
     override fun setPercentOutput(output: Double) {
-        spx.set(PhoenixControlMode.PercentOutput, output)
+        baseController.set(PhoenixControlMode.PercentOutput, output)
     }
 
     override fun setTargetPosition(position: Int) {
-        spx.set(PhoenixControlMode.Position, position.toDouble())
+        baseController.set(PhoenixControlMode.Position, position.toDouble())
     }
 
     override fun setTargetVelocity(velocity: Int) {
-        spx.set(PhoenixControlMode.Velocity, velocity.toDouble())
+        baseController.set(PhoenixControlMode.Velocity, velocity.toDouble())
     }
 
     override fun setCurrent(current: Double) {
-        spx.set(PhoenixControlMode.Current, current)
+        baseController.set(PhoenixControlMode.Current, current)
     }
 
     override fun disable() {
-        spx.neutralOutput()
+        baseController.neutralOutput()
     }
 
     override fun updatePidf(slot: Int, pidf: MotorPidf) {
         with(pidf) {
-            spx.apply {
+            baseController.apply {
                 config_kP(slot, kp)
                 config_kI(slot, ki)
                 config_kD(slot, kd)
@@ -150,8 +148,8 @@ class VictorMotorController(
     }
 
     init {
-        eachMotor { spx.setNeutralMode(ctreNeutralMode(brakeMode)) }
-        spx.apply {
+        eachMotor { baseController.setNeutralMode(ctreNeutralMode(brakeMode)) }
+        baseController.apply {
             configClosedloopRamp(closedLoopRamp)
             configOpenloopRamp(openLoopRamp)
             configNominalOutputReverse(minOutputRange.start)
