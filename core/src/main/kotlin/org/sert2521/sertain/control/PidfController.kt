@@ -1,5 +1,7 @@
 package org.sert2521.sertain.control
 
+import kotlin.math.sign
+
 open class PidfConfig {
     var kp: Double? = null
     var ki: Double? = null
@@ -21,6 +23,6 @@ class PidfController(config: PidfConfig, val dt: Double) {
         integral += error * dt
         val derivative = (error - lastError) / dt
         lastError = error
-        return (kp * error) + (ki * integral) + (kd * derivative) + kf
+        return (kp * error) + (ki * integral) + (kd * derivative) + (kf * sign(error))
     }
 }
