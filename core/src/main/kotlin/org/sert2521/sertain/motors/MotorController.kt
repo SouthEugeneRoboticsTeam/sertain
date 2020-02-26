@@ -41,7 +41,7 @@ fun<T: MotorId> motorController(id: T, vararg followerIds: MotorId, configure: M
     return when (id) {
         is TalonId  -> RealTalonMotorController(id,  *followerIds, configure = configure)
         is VictorId -> VictorMotorController(id, *followerIds, configure = configure)
-        else        -> throw NotImplementedError("A Motor Controller is not implemented for this ID")
+        else -> throw NotImplementedError("A Motor Controller is not implemented for this ID")
     }
 }
 
