@@ -15,7 +15,6 @@ import org.sert2521.sertain.events.Clean
 import org.sert2521.sertain.events.Use
 import org.sert2521.sertain.events.fire
 import org.sert2521.sertain.events.subscribe
-import java.lang.IllegalStateException
 import kotlin.coroutines.AbstractCoroutineContextElement
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.resume
