@@ -6,6 +6,7 @@ import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.sert2521.sertain.coroutines.RobotScope
@@ -66,11 +67,14 @@ fun CoroutineScope.manageTasks() {
                     }
                 }
 
-                val result = coroutineScope { use.action(this) }
 
-                use.continuation.resume(result)
+                val result = coroutineScope {
+                    use.action(this)
+                }
+
+                use.continuation.resume(Result.success(result))
             } catch (e: Throwable) {
-                use.continuation.resumeWithException(e)
+                use.continuation.resume(Result.failure(e))
             } finally {
                 fire(Clean(newSubsystems, coroutineContext[Job]!!))
             }

@@ -34,8 +34,9 @@ suspend fun <R> use(
     cancelConflicts: Boolean = true,
     name: String = "ANONYMOUS_TASK",
     action: suspend CoroutineScope.() -> R
-): R {
+): Result<R> {
     val context = coroutineContext
+    println("Calling use!")
     return suspendCancellableCoroutine { continuation ->
         CoroutineScope(context).launch {
             fire(Use(

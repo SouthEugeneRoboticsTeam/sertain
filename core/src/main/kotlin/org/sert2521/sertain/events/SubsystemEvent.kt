@@ -13,7 +13,7 @@ class Use<R>(
     val cancelConflicts: Boolean,
     val name: String,
     val context: CoroutineContext,
-    val continuation: CancellableContinuation<R>,
+    val continuation: CancellableContinuation<Result<R>>,
     val action: suspend CoroutineScope.() -> R
 ) : SubsystemEvent
 
