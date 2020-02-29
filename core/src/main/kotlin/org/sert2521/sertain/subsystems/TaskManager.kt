@@ -5,6 +5,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -14,6 +15,7 @@ import org.sert2521.sertain.events.Clean
 import org.sert2521.sertain.events.Use
 import org.sert2521.sertain.events.fire
 import org.sert2521.sertain.events.subscribe
+import java.lang.IllegalStateException
 import kotlin.coroutines.AbstractCoroutineContextElement
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.resume
@@ -81,6 +83,13 @@ fun CoroutineScope.manageTasks() {
         }
 
         newSubsystems.forEach { it.currentJob = newJob }
+
+        // Double check that there are no conflicts
+        delay(1)
+        if (allSubsystems.any { it.currentJob != newJob }) {
+            newJob.cancel("Action ${use.name} was canceled because another action " +
+                    "requiring one or more of the same subsystems is already running.")
+        }
     }
 
     subscribe<Clean> { clean ->
