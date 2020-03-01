@@ -22,6 +22,8 @@ import kotlin.coroutines.resumeWithException
 
 fun CoroutineScope.manageTasks() {
     subscribe<Use<Any?>> { use ->
+        delay(1)
+        
         // Subsystems used in parent coroutine
         val prevSubsystems: Set<Subsystem> = use.context[Requirements] ?: emptySet()
         // Subsystems used in new coroutine but not in parent coroutine
@@ -67,7 +69,6 @@ fun CoroutineScope.manageTasks() {
                         it.join()
                     }
                 }
-
 
                 val result = coroutineScope {
                     use.action(this)
