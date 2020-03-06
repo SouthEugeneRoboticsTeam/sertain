@@ -16,7 +16,7 @@ import org.sert2521.sertain.events.Tick
 import org.sert2521.sertain.events.fire
 import org.sert2521.sertain.subsystems.manageTasks
 import org.sert2521.sertain.subsystems.subsystems
-import org.sert2521.sertain.subsystems.use
+import org.sert2521.sertain.subsystems.useSubsystems
 
 object Robot {
     var mode = RobotMode.DISCONNECTED
@@ -53,9 +53,14 @@ suspend fun robot(configure: RobotScope.() -> Unit) {
 
     subsystems
             .forEach {
+                RobotScope.launch {
+                    it.value.apply {
+                        setup()
+                    }
+                }
                 it.value.default?.apply {
                     RobotScope.launch {
-                        use(it.value, name = "Default") {
+                        useSubsystems(it.value, name = "Default") {
                             invoke()
                         }
                     }

@@ -86,7 +86,7 @@ fun CoroutineScope.manageTasks() {
                     it.currentJob = null
                     if (it.default != null) {
                         RobotScope.launch {
-                            use(it, name = "DEFAULT") { it.default.invoke() }
+                            useSubsystems(it, name = "DEFAULT") { it.default.invoke() }
                         }
                     }
                 }
