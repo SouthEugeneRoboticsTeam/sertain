@@ -2,22 +2,19 @@ package org.sert2521.sertain.telemetry
 
 import kotlinx.coroutines.CoroutineScope
 import org.sert2521.sertain.coroutines.watch
+import org.sert2521.sertain.events.onTick
 
 fun <T> CoroutineScope.linkTableEntry(name: String, parent: Table, get: () -> T) = run {
     val entry = TableEntry(name, get(), parent)
-    get.watch {
-        onChange {
-            entry.value = value
-        }
+    onTick {
+        entry.value = get()
     }
 }
 
 fun <T> CoroutineScope.linkTableEntry(name: String, vararg location: String, get: () -> T) = run {
     val entry = TableEntry(name, get(), *location)
-    get.watch {
-        onChange {
-            entry.value = value
-        }
+    onTick {
+        entry.value = get()
     }
 }
 

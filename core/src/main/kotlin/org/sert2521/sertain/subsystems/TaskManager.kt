@@ -5,7 +5,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.sert2521.sertain.coroutines.RobotScope
@@ -20,6 +22,8 @@ import kotlin.coroutines.resumeWithException
 
 fun CoroutineScope.manageTasks() {
     subscribe<Use<Any?>> { use ->
+        delay(1)
+        
         // Subsystems used in parent coroutine
         val prevSubsystems: Set<Subsystem> = use.context[Requirements] ?: emptySet()
         // Subsystems used in new coroutine but not in parent coroutine
@@ -67,20 +71,25 @@ fun CoroutineScope.manageTasks() {
                 }
 
                 val result = coroutineScope {
-                    launch {
-                        use.action(this)
-                    }
+                    use.action(this)
                 }
 
-                use.continuation.resume(result)
+                use.continuation.resume(Result.success(result))
             } catch (e: Throwable) {
-                use.continuation.resumeWithException(e)
+                use.continuation.resume(Result.failure(e))
             } finally {
                 fire(Clean(newSubsystems, coroutineContext[Job]!!))
             }
         }
 
         newSubsystems.forEach { it.currentJob = newJob }
+
+        // Double check that there are no conflicts
+        delay(1)
+        if (allSubsystems.any { it.currentJob != newJob }) {
+            newJob.cancel("Action ${use.name} was canceled because another action " +
+                    "requiring one or more of the same subsystems is already running.")
+        }
     }
 
     subscribe<Clean> { clean ->
