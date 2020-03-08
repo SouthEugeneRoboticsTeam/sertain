@@ -11,4 +11,3 @@ object Disable : RobotEvent, TeleopOver, AutoOver, TestOver
 object Teleop : RobotEvent, AutoOver, TestOver
 object Auto : RobotEvent, TeleopOver, TestOver
 object Test : RobotEvent, TeleopOver, AutoOver
-object Tick : RobotEvent

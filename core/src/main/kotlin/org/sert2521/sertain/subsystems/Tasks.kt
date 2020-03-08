@@ -36,7 +36,6 @@ suspend fun <R> use(
     action: suspend CoroutineScope.() -> R
 ): Result<R> {
     val context = coroutineContext
-    println("Calling use!")
     return suspendCancellableCoroutine { continuation ->
         CoroutineScope(context).launch {
             fire(Use(
