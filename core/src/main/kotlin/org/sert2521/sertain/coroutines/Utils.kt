@@ -5,7 +5,6 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.sert2521.sertain.events.Change
-import org.sert2521.sertain.events.onTick
 import org.sert2521.sertain.events.subscribe
 import org.sert2521.sertain.events.Event
 import org.sert2521.sertain.events.False
@@ -17,7 +16,7 @@ import kotlin.coroutines.coroutineContext
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
-suspend fun periodic(period: Long, delay: Long = 0, action: () -> Unit) {
+suspend fun periodic(period: Long = 20, delay: Long = 0, action: () -> Unit) {
     delay(delay)
     while (true) {
         action()
@@ -101,16 +100,18 @@ abstract class Observable<T>(val get: () -> T) : ReadOnlyProperty<Any?, T> {
         private set
 
     init {
-        RobotScope.onTick {
-            when {
-                lastValue != value -> fire(Change(this@Observable, value))
+        RobotScope.launch {
+            periodic {
+                when {
+                    lastValue != value -> RobotScope
+                }
+                lastValue = value
             }
-            lastValue = value
         }
     }
 
     fun CoroutineScope.onChange(action: suspend CoroutineScope.(event: Change<T>) -> Unit) =
-            subscribe(this@Observable, action)
+            subscribe(target = this@Observable, action = action)
 
     override fun getValue(thisRef: Any?, property: KProperty<*>) = value
 }
@@ -132,16 +133,16 @@ class ObservableBoolean(get: () -> Boolean) : Observable<Boolean>(get) {
     operator fun invoke(configure: ObservableBoolean.() -> Unit) = apply(configure)
 
     fun CoroutineScope.whenTrue(action: suspend CoroutineScope.(event: True) -> Unit) =
-            subscribe(this@ObservableBoolean as Observable<Boolean>, action)
+            subscribe(target = this@ObservableBoolean as Observable<Boolean>, action = action)
 
     fun CoroutineScope.whenFalse(action: suspend CoroutineScope.(event: False) -> Unit) =
-            subscribe(this@ObservableBoolean as Observable<Boolean>, action)
+            subscribe(target = this@ObservableBoolean as Observable<Boolean>, action = action)
 
     fun CoroutineScope.whileTrue(action: suspend CoroutineScope.(event: True) -> Unit) =
-            subscribeBetween<Observable<Boolean>, True, False>(this@ObservableBoolean, action)
+            subscribeBetween<Observable<Boolean>, True, False>(target = this@ObservableBoolean, action = action)
 
     fun CoroutineScope.whileFalse(action: suspend CoroutineScope.(event: False) -> Unit) =
-            subscribeBetween<Observable<Boolean>, False, True>(this@ObservableBoolean, action)
+            subscribeBetween<Observable<Boolean>, False, True>(target = this@ObservableBoolean, action = action)
 }
 
 fun (() -> Boolean).watch(configure: ObservableBoolean.() -> Unit = {}) = ObservableBoolean(this).apply(configure)
