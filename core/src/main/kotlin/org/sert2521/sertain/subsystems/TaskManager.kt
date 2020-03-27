@@ -21,7 +21,7 @@ import kotlin.coroutines.resumeWithException
 fun CoroutineScope.manageTasks() {
     subscribe<Use<Any?>> { use ->
         // Subsystems used in parent coroutine
-        val prevSubsystems: Set<Subsystem> = use.context[Requirements] ?: emptySet()
+        val prevSubsystems: Set<Subsystem<*>> = use.context[Requirements] ?: emptySet()
         // Subsystems used in new coroutine but not in parent coroutine
         val newSubsystems = use.subsystems - prevSubsystems
         // Subsystems from both parent and new coroutines
@@ -68,9 +68,9 @@ fun CoroutineScope.manageTasks() {
 
                 val result = coroutineScope { use.action(this) }
 
-                use.continuation.resume(result)
+                use.continuation.resume(Result.success(result))
             } catch (e: Throwable) {
-                use.continuation.resumeWithException(e)
+                use.continuation.resume(Result.failure(e))
             } finally {
                 fire(Clean(newSubsystems, coroutineContext[Job]!!))
             }
@@ -83,10 +83,12 @@ fun CoroutineScope.manageTasks() {
         clean.subsystems
                 .filter { it.currentJob == clean.job }
                 .forEach {
-                    it.currentJob = null
-                    if (it.default != null) {
-                        RobotScope.launch {
-                            useSubsystems(it, name = "DEFAULT") { it.default.invoke() }
+                    (it as Subsystem<Any?>).let { s ->
+                        s.currentJob = null
+                        if (s.default != null) {
+                            RobotScope.launch {
+                                reserve(s, name = "DEFAULT") { s.default.invoke(this, s.value) }
+                            }
                         }
                     }
                 }
@@ -94,7 +96,7 @@ fun CoroutineScope.manageTasks() {
 }
 
 private class Requirements(
-    requirements: Set<Subsystem>
-) : Set<Subsystem> by requirements, AbstractCoroutineContextElement(Key) {
+    requirements: Set<Subsystem<*>>
+) : Set<Subsystem<*>> by requirements, AbstractCoroutineContextElement(Key) {
     companion object Key : CoroutineContext.Key<Requirements>
 }
