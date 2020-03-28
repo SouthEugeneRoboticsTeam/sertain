@@ -63,7 +63,7 @@ robot {
 
 ### Events
 
-It is also possible to subscribe to events. Events are the core component of org.sert2521.sertain, and run almost everything. To create an event, do:
+It is also possible to subscribe to events. Events are the core component of sertain, and run almost everything. To create an event, do:
 
 ```kotlin
 class MyEvent : Event
@@ -102,22 +102,25 @@ class MySubsystem : Subsystem("My Subsystem") {
 }
 ```
 
-There are several ways to use subsystems, but this guide will only cover one. To add the subsystem to the robot, you need to call `add` inside the `robot` function, like so:
+There are several ways to use subsystems, but this guide will only cover one. To register a subsystem, just call `register` and you can get the subsystem's `Accessor`. It's easy! Just do this:
 
 ```kotlin
-robot {
-  add<MySubsystem>()
-}
+val mySubsystem = register<MySubsystem>()
 ```
  
-You can assign tasks to subsystems by calling `doTask`. Inside the `doTask` block, you can call `use` to get instances of the subsystems that you wish to occupy. The `action` block should contain the code that you want to run. Use this example:
+You can assign tasks to subsystems by calling `use`. Inside the block, you can get instances of your subsystems in the order they are passed into use. The block should contain the code that you want to run. Use this example:
 
 ```kotlin
-doTask {
-  val mySubsystem = use<MySubsystem>()
-  action {
-    // Use the subsystem here
-  }
+use(mySubsystem, myOtherSubsystem) { mySubsystem, myOtherSubsystem ->
+  // code goes here
+}
+```
+
+Additionaly, if your command only uses one subsystem, you can just call your subsystem like a function instead. Follow this example:
+
+```kotlin
+mySubsystem { mySubsystem ->
+  // code goes here
 }
 ```
 
