@@ -10,49 +10,47 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlin.coroutines.CoroutineContext
 import org.sert2521.sertain.coroutines.delayUntil
+import kotlin.coroutines.EmptyCoroutineContext
 
 @UseExperimental(ExperimentalCoroutinesApi::class)
 val events = BroadcastChannel<Event>(Channel.BUFFERED)
 
 @UseExperimental(ExperimentalCoroutinesApi::class)
-suspend fun <E : Event> fire(event: E) {
+fun <E : Event> CoroutineScope.fire(event: E) = launch {
     events.send(event)
 }
 
 @UseExperimental(ExperimentalCoroutinesApi::class, FlowPreview::class)
-inline fun <reified E : Event> CoroutineScope.subscribe(noinline action: suspend CoroutineScope.(E) -> Unit) =
-            launch {
-                events.asFlow().filter { it is E }.map { it as E }.apply {
-                    collect {
-                        launch { action(it) }
+inline fun <reified E : Event> CoroutineScope.subscribe(context: CoroutineContext = EmptyCoroutineContext, noinline action: suspend CoroutineScope.(E) -> Unit) =
+        launch(context) {
+            events.asFlow().filter { it is E }.map { it as E }.collect {
+                launch(context) { action(it) }
+            }
+        }
+
+@UseExperimental(ExperimentalCoroutinesApi::class, FlowPreview::class)
+inline fun <T, reified E : TargetedEvent<T>> CoroutineScope.subscribe(target: T, context: CoroutineContext = EmptyCoroutineContext, noinline action: suspend CoroutineScope.(E) -> Unit) =
+        launch(context) {
+            events.asFlow()
+                    .filter { it is E && (it as? TargetedEvent<*>)?.target == target }
+                    .map { it as E }
+                    .collect {
+                        launch(context) { action(it) }
                     }
-                }
-            }
+        }
 
 @UseExperimental(ExperimentalCoroutinesApi::class, FlowPreview::class)
-inline fun <T, reified E : TargetedEvent<T>> CoroutineScope.subscribe(target: T, noinline action: suspend CoroutineScope.(E) -> Unit) =
-            launch {
-                events.asFlow()
-                        .filter { it is E && (it as? TargetedEvent<*>)?.target == target }
-                        .map { it as E }
-                        .apply {
-                            collect {
-                                launch { action(it) }
-                            }
-                        }
-            }
-
-@UseExperimental(ExperimentalCoroutinesApi::class, FlowPreview::class)
-inline fun <reified E1 : Event, reified E2 : Event> CoroutineScope.subscribeBetween(noinline action: suspend CoroutineScope.(E1) -> Unit) =
-        launch {
+inline fun <reified E1 : Event, reified E2 : Event> CoroutineScope.subscribeBetween(context: CoroutineContext = EmptyCoroutineContext, noinline action: suspend CoroutineScope.(E1) -> Unit) =
+        launch(context) {
             events.asFlow()
                     .filter { it is E1 }
                     .map { it as E1 }
                     .apply {
                         collect {
-                            launch {
-                                val job = launch { action(it) }
+                            launch(context) {
+                                val job = launch(context) { action(it) }
                                 delayUntil<E2>()
                                 job.cancel()
                             }
@@ -61,18 +59,16 @@ inline fun <reified E1 : Event, reified E2 : Event> CoroutineScope.subscribeBetw
         }
 
 @UseExperimental(ExperimentalCoroutinesApi::class, FlowPreview::class)
-inline fun <T, reified E1 : TargetedEvent<T>, reified E2 : TargetedEvent<T>> CoroutineScope.subscribeBetween(target: T, noinline action: suspend CoroutineScope.(E1) -> Unit) =
-        launch {
+inline fun <T, reified E1 : TargetedEvent<T>, reified E2 : TargetedEvent<T>> CoroutineScope.subscribeBetween(target: T, context: CoroutineContext = EmptyCoroutineContext, noinline action: suspend CoroutineScope.(E1) -> Unit) =
+        launch(context) {
             events.asFlow()
                     .filter { it is E1 && (it as? TargetedEvent<*>)?.target == target }
                     .map { it as E1 }
-                    .apply {
-                        collect {
-                            launch {
-                                val job = launch { action(it) }
-                                delayUntil<T, E2>(target)
-                                job.cancel()
-                            }
+                    .collect {
+                        launch(context) {
+                            val job = launch(context) { action(it) }
+                            delayUntil<T, E2>(target)
+                            job.cancel()
                         }
                     }
         }
