@@ -103,7 +103,7 @@ abstract class Observable<T>(val get: () -> T) : ReadOnlyProperty<Any?, T> {
         RobotScope.launch {
             periodic {
                 when {
-                    lastValue != value -> RobotScope
+                    lastValue != value -> fire(Change(this@Observable, value))
                 }
                 lastValue = value
             }
