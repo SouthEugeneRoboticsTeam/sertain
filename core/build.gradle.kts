@@ -8,8 +8,8 @@ plugins {
 }
 
 dependencies {
-    implementation(kotlin("stdlib-jdk8", "1.3.61"))
-    implementation(kotlin("reflect", "1.3.61"))
+    implementation(kotlin("stdlib-jdk8", "1.3.71"))
+    implementation(kotlin("reflect", "1.3.71"))
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.3")
     implementation("edu.wpi.first.wpilibj:wpilibj-java:2020.1.2")
     implementation("edu.wpi.first.hal:hal-java:2020.1.2")
