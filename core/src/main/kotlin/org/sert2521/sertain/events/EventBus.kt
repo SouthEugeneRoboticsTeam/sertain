@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlin.coroutines.CoroutineContext
 import org.sert2521.sertain.coroutines.delayUntil
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
@@ -18,7 +19,7 @@ import kotlin.coroutines.EmptyCoroutineContext
 val events = BroadcastChannel<Event>(Channel.BUFFERED)
 
 @UseExperimental(ExperimentalCoroutinesApi::class)
-suspend fun <E : Event> fire(event: E) {
+fun <E : Event> CoroutineScope.fire(event: E) = launch {
     events.send(event)
 }
 
