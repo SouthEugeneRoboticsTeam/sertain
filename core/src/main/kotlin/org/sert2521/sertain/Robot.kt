@@ -2,6 +2,7 @@ package org.sert2521.sertain
 
 import edu.wpi.first.hal.HAL
 import edu.wpi.first.wpilibj.DriverStation
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.sert2521.sertain.core.initializeWpiLib
 import org.sert2521.sertain.coroutines.RobotScope
@@ -9,10 +10,14 @@ import org.sert2521.sertain.events.Auto
 import org.sert2521.sertain.events.Connect
 import org.sert2521.sertain.events.Disable
 import org.sert2521.sertain.events.Enable
+import org.sert2521.sertain.events.Start
 import org.sert2521.sertain.events.Teleop
 import org.sert2521.sertain.events.Test
 import org.sert2521.sertain.events.fire
+import org.sert2521.sertain.subsystems.defaultIfNotNull
 import org.sert2521.sertain.subsystems.manageTasks
+import org.sert2521.sertain.subsystems.reserve
+import org.sert2521.sertain.subsystems.workers
 
 object Robot {
     var mode = RobotMode.DISCONNECTED
@@ -36,11 +41,15 @@ suspend fun robot(configure: RobotScope.() -> Unit) {
     val ds: DriverStation = DriverStation.getInstance()
     val running = true
 
-    RobotScope.apply(configure)
-
     RobotScope.launch {
         manageTasks()
     }
+
+    workers.forEach {
+            it.defaultIfNotNull()
+    }
+
+    RobotScope.apply(configure)
 
     while (running) {
         val hasNewData = ds.waitForData(0.02)

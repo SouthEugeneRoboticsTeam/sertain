@@ -20,8 +20,9 @@ import kotlin.coroutines.resumeWithException
 
 fun CoroutineScope.manageTasks() {
     subscribe<Use<Any?>> { use ->
+        println("Creating task ${use.name}")
         // Subsystems used in parent coroutine
-        val prevSubsystems: Set<Subsystem<*>> = use.context[Requirements] ?: emptySet()
+        val prevSubsystems: Set<Worker<*>> = use.context[Requirements] ?: emptySet()
         // Subsystems used in new coroutine but not in parent coroutine
         val newSubsystems = use.subsystems - prevSubsystems
         // Subsystems from both parent and new coroutines
@@ -72,7 +73,8 @@ fun CoroutineScope.manageTasks() {
             } catch (e: Throwable) {
                 use.continuation.resume(Result.failure(e))
             } finally {
-                fire(Clean(newSubsystems, coroutineContext[Job]!!))
+                println("Finally...")
+                RobotScope.fire(Clean(newSubsystems, coroutineContext[Job]!!))
             }
         }
 
@@ -80,14 +82,15 @@ fun CoroutineScope.manageTasks() {
     }
 
     subscribe<Clean> { clean ->
+        println("Lean clean")
         clean.subsystems
                 .filter { it.currentJob == clean.job }
                 .forEach {
-                    (it as Subsystem<Any?>).let { s ->
+                    (it as Worker<Any?>).let { s ->
                         s.currentJob = null
                         if (s.default != null) {
                             RobotScope.launch {
-                                reserve(s, name = "DEFAULT") { s.default.invoke(this, s.value) }
+                                reserve(s, name = "Default") { s.default.invoke(this, s.value) }
                             }
                         }
                     }
@@ -96,7 +99,7 @@ fun CoroutineScope.manageTasks() {
 }
 
 private class Requirements(
-    requirements: Set<Subsystem<*>>
-) : Set<Subsystem<*>> by requirements, AbstractCoroutineContextElement(Key) {
+    requirements: Set<Worker<*>>
+) : Set<Worker<*>> by requirements, AbstractCoroutineContextElement(Key) {
     companion object Key : CoroutineContext.Key<Requirements>
 }
