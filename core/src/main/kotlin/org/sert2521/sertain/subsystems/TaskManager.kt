@@ -85,7 +85,7 @@ fun CoroutineScope.manageTasks() {
                 .forEach {
                     (it as Worker<Any?>).let { s ->
                         s.currentJob = null
-                        s.defaultIfNotNull()
+                        Workers.defaultOf(s)
                     }
                 }
     }
