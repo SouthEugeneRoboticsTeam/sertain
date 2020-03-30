@@ -14,9 +14,9 @@ class SubsystemWorker<S : Subsystem>(subsystem: S) : Worker<S>(
         }
 
     override val default: (suspend CoroutineScope.(s: S) -> Any?)?
-        get() = value.default
+        get() = { value.run { default() } }
     override val setup: (CoroutineScope.(s: S) -> Any?)?
-        get() = value.setup
+        get() = { value.run { setup() } }
 }
 
 inline fun <reified S : Subsystem> add(): SubsystemWorker<S> {

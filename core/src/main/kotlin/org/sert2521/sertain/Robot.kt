@@ -37,15 +37,15 @@ suspend fun robot(configure: RobotScope.() -> Unit) {
     val ds: DriverStation = DriverStation.getInstance()
     val running = true
 
-    Workers.setupAll()
-
     RobotScope.launch {
         manageTasks()
     }
 
-    Workers.defaultAll()
-
     RobotScope.apply(configure)
+
+    Workers.setupAll()
+
+    Workers.defaultAll()
 
     while (running) {
         val hasNewData = ds.waitForData(0.02)

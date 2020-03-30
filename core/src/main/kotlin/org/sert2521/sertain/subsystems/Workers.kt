@@ -7,7 +7,11 @@ object Workers {
         workers += worker
     }
 
-    internal suspend fun setupAll() = workers.forEach { it.setupIfNotNull() }
+    internal suspend fun setupAll() {
+        workers.forEach { it.setupIfNotNull() }
+    }
 
-    internal suspend fun defaultAll() = workers.forEach { it.defaultIfNotNull() }
+    internal suspend fun defaultAll() {
+        workers.forEach { it.defaultIfNotNull() }
+    }
 }
