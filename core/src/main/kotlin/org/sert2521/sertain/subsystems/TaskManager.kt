@@ -20,40 +20,39 @@ import kotlin.coroutines.resumeWithException
 
 fun CoroutineScope.manageTasks() {
     subscribe<Use<Any?>> { use ->
-        println("Creating task ${use.name}")
         // Subsystems used in parent coroutine
-        val prevSubsystems: Set<Worker<*>> = use.context[Requirements] ?: emptySet()
+        val prevWorkers: Set<Worker<*>> = use.context[Requirements] ?: emptySet()
         // Subsystems used in new coroutine but not in parent coroutine
-        val newSubsystems = use.subsystems - prevSubsystems
+        val newWorkers = use.workers - prevWorkers
         // Subsystems from both parent and new coroutines
-        val allSubsystems = use.subsystems + prevSubsystems
+        val allWorkers = use.workers + prevWorkers
 
-        if (allSubsystems.any { !it.isEnabled }) {
+        if (allWorkers.any { !it.isEnabled }) {
             use.continuation.resumeWithException(
                     CancellationException(
-                            "Cannot execute action ${use.name} because the following subsystems are disabled:" +
-                                    " ${allSubsystems.filter { !it.isEnabled }.joinToString(" ")}."
+                            "Cannot execute action ${use.name} because the following workers are disabled:" +
+                                    " ${allWorkers.filter { !it.isEnabled }.joinToString(" ")}."
                     )
             )
         }
 
-        // Subsystems that are already occupied
-        val occupiedSubsystems = newSubsystems.filter { it.occupied }
+        // Workers that are already occupied
+        val occupiedWorkers = newWorkers.filter { it.occupied }
 
-        if (!use.cancelConflicts && occupiedSubsystems.isNotEmpty()) {
+        if (!use.cancelConflicts && occupiedWorkers.isNotEmpty()) {
             use.continuation.resumeWithException(
                     CancellationException(
-                            "Cannot execute unimportant action ${use.name} because the following subsystems are " +
-                                    "occupied: ${occupiedSubsystems.joinToString(" ")}"
+                            "Cannot execute low priority action ${use.name} because the following workers are " +
+                                    "occupied: ${occupiedWorkers.joinToString(" ")}"
                     )
             )
         }
 
-        // Jobs of conflicting subsystems
-        val conflictingJobs = occupiedSubsystems.map { it.currentJob!! }.filter { !it.isCompleted }.toSet()
+        // Jobs of conflicting workers
+        val conflictingJobs = occupiedWorkers.map { it.currentJob!! }.filter { !it.isCompleted }.toSet()
 
         val newJob = CoroutineScope(use.context).launch(
-                Requirements(allSubsystems),
+                Requirements(allWorkers),
                 CoroutineStart.ATOMIC
         ) {
             try {
@@ -73,26 +72,20 @@ fun CoroutineScope.manageTasks() {
             } catch (e: Throwable) {
                 use.continuation.resume(Result.failure(e))
             } finally {
-                println("Finally...")
-                RobotScope.fire(Clean(newSubsystems, coroutineContext[Job]!!))
+                RobotScope.fire(Clean(newWorkers, coroutineContext[Job]!!))
             }
         }
 
-        newSubsystems.forEach { it.currentJob = newJob }
+        newWorkers.forEach { it.currentJob = newJob }
     }
 
     subscribe<Clean> { clean ->
-        println("Lean clean")
-        clean.subsystems
+        clean.workers
                 .filter { it.currentJob == clean.job }
                 .forEach {
                     (it as Worker<Any?>).let { s ->
                         s.currentJob = null
-                        if (s.default != null) {
-                            RobotScope.launch {
-                                reserve(s, name = "Default") { s.default.invoke(this, s.value) }
-                            }
-                        }
+                        s.defaultIfNotNull()
                     }
                 }
     }

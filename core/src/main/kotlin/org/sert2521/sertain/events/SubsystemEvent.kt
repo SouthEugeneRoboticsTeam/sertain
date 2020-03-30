@@ -9,7 +9,7 @@ import kotlin.coroutines.CoroutineContext
 interface SubsystemEvent : Event
 
 class Use<R>(
-        val subsystems: Set<Worker<*>>,
+        val workers: Set<Worker<*>>,
         val cancelConflicts: Boolean,
         val name: String,
         val context: CoroutineContext,
@@ -18,6 +18,6 @@ class Use<R>(
 ) : SubsystemEvent
 
 class Clean(
-        val subsystems: Set<Worker<*>>,
+        val workers: Set<Worker<*>>,
         val job: Job
 ) : SubsystemEvent
