@@ -3,21 +3,21 @@ package org.sert2521.sertain.events
 import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import org.sert2521.sertain.subsystems.Subsystem
+import org.sert2521.sertain.subsystems.Worker
 import kotlin.coroutines.CoroutineContext
 
 interface SubsystemEvent : Event
 
-data class Use<R>(
-    val subsystems: Set<Subsystem>,
-    val cancelConflicts: Boolean,
-    val name: String,
-    val context: CoroutineContext,
-    val continuation: CancellableContinuation<Result<R>>,
-    val action: suspend CoroutineScope.() -> R
+class Use<R>(
+        val workers: Set<Worker<*>>,
+        val cancelConflicts: Boolean,
+        val name: String,
+        val context: CoroutineContext,
+        val continuation: CancellableContinuation<Result<R>>,
+        val action: suspend CoroutineScope.() -> R
 ) : SubsystemEvent
 
-data class Clean(
-    val subsystems: Set<Subsystem>,
-    val job: Job
+class Clean(
+        val workers: Set<Worker<*>>,
+        val job: Job
 ) : SubsystemEvent

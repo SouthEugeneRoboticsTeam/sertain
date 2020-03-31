@@ -12,9 +12,8 @@ import org.sert2521.sertain.events.Enable
 import org.sert2521.sertain.events.Teleop
 import org.sert2521.sertain.events.Test
 import org.sert2521.sertain.events.fire
+import org.sert2521.sertain.subsystems.Workers
 import org.sert2521.sertain.subsystems.manageTasks
-import org.sert2521.sertain.subsystems.subsystems
-import org.sert2521.sertain.subsystems.use
 
 object Robot {
     var mode = RobotMode.DISCONNECTED
@@ -38,22 +37,15 @@ suspend fun robot(configure: RobotScope.() -> Unit) {
     val ds: DriverStation = DriverStation.getInstance()
     val running = true
 
-    RobotScope.apply(configure)
-
     RobotScope.launch {
         manageTasks()
     }
 
-    subsystems
-            .forEach {
-                it.value.default?.apply {
-                    RobotScope.launch {
-                        use(it.value, name = "Default") {
-                            invoke()
-                        }
-                    }
-                }
-            }
+    RobotScope.apply(configure)
+
+    Workers.setupAll()
+
+    Workers.defaultAll()
 
     while (running) {
         val hasNewData = ds.waitForData(0.02)

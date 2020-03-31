@@ -5,9 +5,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.sert2521.sertain.coroutines.RobotScope
@@ -22,41 +20,39 @@ import kotlin.coroutines.resumeWithException
 
 fun CoroutineScope.manageTasks() {
     subscribe<Use<Any?>> { use ->
-        delay(1)
-        
         // Subsystems used in parent coroutine
-        val prevSubsystems: Set<Subsystem> = use.context[Requirements] ?: emptySet()
+        val prevWorkers: Set<Worker<*>> = use.context[Requirements] ?: emptySet()
         // Subsystems used in new coroutine but not in parent coroutine
-        val newSubsystems = use.subsystems - prevSubsystems
+        val newWorkers = use.workers - prevWorkers
         // Subsystems from both parent and new coroutines
-        val allSubsystems = use.subsystems + prevSubsystems
+        val allWorkers = use.workers + prevWorkers
 
-        if (allSubsystems.any { !it.isEnabled }) {
+        if (allWorkers.any { !it.isEnabled }) {
             use.continuation.resumeWithException(
                     CancellationException(
-                            "Cannot execute action ${use.name} because the following subsystems are disabled:" +
-                                    " ${allSubsystems.filter { !it.isEnabled }.joinToString(" ")}."
+                            "Cannot execute action ${use.name} because the following workers are disabled:" +
+                                    " ${allWorkers.filter { !it.isEnabled }.joinToString(" ")}."
                     )
             )
         }
 
-        // Subsystems that are already occupied
-        val occupiedSubsystems = newSubsystems.filter { it.occupied }
+        // Workers that are already occupied
+        val occupiedWorkers = newWorkers.filter { it.occupied }
 
-        if (!use.cancelConflicts && occupiedSubsystems.isNotEmpty()) {
+        if (!use.cancelConflicts && occupiedWorkers.isNotEmpty()) {
             use.continuation.resumeWithException(
                     CancellationException(
-                            "Cannot execute unimportant action ${use.name} because the following subsystems are " +
-                                    "occupied: ${occupiedSubsystems.joinToString(" ")}"
+                            "Cannot execute low priority action ${use.name} because the following workers are " +
+                                    "occupied: ${occupiedWorkers.joinToString(" ")}"
                     )
             )
         }
 
-        // Jobs of conflicting subsystems
-        val conflictingJobs = occupiedSubsystems.map { it.currentJob!! }.filter { !it.isCompleted }.toSet()
+        // Jobs of conflicting workers
+        val conflictingJobs = occupiedWorkers.map { it.currentJob!! }.filter { !it.isCompleted }.toSet()
 
         val newJob = CoroutineScope(use.context).launch(
-                Requirements(allSubsystems),
+                Requirements(allWorkers),
                 CoroutineStart.ATOMIC
         ) {
             try {
@@ -70,44 +66,33 @@ fun CoroutineScope.manageTasks() {
                     }
                 }
 
-                val result = coroutineScope {
-                    use.action(this)
-                }
+                val result = coroutineScope { use.action(this) }
 
                 use.continuation.resume(Result.success(result))
             } catch (e: Throwable) {
                 use.continuation.resume(Result.failure(e))
             } finally {
-                fire(Clean(newSubsystems, coroutineContext[Job]!!))
+                RobotScope.fire(Clean(newWorkers, coroutineContext[Job]!!))
             }
         }
 
-        newSubsystems.forEach { it.currentJob = newJob }
-
-        // Double check that there are no conflicts
-        delay(1)
-        if (allSubsystems.any { it.currentJob != newJob }) {
-            newJob.cancel("Action ${use.name} was canceled because another action " +
-                    "requiring one or more of the same subsystems is already running.")
-        }
+        newWorkers.forEach { it.currentJob = newJob }
     }
 
     subscribe<Clean> { clean ->
-        clean.subsystems
+        clean.workers
                 .filter { it.currentJob == clean.job }
                 .forEach {
-                    it.currentJob = null
-                    if (it.default != null) {
-                        RobotScope.launch {
-                            use(it, name = "DEFAULT") { it.default.invoke() }
-                        }
+                    (it as Worker<Any?>).let { s ->
+                        s.currentJob = null
+                        Workers.defaultOf(s)
                     }
                 }
     }
 }
 
 private class Requirements(
-    requirements: Set<Subsystem>
-) : Set<Subsystem> by requirements, AbstractCoroutineContextElement(Key) {
+    requirements: Set<Worker<*>>
+) : Set<Worker<*>> by requirements, AbstractCoroutineContextElement(Key) {
     companion object Key : CoroutineContext.Key<Requirements>
 }

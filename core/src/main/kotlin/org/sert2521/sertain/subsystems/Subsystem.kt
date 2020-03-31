@@ -1,12 +1,9 @@
 package org.sert2521.sertain.subsystems
 
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.CoroutineScope
 
-abstract class Subsystem(val name: String = "Anonymous Subsystem", val default: (suspend () -> Any?)? = null) {
-    var isEnabled = true
+abstract class Subsystem(val name: String? = null, var enabled: Boolean = true) {
+    open suspend fun CoroutineScope.default() = Unit
 
-    internal var currentJob: Job? = null
-
-    val occupied: Boolean
-        get() = currentJob != null
+    open fun CoroutineScope.setup() = Unit
 }
