@@ -7,3 +7,7 @@ fun <T : MetricUnitType, U1 : MetricUnit<T>, U2 : MetricUnit<T>> Double.convert(
 fun <T : MetricUnitType> MetricValue<T>.convertTo(other: MetricUnit<T>): MetricValue<T> {
     return MetricValue(other, value.convert(unit to other))
 }
+
+fun <T : MetricUnitType> MetricValue<T>.from(other: MetricUnit<T>): Double {
+    return value.convert(unit to other)
+}
