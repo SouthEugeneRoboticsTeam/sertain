@@ -9,6 +9,6 @@ fun <T : MetricUnitType> MetricValue<T>.convertTo(other: MetricUnit<T>): MetricV
     return MetricValue(other, value.convert(unit to other))
 }
 
-infix fun <T : MetricUnitType> MetricValue<T>.from(other: MetricUnit<T>): Double {
+fun <T : MetricUnitType> MetricValue<T>.from(other: MetricUnit<T>): Double {
     return value.convert(unit to other)
 }
