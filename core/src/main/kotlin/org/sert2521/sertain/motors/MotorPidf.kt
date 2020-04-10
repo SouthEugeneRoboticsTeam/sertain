@@ -22,7 +22,7 @@ class MotorPidfConfig : PidfConfig() {
     var period: Int? = null
 }
 
-class MotorPidfCollection(val motor: MotorController<*>, vararg initialPidf: Pair<Int, MotorPidf>) {
+class MotorPidfCollection(val motor: MotorController, vararg initialPidf: Pair<Int, MotorPidf>) {
     private val pidfMap = initialPidf.toMap(mutableMapOf())
 
     fun toMap() = pidfMap

@@ -1,265 +1,49 @@
 package org.sert2521.sertain.motors
 
-import org.sert2521.sertain.units.AngularUnit
-import org.sert2521.sertain.units.AngularValue
-import org.sert2521.sertain.units.AngularVelocity
-import org.sert2521.sertain.units.AngularVelocityUnit
-import org.sert2521.sertain.units.AngularVelocityValue
-import org.sert2521.sertain.units.ChronicUnit
-import org.sert2521.sertain.units.MetricValue
-import org.sert2521.sertain.units.convertTo
-import com.ctre.phoenix.motorcontrol.ControlMode as CtreControlMode
+import org.sert2521.sertain.units.*
 import com.ctre.phoenix.motorcontrol.NeutralMode as CtreNeutralMode
-import com.ctre.phoenix.motorcontrol.can.TalonSRX as CtreTalon
 
-class MotorController<T : MotorId>(
-    val id: T,
-    vararg followerIds: MotorId,
-    configure: MotorController<T>.() -> Unit = {}
-) {
-    val ctreMotorController = ctreMotorController(id)
+abstract class MotorController {
+    abstract fun eachMotor(configure: MotorController.() -> Unit)
 
-    var encoder: Encoder? = null
+    abstract fun eachFollower(configure: MotorController.() -> Unit)
 
-    var master: MotorController<*>? = null
-        internal set(value) {
-            if (value != null) {
-                ctreMotorController.follow(value.ctreMotorController)
-            }
-            field = value
-        }
+    abstract var inverted: Boolean
 
-    val followers = with(mutableMapOf<MotorId, MotorController<*>>()) {
-        followerIds.forEach {
-            set(it, MotorController(it).apply {
-                master = this@MotorController
-            })
-        }
-        toMap()
-    }
+    open var sensorInverted: Boolean = false
 
-    fun eachMotor(configure: MotorController<*>.() -> Unit) {
-        apply(configure)
-        eachFollower(configure)
-    }
+    open var openLoopRamp: Double = 0.0
 
-    fun eachFollower(configure: MotorController<*>.() -> Unit) {
-        followers.forEach {
-            it.value.apply(configure)
-        }
-    }
+    open var closedLoopRamp: Double = 0.0
 
-    fun eachTalon(configure: MotorController<TalonId>.() -> Unit) {
-        eachMotor {
-            @Suppress("unchecked_cast") // Will work because type of id is T
-            if (id is TalonId) {
-                (this as MotorController<TalonId>).apply(configure)
-                Unit
-            }
-        }
-    }
+    open var minOutputRange: ClosedRange<Double> = 0.0..0.0
 
-    fun eachVictor(configure: MotorController<VictorId>.() -> Unit) {
-        eachMotor {
-            @Suppress("unchecked_cast") // Will work because type of id is T
-            if (id is VictorId) {
-                (this as MotorController<VictorId>).apply(configure)
-                Unit
-            }
-        }
-    }
+    open var maxOutputRange: ClosedRange<Double> = -1.0..1.0
 
-    val controlMode: ControlMode
-            get() = when (ctreMotorController.controlMode) {
-                CtreControlMode.PercentOutput -> ControlMode.PERCENT_OUTPUT
-                CtreControlMode.Position -> ControlMode.POSITION
-                CtreControlMode.Velocity -> ControlMode.VELOCITY
-                CtreControlMode.Current -> ControlMode.CURRENT
-                CtreControlMode.Disabled -> ControlMode.DISABLED
-                else -> throw IllegalStateException("Invalid control mode.")
-            }
+    abstract val percentOutput: Double
 
-    var brakeMode: Boolean = false
-            set(value) {
-                eachFollower {
-                    brakeMode = value
-                }
-                ctreMotorController.setNeutralMode(ctreNeutralMode(value))
-                field = value
-            }
+    abstract fun setPercentOutput(output: Double)
 
-    var pidfSlot: Int = 0
-            set(value) {
-                ctreMotorController.selectProfileSlot(value, 0)
-                field = value
-            }
+    abstract fun <U : AngularUnit> position(unit: U): MetricValue<Angular, U>
 
-    val pidf = MotorPidfCollection(this, 0 to MotorPidf())
+    abstract fun <U1 : AngularVelocity, U2 : ChronicUnit, U : AngularVelocityUnit<U1, U2>> velocity(unit: U): MetricValue<CompositeUnitType<Per, Angular, Chronic>, U>
 
-    fun pidf(slot: Int = pidfSlot, configure: MotorPidfConfig.() -> Unit) {
-        with(MotorPidfConfig().apply(configure)) {
-            pidf[slot] = MotorPidf(
-                kp ?: pidf[slot]?.kp ?: 0.0,
-                ki ?: pidf[slot]?.ki ?: 0.0,
-                kd ?: pidf[slot]?.kd ?: 0.0,
-                kf ?: pidf[slot]?.kf ?: 0.0,
-                integralZone ?: pidf[slot]?.integralZone ?: 0,
-                allowedError ?: pidf[slot]?.allowedError ?: 0,
-                maxIntegral ?: pidf[slot]?.maxIntegral ?: 0.0,
-                maxOutput ?: pidf[slot]?.maxOutput ?: 1.0,
-                period ?: pidf[slot]?.period ?: 0
-            )
-        }
-    }
+    abstract fun <U : AngularUnit, V : AngularValue<U>> setTargetPosition(position: V)
 
-    var currentLimit = CurrentLimit(0, 0, 0, false)
-            set(value) {
-                updateCurrentLimit(value)
-                field = value
-            }
+    abstract fun <U1 : AngularUnit, U2 : ChronicUnit, V : AngularVelocityValue<U1, U2>> setTargetVelocity(velocity: V)
 
-    fun currentLimit(configure: CurrentLimitConfigure.() -> Unit) {
-        with(CurrentLimitConfigure().apply(configure)) {
-            currentLimit = CurrentLimit(continuousLimit, maxLimit, maxDuration, enabled)
-        }
-    }
+    abstract fun disable()
 
-    var inverted: Boolean
-            get() = ctreMotorController.inverted
-            set(value) {
-                ctreMotorController.inverted = value
-                eachFollower {
-                    inverted = value
-                }
-            }
-
-    var sensorInverted: Boolean = false
-            set(value) {
-                ctreMotorController.setSensorPhase(value)
-                field = value
-            }
-
-    var openLoopRamp: Double = 0.0
-            set(value) {
-                ctreMotorController.configOpenloopRamp(value, 20)
-            }
-
-    var closedLoopRamp: Double = 0.0
-            set(value) {
-                ctreMotorController.configClosedloopRamp(value, 20)
-            }
-
-    var minOutputRange: ClosedRange<Double> = 0.0..0.0
-            set(value) {
-                ctreMotorController.configNominalOutputForward(value.endInclusive, 20)
-                ctreMotorController.configNominalOutputReverse(value.endInclusive, 20)
-                field = value
-            }
-
-    var maxOutputRange: ClosedRange<Double> = -1.0..1.0
-            set(value) {
-                ctreMotorController.configPeakOutputForward(value.endInclusive, 20)
-                ctreMotorController.configPeakOutputReverse(value.start, 20)
-                field = value
-            }
-
-    val percentOutput: Double
-        get() = ctreMotorController.motorOutputPercent
-
-    var position: Int
-        get() = ctreMotorController.getSelectedSensorPosition(0)
-        set(value) {
-            ctreMotorController.selectedSensorPosition = value
-        }
-
-    fun <U : AngularUnit> position(unit: U) =
-            MetricValue(encoder!!.ticks, position.toDouble()).convertTo(unit)
-
-    val velocity: Int
-        get() = ctreMotorController.getSelectedSensorVelocity(0)
-
-    fun <U1 : AngularVelocity, U2 : ChronicUnit, U : AngularVelocityUnit<U1, U2>> velocity(unit: U) =
-            MetricValue(encoder!!.ticksPerSecond, velocity.toDouble()).convertTo(unit)
-
-    fun setPercentOutput(output: Double) {
-        ctreMotorController.set(CtreControlMode.PercentOutput, output)
-    }
-
-    fun setTargetPosition(position: Int) {
-        ctreMotorController.set(CtreControlMode.Position, position.toDouble())
-    }
-
-    fun <U : AngularUnit, V : AngularValue<U>> setTargetPosition(position: V) {
-        checkNotNull(encoder) { "You must configure your encoder to use units." }
-        setTargetPosition(position.convertTo(encoder!!.ticks).value.toInt())
-    }
-
-    fun setTargetVelocity(velocity: Int) {
-        ctreMotorController.set(CtreControlMode.Velocity, velocity.toDouble())
-    }
-
-    fun <U1 : AngularUnit, U2 : ChronicUnit, V : AngularVelocityValue<U1, U2>> setTargetVelocity(velocity: V) {
-        checkNotNull(encoder) { "You must configure your encoder to use units." }
-        setTargetVelocity(velocity.convertTo(encoder!!.ticksPerSecond).value.toInt())
-    }
-
-    fun setCurrent(current: Double) {
-        ctreMotorController.set(CtreControlMode.Current, current)
-    }
-
-    fun disable() {
-        ctreMotorController.neutralOutput()
-    }
-
-    internal fun updatePidf(slot: Int, pidf: MotorPidf) {
-        with(pidf) {
-            ctreMotorController.apply {
-                config_kP(slot, kp)
-                config_kI(slot, ki)
-                config_kD(slot, kd)
-                config_kF(slot, kf)
-                config_IntegralZone(slot, integralZone)
-                configAllowableClosedloopError(slot, allowedError)
-                configMaxIntegralAccumulator(slot, maxIntegral)
-                configClosedLoopPeakOutput(slot, maxOutput)
-                configClosedLoopPeriod(slot, period)
-            }
-        }
-    }
-
-    private fun updateCurrentLimit(limit: CurrentLimit) {
-        eachTalon {
-            (ctreMotorController as CtreTalon).apply {
-                configContinuousCurrentLimit(limit.continuousLimit)
-                configPeakCurrentLimit(limit.maxLimit)
-                configPeakCurrentDuration(limit.maxDuration)
-                enableCurrentLimit(limit.enabled)
-            }
-        }
-    }
-
-    init {
-        eachMotor { ctreMotorController.setNeutralMode(ctreNeutralMode(brakeMode)) }
-        ctreMotorController.apply {
-            configClosedloopRamp(closedLoopRamp)
-            configOpenloopRamp(openLoopRamp)
-            configNominalOutputReverse(minOutputRange.start)
-            configNominalOutputForward(minOutputRange.endInclusive)
-            configPeakOutputReverse(maxOutputRange.start)
-            configPeakOutputForward(maxOutputRange.endInclusive)
-            selectProfileSlot(pidfSlot, 0)
-            pidf.toMap().forEach {
-                updatePidf(it.key, it.value)
-            }
-            updateCurrentLimit(currentLimit)
-        }
-        configure()
-    }
+    internal abstract fun updatePidf(slot: Int, pidf: MotorPidf)
 }
 
-// Current can only be read from talons
-val MotorController<TalonId>.current: Double
-        get() = (ctreMotorController as CtreTalon).outputCurrent
+fun<T: MotorId> motorController(id: T, vararg followerIds: MotorId, configure: MotorController.() -> Unit = {}): MotorController {
+    return when (id) {
+        is TalonId  -> RealTalonMotorController(id,  *followerIds, configure = configure)
+        is VictorId -> VictorMotorController(id, *followerIds, configure = configure)
+        else -> throw NotImplementedError("A Motor Controller is not implemented for this ID")
+    }
+}
 
 enum class ControlMode {
     PERCENT_OUTPUT,
