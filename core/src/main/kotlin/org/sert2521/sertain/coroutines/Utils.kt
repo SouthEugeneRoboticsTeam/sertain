@@ -56,14 +56,6 @@ suspend fun delayForever() {
     }
 }
 
-suspend fun periodic(period: MetricValue<Chronic> = 20.ms, delay: MetricValue<Chronic> = 0.s, action: () -> Unit) {
-    delay(delay)
-    while (true) {
-        action()
-        delay(period)
-    }
-}
-
 suspend fun CoroutineScope.doAll(configure: ActionGroupConfigure.() -> Unit) {
     with(ActionGroupConfigure().apply(configure)) {
         val job = launch {
