@@ -1,11 +1,9 @@
 package org.sert2521.sertain.motors
 
+import org.sert2521.sertain.units.Angular
 import org.sert2521.sertain.units.AngularUnit
-import org.sert2521.sertain.units.AngularValue
 import org.sert2521.sertain.units.AngularVelocity
 import org.sert2521.sertain.units.AngularVelocityUnit
-import org.sert2521.sertain.units.AngularVelocityValue
-import org.sert2521.sertain.units.ChronicUnit
 import org.sert2521.sertain.units.MetricValue
 import org.sert2521.sertain.units.convertTo
 import com.ctre.phoenix.motorcontrol.ControlMode as CtreControlMode
@@ -172,13 +170,13 @@ class MotorController<T : MotorId>(
             ctreMotorController.selectedSensorPosition = value
         }
 
-    fun <U : AngularUnit> position(unit: U) =
+    fun position(unit: AngularUnit) =
             MetricValue(encoder!!.ticks, position.toDouble()).convertTo(unit)
 
     val velocity: Int
         get() = ctreMotorController.getSelectedSensorVelocity(0)
 
-    fun <U1 : AngularVelocity, U2 : ChronicUnit, U : AngularVelocityUnit<U1, U2>> velocity(unit: U) =
+    fun velocity(unit: AngularVelocityUnit) =
             MetricValue(encoder!!.ticksPerSecond, velocity.toDouble()).convertTo(unit)
 
     fun setPercentOutput(output: Double) {
@@ -189,7 +187,7 @@ class MotorController<T : MotorId>(
         ctreMotorController.set(CtreControlMode.Position, position.toDouble())
     }
 
-    fun <U : AngularUnit, V : AngularValue<U>> setTargetPosition(position: V) {
+    fun setTargetPosition(position: MetricValue<Angular>) {
         checkNotNull(encoder) { "You must configure your encoder to use units." }
         setTargetPosition(position.convertTo(encoder!!.ticks).value.toInt())
     }
@@ -198,7 +196,7 @@ class MotorController<T : MotorId>(
         ctreMotorController.set(CtreControlMode.Velocity, velocity.toDouble())
     }
 
-    fun <U1 : AngularUnit, U2 : ChronicUnit, V : AngularVelocityValue<U1, U2>> setTargetVelocity(velocity: V) {
+    fun setTargetVelocity(velocity: MetricValue<AngularVelocity>) {
         checkNotNull(encoder) { "You must configure your encoder to use units." }
         setTargetVelocity(velocity.convertTo(encoder!!.ticksPerSecond).value.toInt())
     }

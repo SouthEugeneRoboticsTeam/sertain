@@ -12,11 +12,51 @@ import org.sert2521.sertain.events.TargetedEvent
 import org.sert2521.sertain.events.True
 import org.sert2521.sertain.events.fire
 import org.sert2521.sertain.events.subscribeBetween
+import org.sert2521.sertain.units.Chronic
+import org.sert2521.sertain.units.MetricValue
+import org.sert2521.sertain.units.from
+import org.sert2521.sertain.units.milliseconds
+import org.sert2521.sertain.units.ms
+import org.sert2521.sertain.units.s
 import kotlin.coroutines.coroutineContext
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
-suspend fun periodic(period: Long = 20, delay: Long = 0, action: () -> Unit) {
+suspend fun delay(t: MetricValue<Chronic>) = delay(t.from(milliseconds).toLong())
+
+suspend fun delayUntil(condition: () -> Boolean) {
+    while (!condition()) {
+        delay(20)
+    }
+}
+
+suspend inline fun <reified E : Event> delayUntil() {
+    val job = CoroutineScope(coroutineContext).launch {
+        delayForever()
+    }
+    CoroutineScope(coroutineContext).subscribe<E> {
+        job.cancel()
+    }
+    job.join()
+}
+
+suspend inline fun <T, reified E : TargetedEvent<T>> delayUntil(target: T) {
+    val job = CoroutineScope(coroutineContext).launch {
+        delayForever()
+    }
+    CoroutineScope(coroutineContext).subscribe<T, E>(target) {
+        job.cancel()
+    }
+    job.join()
+}
+
+suspend fun delayForever() {
+    while (true) {
+        delay(2000)
+    }
+}
+
+suspend fun periodic(period: MetricValue<Chronic> = 20.ms, delay: MetricValue<Chronic> = 0.s, action: () -> Unit) {
     delay(delay)
     while (true) {
         action()
@@ -59,38 +99,6 @@ class ActionGroupConfigure {
     fun action(action: suspend CoroutineScope.() -> Unit) {
         actions.add(action)
     }
-}
-
-suspend fun delayUntil(condition: () -> Boolean) {
-    while (!condition()) {
-        delay(20)
-    }
-}
-
-suspend fun delayForever() {
-    while (true) {
-        delay(2000)
-    }
-}
-
-suspend inline fun <reified E : Event> delayUntil() {
-    val job = CoroutineScope(coroutineContext).launch {
-        delayForever()
-    }
-    CoroutineScope(coroutineContext).subscribe<E> {
-        job.cancel()
-    }
-    job.join()
-}
-
-suspend inline fun <T, reified E : TargetedEvent<T>> delayUntil(target: T) {
-    val job = CoroutineScope(coroutineContext).launch {
-        delayForever()
-    }
-    CoroutineScope(coroutineContext).subscribe<T, E>(target) {
-        job.cancel()
-    }
-    job.join()
 }
 
 abstract class Observable<T>(val get: () -> T) : ReadOnlyProperty<Any?, T> {
