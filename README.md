@@ -38,7 +38,7 @@ dependencies {
 }
 ```
 
-You can also replace the any commit on master, and you can replace `0.0.12` with `any-branch-SNAPSHOT`. You can also use a commit hash as the version without a branch name.
+You can also replace the any commit on master, and you can replace `0.0.12` with `any-branch-SNAPSHOT`. You can also use a commit hash as the version without a branch name. See [the Jitpack docs](https://jitpack.io/docs/) for more details.
 
 ### Creating a Robot Program
 To create a robot program, start by using the `robot` function. The function takes a lambda, which should serve as the entry point of the robot program. For example:
@@ -97,18 +97,18 @@ onEnable {
 Subsystems represent different components of the robot. A subsystem should only preform one task at a time. If you need to run more than one task, then you should probably be using two different subsystems. To create a subsystem, extend the `Subsystem` class.
 
 ```kotlin
-class MySubsystem : Subsystem("My Subsystem") {
+class MySubsystem : Subsystem() {
   // Subsystem code goes here
 }
 ```
 
-There are several ways to use subsystems, but this guide will only cover one. To register a subsystem, just call `register` and you can get the subsystem's `Accessor`. It's easy! Just do this:
+To begin using your subsystem, you need to call `add` to get it's `Worker`. A `Worker` allows you to access your subsystem in a safe mannor. You should call `add` above the main function to ensure that it gets called at the beggining of the program:
 
 ```kotlin
-val mySubsystem = register<MySubsystem>()
+val mySubsystem = add<MySubsystem>()
 ```
  
-You can assign tasks to subsystems by calling `use`. Inside the block, you can get instances of your subsystems in the order they are passed into use. The block should contain the code that you want to run. Use this example:
+You can assign tasks to subsystems by calling `use`. Inside the block, you can get instances of your subsystems in the order they are passed into `use`. The block should contain the code that you want to run. Use this example:
 
 ```kotlin
 use(mySubsystem, myOtherSubsystem) { mySubsystem, myOtherSubsystem ->
