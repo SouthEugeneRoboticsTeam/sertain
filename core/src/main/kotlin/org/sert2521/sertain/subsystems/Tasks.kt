@@ -7,6 +7,27 @@ import org.sert2521.sertain.events.Use
 import org.sert2521.sertain.events.fire
 import kotlin.coroutines.coroutineContext
 
+/**
+ * Runs a command using the specified [worker] parameters. Can take up to 8 [Worker]s as parameters.
+ *
+ * @param w1 The first worker to use.
+ * @param w2 The second worker to use.
+ * @param w3 The third worker to use.
+ * @param w4 The fourth worker to use.
+ * @param w5 The fifth worker to use.
+ * @param w6 The sixth worker to use.
+ * @param w7 The seventh worker to use.
+ * @param w8 The eighth worker to use.
+ * @param cancelConflicts Specifies weather the command should cancel conflicting commands.
+ * @param name The name of the command for purposes of debugging.
+ * @param action The action to run inside of the command. The action passes the values of the workers that were
+ * @return Returns a [Result] containing the value returned from the [action] parameter.
+ *
+ * @sample { suspend fun myCommand() = use(subsys1, subsys2) { s1, s2 ->
+ *      // use values here
+ * }
+ * }
+ */
 suspend fun <S1, R> use(w1: Worker<S1>, cancelConflicts: Boolean = true, name: String = "Unnamed Task", action: suspend CoroutineScope.(S1) -> R) =
         reserve(w1, cancelConflicts = cancelConflicts, name = name) { action(w1.value) }
 suspend fun <S1, S2, R> use(w1: Worker<S1>, w2: Worker<S2>, cancelConflicts: Boolean = true, name: String = "Unnamed Task", action: suspend CoroutineScope.(S1, S2) -> R) =
