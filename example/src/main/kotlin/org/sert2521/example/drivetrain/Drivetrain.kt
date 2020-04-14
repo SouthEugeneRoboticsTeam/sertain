@@ -7,9 +7,12 @@ import org.sert2521.sertain.subsystems.Subsystem
 import org.sert2521.sertain.telemetry.linkTableEntry
 import org.sert2521.sertain.units.AngularUnit
 import org.sert2521.sertain.units.revolutions
-import javax.naming.ldap.Control
 
 class Drivetrain : Subsystem() {
+    init {
+        enabled
+    }
+
     val leftDrive = MotorController(MotorIds.LEFT_FRONT, MotorIds.LEFT_REAR)
     val rightDrive = MotorController(MotorIds.RIGHT_FRONT, MotorIds.RIGHT_REAR)
 
@@ -32,6 +35,6 @@ class Drivetrain : Subsystem() {
     }
 
     override suspend fun CoroutineScope.default() {
-
+        controlDrivetrain()
     }
 }
