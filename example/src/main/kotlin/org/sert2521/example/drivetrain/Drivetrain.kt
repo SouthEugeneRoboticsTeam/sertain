@@ -9,15 +9,11 @@ import org.sert2521.sertain.units.AngularUnit
 import org.sert2521.sertain.units.revolutions
 
 class Drivetrain : Subsystem() {
-    init {
-        enabled
-    }
+    private val leftDrive = MotorController(MotorIds.LEFT_FRONT, MotorIds.LEFT_REAR)
+    private val rightDrive = MotorController(MotorIds.RIGHT_FRONT, MotorIds.RIGHT_REAR)
 
-    val leftDrive = MotorController(MotorIds.LEFT_FRONT, MotorIds.LEFT_REAR)
-    val rightDrive = MotorController(MotorIds.RIGHT_FRONT, MotorIds.RIGHT_REAR)
-
-    fun leftPosition(unit: AngularUnit) = leftDrive.position(unit)
-    fun rightPosition(unit: AngularUnit) = rightDrive.position(unit)
+    private fun leftPosition(unit: AngularUnit) = leftDrive.position(unit)
+    private fun rightPosition(unit: AngularUnit) = rightDrive.position(unit)
 
     fun arcadeDrive(drive: Double, turn: Double) {
         leftDrive.setPercentOutput(drive - turn)
