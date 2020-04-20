@@ -1,6 +1,6 @@
 
 plugins {
-    kotlin("jvm") version "1.3.61"
+    kotlin("jvm") version "1.3.71"
     java
     `maven-publish`
     maven
@@ -8,7 +8,7 @@ plugins {
 
 allprojects {
     group = "org.sert2521.sertain"
-    version = "0.0.8"
+    version = "0.1.1"
 
     repositories {
         jcenter()
