@@ -18,6 +18,8 @@ fun linearUnit(meters: Double, symbol: String): LinearUnit = MetricUnit(Linear, 
 val meters = linearUnit(1.0, " m")
 val centimeters = linearUnit(0.01, " cm")
 val millimeters = linearUnit(0.001, " mm")
+val feet = linearUnit(0.3048, " ft")
+val inches = linearUnit(0.0254, " in")
 
 typealias AngularUnit = MetricUnit<Angular>
 fun angularUnit(radians: Double, symbol: String): AngularUnit = MetricUnit(Angular, radians, symbol)
