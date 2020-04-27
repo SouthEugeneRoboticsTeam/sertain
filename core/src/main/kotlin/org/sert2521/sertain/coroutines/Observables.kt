@@ -50,16 +50,16 @@ class ObservableBoolean(get: () -> Boolean) : Observable<Boolean>(get) {
 
     operator fun invoke(configure: ObservableBoolean.() -> Unit) = apply(configure)
 
+    fun CoroutineScope.onTrue(action: suspend CoroutineScope.(event: True) -> Unit) =
+            subscribe(target = this@ObservableBoolean as Observable<Boolean>, action = action)
+
+    fun CoroutineScope.onFalse(action: suspend CoroutineScope.(event: False) -> Unit) =
+            subscribe(target = this@ObservableBoolean as Observable<Boolean>, action = action)
+
     fun CoroutineScope.whenTrue(action: suspend CoroutineScope.(event: True) -> Unit) =
-            subscribe(target = this@ObservableBoolean as Observable<Boolean>, action = action)
-
-    fun CoroutineScope.whenFalse(action: suspend CoroutineScope.(event: False) -> Unit) =
-            subscribe(target = this@ObservableBoolean as Observable<Boolean>, action = action)
-
-    fun CoroutineScope.whileTrue(action: suspend CoroutineScope.(event: True) -> Unit) =
             subscribeBetween<Observable<Boolean>, True, False>(target = this@ObservableBoolean, action = action)
 
-    fun CoroutineScope.whileFalse(action: suspend CoroutineScope.(event: False) -> Unit) =
+    fun CoroutineScope.whenFalse(action: suspend CoroutineScope.(event: False) -> Unit) =
             subscribeBetween<Observable<Boolean>, False, True>(target = this@ObservableBoolean, action = action)
 }
 
