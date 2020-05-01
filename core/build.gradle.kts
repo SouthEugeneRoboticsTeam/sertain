@@ -2,6 +2,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("jvm")
+    kotlin("plugin.serialization")
     java
     `maven-publish`
     maven
@@ -11,6 +12,7 @@ dependencies {
     implementation(kotlin("stdlib-jdk8", "1.3.71"))
     implementation(kotlin("reflect", "1.3.71"))
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0")
     implementation("edu.wpi.first.wpilibj:wpilibj-java:2020.1.2")
     implementation("edu.wpi.first.hal:hal-java:2020.1.2")
     implementation("edu.wpi.first.wpiutil:wpiutil-java:2020.1.2")
