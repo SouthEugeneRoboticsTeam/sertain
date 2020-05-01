@@ -2,6 +2,8 @@ package org.sert2521.sertain.telemetry
 
 import edu.wpi.first.networktables.NetworkTable
 import edu.wpi.first.networktables.NetworkTableInstance
+import kotlin.properties.ReadWriteProperty
+import kotlin.reflect.KProperty
 
 fun wpiTable(vararg location: String): NetworkTable {
     var table = NetworkTableInstance.getDefault().getTable(location.first())
@@ -11,7 +13,7 @@ fun wpiTable(vararg location: String): NetworkTable {
     return table
 }
 
-class TableEntry<T>(val name: String, initialValue: T, val parent: Table) {
+class TableEntry<T>(val name: String, initialValue: T, val parent: Table) : ReadWriteProperty<Any?, T> {
     constructor(name: String, initialValue: T, vararg location: String) :
             this(name, initialValue, if (location.isNotEmpty()) Table(location.last(), *location.dropLast(1).toTypedArray()) else Table("Global"))
 
@@ -29,6 +31,12 @@ class TableEntry<T>(val name: String, initialValue: T, val parent: Table) {
         set(value) {
             wpiProperty.setValue(value)
         }
+
+    override fun getValue(thisRef: Any?, property: KProperty<*>) = value
+
+    override fun setValue(thisRef: Any?, property: KProperty<*>, value: T) {
+        this.value = value
+    }
 }
 
 fun groundControlToMajorTom() = Unit
