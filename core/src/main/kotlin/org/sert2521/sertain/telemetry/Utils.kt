@@ -5,8 +5,8 @@ import kotlinx.coroutines.launch
 import org.sert2521.sertain.coroutines.periodic
 import org.sert2521.sertain.coroutines.watch
 
-fun <T> CoroutineScope.linkTableEntry(name: String, parent: Table, get: () -> T) = run {
-    val entry = TableEntry(name, get(), parent)
+fun CoroutineScope.linkTableEntry(name: String, parent: Table, get: () -> Any?) {
+    val entry = TableEntry.create(parent, name, get())
     launch {
         periodic {
             entry.value = get()
