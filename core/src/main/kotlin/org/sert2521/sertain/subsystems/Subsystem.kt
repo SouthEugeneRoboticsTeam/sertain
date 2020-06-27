@@ -19,7 +19,7 @@ abstract class Subsystem(val name: String? = null, var isEnabled: Boolean = true
     open fun CoroutineScope.setup() = Unit
 }
 
-class Key<S : Subsystem>
+class Key<S : Subsystem> internal constructor()
 
 fun CoroutineScope.add(vararg subsystems: Subsystem) {
     for (s in subsystems) {
