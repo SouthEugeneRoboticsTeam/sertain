@@ -45,6 +45,9 @@ suspend fun <S1 : Subsystem, S2 : Subsystem, S3 : Subsystem, S4 : Subsystem, S5 
 suspend fun <S1 : Subsystem, S2 : Subsystem, S3 : Subsystem, S4 : Subsystem, S5 : Subsystem, S6 : Subsystem, S7 : Subsystem, S8 : Subsystem, R> use(s1: S1, s2: S2, s3: S3, s4: S4, s5: S5, s6: S6, s7: S7, s8: S8, cancelConflicts: Boolean = true, name: String = "Unnamed Task", action: suspend CoroutineScope.(Key<S1>, Key<S2>, Key<S3>, Key<S4>, Key<S5>, Key<S6>, Key<S7>, Key<S8>) -> R) =
         reserve(s1, s2, s3, s4, s5, s6, s7, s8, cancelConflicts = cancelConflicts, name = name) { action(Key(), Key(), Key(), Key(), Key(), Key(), Key(), Key()) }
 
+suspend operator fun <S : Subsystem, R> S.invoke(cancelConflicts: Boolean = true, name: String = "Unnamed Task", action: suspend CoroutineScope.(Key<S>) -> R) =
+        reserve(this, cancelConflicts = cancelConflicts, name = name) { action(Key()) }
+
 suspend fun reserve(
         vararg subsystems: Subsystem,
         cancelConflicts: Boolean = true,
