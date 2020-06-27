@@ -21,38 +21,38 @@ import kotlin.coroutines.resumeWithException
 fun CoroutineScope.manageTasks() {
     subscribe<Use<Any?>> { use ->
         // Subsystems used in parent coroutine
-        val prevWorkers: Set<Worker<*>> = use.context[Requirements] ?: emptySet()
+        val prevSubsystems: Set<Subsystem> = use.context[Requirements] ?: emptySet()
         // Subsystems used in new coroutine but not in parent coroutine
-        val newWorkers = use.workers - prevWorkers
+        val newSubsystems = use.subsystems - prevSubsystems
         // Subsystems from both parent and new coroutines
-        val allWorkers = use.workers + prevWorkers
+        val allSubsystems = use.subsystems + prevSubsystems
 
-        if (allWorkers.any { !it.isEnabled }) {
+        if (allSubsystems.any { !it.isEnabled }) {
             use.continuation.resumeWithException(
                     CancellationException(
                             "Cannot execute action ${use.name} because the following workers are disabled:" +
-                                    " ${allWorkers.filter { !it.isEnabled }.joinToString(" ")}."
+                                    " ${allSubsystems.filter { !it.isEnabled }.joinToString(" ")}."
                     )
             )
         }
 
         // Workers that are already occupied
-        val occupiedWorkers = newWorkers.filter { it.occupied }
+        val occupiedSubsystems = newSubsystems.filter { it.occupied }
 
-        if (!use.cancelConflicts && occupiedWorkers.isNotEmpty()) {
+        if (!use.cancelConflicts && occupiedSubsystems.isNotEmpty()) {
             use.continuation.resumeWithException(
                     CancellationException(
-                            "Cannot execute low priority action ${use.name} because the following workers are " +
-                                    "occupied: ${occupiedWorkers.joinToString(" ")}"
+                            "Cannot execute low priority action ${use.name} because the following subsystems are " +
+                                    "occupied: ${occupiedSubsystems.joinToString(" ")}"
                     )
             )
         }
 
-        // Jobs of conflicting workers
-        val conflictingJobs = occupiedWorkers.map { it.currentJob!! }.filter { !it.isCompleted }.toSet()
+        // Jobs of conflicting subsystems
+        val conflictingJobs = occupiedSubsystems.map { it.job!! }.filter { !it.isCompleted }.toSet()
 
         val newJob = CoroutineScope(use.context).launch(
-                Requirements(allWorkers),
+                Requirements(allSubsystems),
                 CoroutineStart.ATOMIC
         ) {
             try {
@@ -72,27 +72,29 @@ fun CoroutineScope.manageTasks() {
             } catch (e: Throwable) {
                 use.continuation.resume(Result.failure(e))
             } finally {
-                RobotScope.fire(Clean(newWorkers, coroutineContext[Job]!!))
+                RobotScope.fire(Clean(newSubsystems, coroutineContext[Job]!!))
             }
         }
 
-        newWorkers.forEach { it.currentJob = newJob }
+        newSubsystems.forEach { it.job = newJob }
     }
 
     subscribe<Clean> { clean ->
-        clean.workers
-                .filter { it.currentJob == clean.job }
+        clean.subsystems
+                .filter { it.job == clean.job }
                 .forEach {
-                    (it as Worker<Any?>).let { s ->
-                        s.currentJob = null
-                        Workers.defaultOf(s)
+                    it.job = null
+                    launch {
+                        reserve(it, cancelConflicts = false, name = "Default") {
+                            it.apply { default() }
+                        }
                     }
                 }
     }
 }
 
 private class Requirements(
-    requirements: Set<Worker<*>>
-) : Set<Worker<*>> by requirements, AbstractCoroutineContextElement(Key) {
+    requirements: Set<Subsystem>
+) : Set<Subsystem> by requirements, AbstractCoroutineContextElement(Key) {
     companion object Key : CoroutineContext.Key<Requirements>
 }
