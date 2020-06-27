@@ -12,7 +12,6 @@ import org.sert2521.sertain.events.Enable
 import org.sert2521.sertain.events.Teleop
 import org.sert2521.sertain.events.Test
 import org.sert2521.sertain.events.fire
-import org.sert2521.sertain.subsystems.Workers
 import org.sert2521.sertain.subsystems.manageTasks
 
 object Robot {
@@ -42,10 +41,6 @@ suspend fun robot(configure: RobotScope.() -> Unit) {
     }
 
     RobotScope.apply(configure)
-
-    Workers.setupAll()
-
-    Workers.defaultAll()
 
     while (running) {
         val hasNewData = ds.waitForData(0.02)
