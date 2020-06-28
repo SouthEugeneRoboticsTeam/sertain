@@ -1,6 +1,7 @@
 package org.sert2521.sertain.eventies
 
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import org.sert2521.sertain.coroutines.RobotScope
 
@@ -20,6 +21,15 @@ object EventBus {
         }
         subscribers.addLast(sub)
         return sub
+    }
+
+    inline fun <reified E1 : Event, reified E2 : Event> between(noinline action: suspend CoroutineScope.(E1) -> Unit): Sub<E1> {
+        return subscribe scope@{
+            subscribe<E2> {
+                this@scope.cancel()
+            }
+            action(this, it)
+        }
     }
 
     fun remove(sub: Sub<*>) {

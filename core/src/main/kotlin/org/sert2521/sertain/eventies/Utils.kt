@@ -19,3 +19,15 @@ inline fun <reified E : Event> CoroutineScope.subscribe(noinline action: suspend
         }
     }
 }
+
+inline fun <reified E1 : Event, reified E2 : Event> CoroutineScope.between(noinline action: suspend CoroutineScope.(E1) -> Unit): Job {
+    var sub: Sub<E1>? = null
+    return launch {
+        try {
+            sub = EventBus.between<E1, E2>(action)
+            delayForever()
+        } finally {
+            EventBus.remove(sub!!)
+        }
+    }
+}
