@@ -15,77 +15,79 @@ import org.sert2521.sertain.events.fire
 import org.sert2521.sertain.subsystems.manageTasks
 
 object Robot {
-    var mode = RobotMode.DISCONNECTED
+    var mode = Mode.DISCONNECTED
         internal set
-}
 
-enum class RobotMode {
-    DISCONNECTED,
-    DISABLED,
-    TELEOPERATED,
-    AUTONOMOUS,
-    TEST
-}
+    enum class Mode {
+        DISCONNECTED,
+        DISABLED,
+        TELEOPERATED,
+        AUTONOMOUS,
+        TEST
+    }
 
-suspend fun robot(configure: RobotScope.() -> Unit) {
-    initializeWpiLib()
+    suspend fun start(configure: RobotScope.() -> Unit) {
+        initializeWpiLib()
 
-    // tell the DS that robot is ready to enable
-    HAL.observeUserProgramStarting()
+        // tell the DS that robot is ready to enable
+        HAL.observeUserProgramStarting()
 
-    val ds: DriverStation = DriverStation.getInstance()
-    val running = true
+        val ds: DriverStation = DriverStation.getInstance()
+        val running = true
 
-    Events.manageTasks()
+        Events.manageTasks()
 
-    RobotScope.apply(configure)
+        RobotScope.apply(configure)
 
-    while (running) {
-        val hasNewData = ds.waitForData(0.02)
+        while (running) {
+            val hasNewData = ds.waitForData(0.02)
 
-        if (!ds.isDSAttached) {
-            // robot has disconnected
-            Robot.mode = RobotMode.DISCONNECTED
-        }
-
-        if (hasNewData) {
-            if (Robot.mode == RobotMode.DISCONNECTED) {
-                // robot has just connected to DS
-                Robot.mode = RobotMode.DISABLED
-                fire(Connect)
+            if (!ds.isDSAttached) {
+                // robot has disconnected
+                mode = Mode.DISCONNECTED
             }
 
-            val wasDisabled = Robot.mode == RobotMode.DISABLED
+            if (hasNewData) {
+                if (mode == Mode.DISCONNECTED) {
+                    // robot has just connected to DS
+                    mode = Mode.DISABLED
+                    fire(Connect)
+                }
 
-            when {
-                ds.isDisabled && Robot.mode != RobotMode.DISABLED -> {
-                    // robot has just been disabled
-                    HAL.observeUserProgramDisabled()
-                    Robot.mode = RobotMode.DISABLED
-                    fire(Disable)
-                }
-                ds.isAutonomous && ds.isEnabled && Robot.mode != RobotMode.AUTONOMOUS -> {
-                    // robot has just been set to autonomous
-                    HAL.observeUserProgramAutonomous()
-                    Robot.mode = RobotMode.AUTONOMOUS
-                    if (wasDisabled) fire(Enable)
-                    fire(Auto)
-                }
-                ds.isOperatorControl && ds.isEnabled && Robot.mode != RobotMode.TELEOPERATED -> {
-                    // robot has just been set to teleop
-                    HAL.observeUserProgramTeleop()
-                    Robot.mode = RobotMode.TELEOPERATED
-                    if (wasDisabled) fire(Enable)
-                    fire(Teleop)
-                }
-                ds.isTest && ds.isEnabled && Robot.mode != RobotMode.TEST -> {
-                    // robot has just been set to test
-                    HAL.observeUserProgramTest()
-                    Robot.mode = RobotMode.TEST
-                    if (wasDisabled) fire(Enable)
-                    fire(Test)
+                val wasDisabled = mode == Mode.DISABLED
+
+                when {
+                    ds.isDisabled && mode != Mode.DISABLED -> {
+                        // robot has just been disabled
+                        HAL.observeUserProgramDisabled()
+                        mode = Mode.DISABLED
+                        fire(Disable)
+                    }
+                    ds.isAutonomous && ds.isEnabled && mode != Mode.AUTONOMOUS -> {
+                        // robot has just been set to autonomous
+                        HAL.observeUserProgramAutonomous()
+                        mode = Mode.AUTONOMOUS
+                        if (wasDisabled) fire(Enable)
+                        fire(Auto)
+                    }
+                    ds.isOperatorControl && ds.isEnabled && mode != Mode.TELEOPERATED -> {
+                        // robot has just been set to teleop
+                        HAL.observeUserProgramTeleop()
+                        mode = Mode.TELEOPERATED
+                        if (wasDisabled) fire(Enable)
+                        fire(Teleop)
+                    }
+                    ds.isTest && ds.isEnabled && mode != Mode.TEST -> {
+                        // robot has just been set to test
+                        HAL.observeUserProgramTest()
+                        mode = Mode.TEST
+                        if (wasDisabled) fire(Enable)
+                        fire(Test)
+                    }
                 }
             }
         }
     }
 }
+
+
