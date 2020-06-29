@@ -14,10 +14,24 @@ object EventBus {
         events.addLast(event)
     }
 
+    fun <E : Event> subscribe(s: Sub<E>): Sub<E> {
+        subscribers.addLast(s)
+        return s
+    }
+
     inline fun <reified E : Event> subscribe(noinline action: suspend CoroutineScope.(E) -> Unit): Sub<E> {
         val sub = object : Sub<E> {
             override val action = action
             override fun requires(e: Event) = e is E
+        }
+        subscribers.addLast(sub)
+        return sub
+    }
+
+    inline fun <reified E : Event.Targeted<*>> subscribe(target: Any?, noinline action: suspend CoroutineScope.(E) -> Unit): Sub<E> {
+        val sub = object : Sub<E> {
+            override val action = action
+            override fun requires(e: Event) = e is E && e.target == target
         }
         subscribers.addLast(sub)
         return sub
@@ -32,6 +46,15 @@ object EventBus {
         }
     }
 
+    inline fun <reified E1 : Event.Targeted<*>, reified E2 : Event.Targeted<*>> between(target: Any?, noinline action: suspend CoroutineScope.(E1) -> Unit): Sub<E1> {
+        return subscribe(target) scope@{
+            subscribe<E2>(target) {
+                this@scope.cancel()
+            }
+            action(this, it)
+        }
+    }
+
     fun remove(sub: Sub<*>) {
         subscribers.remove(sub)
     }
@@ -40,9 +63,10 @@ object EventBus {
         for (e in events) {
             if (e != null) {
                 for (s in subscribers) {
-                    s?.withEventOrNull(e)?.let {
+                    if (s != null && s.requires(e)) {
+                        @Suppress("UNCHECKED_CAST")
                         RobotScope.launch {
-                            it.action(this, e)
+                            (s as Sub<Event>).action(this, e)
                         }
                     }
                 }
