@@ -1,4 +1,4 @@
-package org.sert2521.sertain.eventies
+package org.sert2521.sertain.events
 
 interface RobotEvent : Event
 

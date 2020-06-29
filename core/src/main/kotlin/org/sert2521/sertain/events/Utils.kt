@@ -1,22 +1,19 @@
-package org.sert2521.sertain.eventies
+package org.sert2521.sertain.events
 
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import org.sert2521.sertain.coroutines.delayForever
 
-fun fire(event: Event) = EventBus.fire(event)
+fun fire(event: Event) = Events.fire(event)
 
 inline fun <reified E : Event> CoroutineScope.subscribe(sub: Sub<E>): Job {
     return launch {
         try {
-            EventBus.subscribe(sub)
+            Events.subscribe(sub)
             delayForever()
         } finally {
-            EventBus.remove(sub)
+            Events.remove(sub)
         }
     }
 }
@@ -25,10 +22,10 @@ inline fun <reified E : Event> CoroutineScope.subscribe(noinline action: suspend
     var sub: Sub<E>? = null
     return launch {
         try {
-            sub = EventBus.subscribe(action)
+            sub = Events.subscribe(action)
             delayForever()
         } finally {
-            EventBus.remove(sub!!)
+            Events.remove(sub!!)
         }
     }
 }
@@ -37,10 +34,10 @@ inline fun <reified E : Event.Targeted<*>> CoroutineScope.subscribe(target: Any?
     var sub: Sub<E>? = null
     return launch {
         try {
-            sub = EventBus.subscribe(target, action)
+            sub = Events.subscribe(target, action)
             delayForever()
         } finally {
-            EventBus.remove(sub!!)
+            Events.remove(sub!!)
         }
     }
 }
@@ -49,10 +46,10 @@ inline fun <reified E1 : Event, reified E2 : Event> CoroutineScope.between(noinl
     var sub: Sub<E1>? = null
     return launch {
         try {
-            sub = EventBus.between<E1, E2>(action)
+            sub = Events.between<E1, E2>(action)
             delayForever()
         } finally {
-            EventBus.remove(sub!!)
+            Events.remove(sub!!)
         }
     }
 }
@@ -61,10 +58,10 @@ inline fun <reified E1 : Event.Targeted<*>, reified E2 : Event.Targeted<*>> Coro
     var sub: Sub<E1>? = null
     return launch {
         try {
-            sub = EventBus.between<E1, E2>(target, action)
+            sub = Events.between<E1, E2>(target, action)
             delayForever()
         } finally {
-            EventBus.remove(sub!!)
+            Events.remove(sub!!)
         }
     }
 }

@@ -1,5 +1,6 @@
 package org.sert2521.sertain.subsystems
 
+import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
@@ -8,9 +9,7 @@ import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.sert2521.sertain.coroutines.RobotScope
-import org.sert2521.sertain.events.Clean
-import org.sert2521.sertain.events.Use
+import org.sert2521.sertain.events.Event
 import org.sert2521.sertain.events.fire
 import org.sert2521.sertain.events.subscribe
 import kotlin.coroutines.AbstractCoroutineContextElement
@@ -72,7 +71,7 @@ fun CoroutineScope.manageTasks() {
             } catch (e: Throwable) {
                 use.continuation.resume(Result.failure(e))
             } finally {
-                RobotScope.fire(Clean(newSubsystems, coroutineContext[Job]!!))
+                fire(Clean(newSubsystems, coroutineContext[Job]!!))
             }
         }
 
@@ -98,3 +97,19 @@ private class Requirements(
 ) : Set<Subsystem> by requirements, AbstractCoroutineContextElement(Key) {
     companion object Key : CoroutineContext.Key<Requirements>
 }
+
+interface SubsystemEvent : Event
+
+class Use<R>(
+        val subsystems: Set<Subsystem>,
+        val cancelConflicts: Boolean,
+        val name: String,
+        val context: CoroutineContext,
+        val continuation: CancellableContinuation<Result<R>>,
+        val action: suspend CoroutineScope.() -> R
+) : SubsystemEvent
+
+class Clean(
+        val subsystems: Set<Subsystem>,
+        val job: Job
+) : SubsystemEvent

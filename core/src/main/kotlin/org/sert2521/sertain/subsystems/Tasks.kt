@@ -3,7 +3,6 @@ package org.sert2521.sertain.subsystems
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
-import org.sert2521.sertain.events.Use
 import org.sert2521.sertain.events.fire
 import kotlin.coroutines.coroutineContext
 

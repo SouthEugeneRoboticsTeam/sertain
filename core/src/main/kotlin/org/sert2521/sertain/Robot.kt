@@ -54,7 +54,7 @@ suspend fun robot(configure: RobotScope.() -> Unit) {
             if (Robot.mode == RobotMode.DISCONNECTED) {
                 // robot has just connected to DS
                 Robot.mode = RobotMode.DISABLED
-                RobotScope.fire(Connect)
+                fire(Connect)
             }
 
             val wasDisabled = Robot.mode == RobotMode.DISABLED
@@ -64,28 +64,28 @@ suspend fun robot(configure: RobotScope.() -> Unit) {
                     // robot has just been disabled
                     HAL.observeUserProgramDisabled()
                     Robot.mode = RobotMode.DISABLED
-                    RobotScope.fire(Disable)
+                    fire(Disable)
                 }
                 ds.isAutonomous && ds.isEnabled && Robot.mode != RobotMode.AUTONOMOUS -> {
                     // robot has just been set to autonomous
                     HAL.observeUserProgramAutonomous()
                     Robot.mode = RobotMode.AUTONOMOUS
-                    if (wasDisabled) RobotScope.fire(Enable)
-                    RobotScope.fire(Auto)
+                    if (wasDisabled) fire(Enable)
+                    fire(Auto)
                 }
                 ds.isOperatorControl && ds.isEnabled && Robot.mode != RobotMode.TELEOPERATED -> {
                     // robot has just been set to teleop
                     HAL.observeUserProgramTeleop()
                     Robot.mode = RobotMode.TELEOPERATED
-                    if (wasDisabled) RobotScope.fire(Enable)
-                    RobotScope.fire(Teleop)
+                    if (wasDisabled) fire(Enable)
+                    fire(Teleop)
                 }
                 ds.isTest && ds.isEnabled && Robot.mode != RobotMode.TEST -> {
                     // robot has just been set to test
                     HAL.observeUserProgramTest()
                     Robot.mode = RobotMode.TEST
-                    if (wasDisabled) RobotScope.fire(Enable)
-                    RobotScope.fire(Test)
+                    if (wasDisabled) fire(Enable)
+                    fire(Test)
                 }
             }
         }

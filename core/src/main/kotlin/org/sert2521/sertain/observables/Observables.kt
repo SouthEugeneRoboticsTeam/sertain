@@ -3,10 +3,10 @@ package org.sert2521.sertain.observables
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.sert2521.sertain.coroutines.periodic
-import org.sert2521.sertain.eventies.Event
-import org.sert2521.sertain.eventies.Sub
-import org.sert2521.sertain.eventies.fire
-import org.sert2521.sertain.eventies.subscribe
+import org.sert2521.sertain.events.Event
+import org.sert2521.sertain.events.Sub
+import org.sert2521.sertain.events.fire
+import org.sert2521.sertain.events.subscribe
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
