@@ -16,8 +16,8 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
-fun Events.manageTasks() {
-    subscribe<Use<Any?>> { use ->
+fun manageTasks() {
+    Events.subscribe<Use<Any?>> { use ->
         // Subsystems used in parent coroutine
         val prevSubsystems: Set<Subsystem> = use.context[Requirements] ?: emptySet()
         // Subsystems used in new coroutine but not in parent coroutine
@@ -70,14 +70,14 @@ fun Events.manageTasks() {
             } catch (e: Throwable) {
                 use.continuation.resume(Result.failure(e))
             } finally {
-                fire(Clean(newSubsystems, coroutineContext[Job]!!))
+                Events.fire(Clean(newSubsystems, coroutineContext[Job]!!))
             }
         }
 
         newSubsystems.forEach { it.job = newJob }
     }
 
-    subscribe<Clean> { clean ->
+    Events.subscribe<Clean> { clean ->
         clean.subsystems
                 .filter { it.job == clean.job }
                 .forEach {
