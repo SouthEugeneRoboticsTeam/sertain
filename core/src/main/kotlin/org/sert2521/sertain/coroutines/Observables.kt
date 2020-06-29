@@ -1,8 +1,7 @@
-package org.sert2521.sertain.observables
+package org.sert2521.sertain.coroutines
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import org.sert2521.sertain.coroutines.periodic
 import org.sert2521.sertain.events.Event
 import org.sert2521.sertain.events.Sub
 import org.sert2521.sertain.events.fire

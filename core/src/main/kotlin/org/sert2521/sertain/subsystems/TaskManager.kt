@@ -10,14 +10,13 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.sert2521.sertain.events.Event
-import org.sert2521.sertain.events.fire
-import org.sert2521.sertain.events.subscribe
+import org.sert2521.sertain.events.Events
 import kotlin.coroutines.AbstractCoroutineContextElement
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
-fun CoroutineScope.manageTasks() {
+fun Events.manageTasks() {
     subscribe<Use<Any?>> { use ->
         // Subsystems used in parent coroutine
         val prevSubsystems: Set<Subsystem> = use.context[Requirements] ?: emptySet()

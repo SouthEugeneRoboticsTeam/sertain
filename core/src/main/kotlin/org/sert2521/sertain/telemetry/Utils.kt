@@ -3,8 +3,8 @@ package org.sert2521.sertain.telemetry
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.sert2521.sertain.coroutines.periodic
-import org.sert2521.sertain.observables.onChange
-import org.sert2521.sertain.observables.watch
+import org.sert2521.sertain.coroutines.onChange
+import org.sert2521.sertain.coroutines.watch
 
 fun <T> CoroutineScope.linkTableEntry(name: String, parent: Table, get: () -> T) = run {
     val entry = TableEntry(name, get(), parent)
