@@ -10,6 +10,17 @@ import org.sert2521.sertain.coroutines.delayForever
 
 fun fire(event: Event) = EventBus.fire(event)
 
+inline fun <reified E : Event> CoroutineScope.subscribe(sub: Sub<E>): Job {
+    return launch {
+        try {
+            EventBus.subscribe(sub)
+            delayForever()
+        } finally {
+            EventBus.remove(sub)
+        }
+    }
+}
+
 inline fun <reified E : Event> CoroutineScope.subscribe(noinline action: suspend CoroutineScope.(E) -> Unit): Job {
     var sub: Sub<E>? = null
     return launch {
