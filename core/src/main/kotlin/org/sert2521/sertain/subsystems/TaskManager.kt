@@ -1,5 +1,6 @@
 package org.sert2521.sertain.subsystems
 
+import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
@@ -8,18 +9,15 @@ import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.sert2521.sertain.coroutines.RobotScope
-import org.sert2521.sertain.events.Clean
-import org.sert2521.sertain.events.Use
-import org.sert2521.sertain.events.fire
-import org.sert2521.sertain.events.subscribe
+import org.sert2521.sertain.events.Event
+import org.sert2521.sertain.events.Events
 import kotlin.coroutines.AbstractCoroutineContextElement
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
-fun CoroutineScope.manageTasks() {
-    subscribe<Use<Any?>> { use ->
+fun manageTasks() {
+    Events.subscribe<Use<Any?>> { use ->
         // Subsystems used in parent coroutine
         val prevSubsystems: Set<Subsystem> = use.context[Requirements] ?: emptySet()
         // Subsystems used in new coroutine but not in parent coroutine
@@ -72,14 +70,14 @@ fun CoroutineScope.manageTasks() {
             } catch (e: Throwable) {
                 use.continuation.resume(Result.failure(e))
             } finally {
-                RobotScope.fire(Clean(newSubsystems, coroutineContext[Job]!!))
+                Events.fire(Clean(newSubsystems, coroutineContext[Job]!!))
             }
         }
 
         newSubsystems.forEach { it.job = newJob }
     }
 
-    subscribe<Clean> { clean ->
+    Events.subscribe<Clean> { clean ->
         clean.subsystems
                 .filter { it.job == clean.job }
                 .forEach {
@@ -98,3 +96,19 @@ private class Requirements(
 ) : Set<Subsystem> by requirements, AbstractCoroutineContextElement(Key) {
     companion object Key : CoroutineContext.Key<Requirements>
 }
+
+interface SubsystemEvent : Event
+
+class Use<R>(
+        val subsystems: Set<Subsystem>,
+        val cancelConflicts: Boolean,
+        val name: String,
+        val context: CoroutineContext,
+        val continuation: CancellableContinuation<Result<R>>,
+        val action: suspend CoroutineScope.() -> R
+) : SubsystemEvent
+
+class Clean(
+        val subsystems: Set<Subsystem>,
+        val job: Job
+) : SubsystemEvent

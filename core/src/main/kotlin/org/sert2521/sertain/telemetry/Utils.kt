@@ -3,6 +3,7 @@ package org.sert2521.sertain.telemetry
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.sert2521.sertain.coroutines.periodic
+import org.sert2521.sertain.coroutines.onChange
 import org.sert2521.sertain.coroutines.watch
 
 fun <T> CoroutineScope.linkTableEntry(name: String, parent: Table, get: () -> T) = run {
@@ -31,9 +32,5 @@ fun <T> CoroutineScope.withTableEntry(name: String, value: T, parent: Table, act
 
 fun <T> CoroutineScope.withTableEntry(entry: TableEntry<T>, action: (T) -> Unit) = run {
     action(entry.value)
-    ({ entry.value }).watch {
-        onChange {
-            action(value)
-        }
-    }
+    watch { entry.value }.onChange { action(it.value) }
 }

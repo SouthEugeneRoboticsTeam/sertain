@@ -5,9 +5,8 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.sert2521.sertain.events.subscribe
 import org.sert2521.sertain.events.Event
-import org.sert2521.sertain.events.TargetedEvent
+import org.sert2521.sertain.events.Events
 import org.sert2521.sertain.units.Chronic
 import org.sert2521.sertain.units.MetricUnit
 import org.sert2521.sertain.units.MetricValue
@@ -29,20 +28,22 @@ suspend inline fun <reified E : Event> delayUntil() {
     val job = CoroutineScope(coroutineContext).launch {
         delayForever()
     }
-    CoroutineScope(coroutineContext).subscribe<E> {
+    val sub = Events.subscribe<E> {
         job.cancel()
     }
     job.join()
+    Events.remove(sub)
 }
 
-suspend inline fun <T, reified E : TargetedEvent<T>> delayUntil(target: T) {
+suspend inline fun <reified E : Event.Targeted<*>> delayUntil(target: Any?) {
     val job = CoroutineScope(coroutineContext).launch {
         delayForever()
     }
-    CoroutineScope(coroutineContext).subscribe<T, E>(target) {
+    val s = Events.subscribe<E>(target) {
         job.cancel()
     }
     job.join()
+    Events.remove(s)
 }
 
 suspend fun delayForever() {

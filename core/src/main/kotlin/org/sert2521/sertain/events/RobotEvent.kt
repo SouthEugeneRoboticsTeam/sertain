@@ -1,6 +1,7 @@
 package org.sert2521.sertain.events
 
 interface RobotEvent : Event
+
 interface TeleopOver : RobotEvent
 interface AutoOver : RobotEvent
 interface TestOver : RobotEvent
