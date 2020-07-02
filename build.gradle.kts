@@ -7,7 +7,7 @@ plugins {
 }
 
 allprojects {
-    group = "org.sert2521.sertain"
+    group = "org.botful"
     version = "0.1.1"
 
     repositories {

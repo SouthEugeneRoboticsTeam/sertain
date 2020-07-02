@@ -1,7 +1,5 @@
 package org.botful.motors
 
-import org.botful.control.PidfConfig
-
 data class MotorPidf(
     val kp: Double = 0.0,
     val ki: Double = 0.0,

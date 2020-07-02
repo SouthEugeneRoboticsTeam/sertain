@@ -1,7 +1,7 @@
 package org.botful.control
 
-import org.sert2521.sertain.utils.root
-import org.sert2521.sertain.utils.roundTo
+import org.botful.utils.root
+import org.botful.utils.roundTo
 import kotlin.math.min
 import kotlin.math.pow
 import kotlin.math.sqrt

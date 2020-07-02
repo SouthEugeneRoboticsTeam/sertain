@@ -3,20 +3,20 @@ package org.botful
 import edu.wpi.first.hal.HAL
 import edu.wpi.first.wpilibj.DriverStation
 import kotlinx.coroutines.CoroutineScope
-import org.sert2521.sertain.core.initializeWpiLib
-import org.sert2521.sertain.events.Auto
-import org.sert2521.sertain.events.AutoOver
-import org.sert2521.sertain.events.Connect
-import org.sert2521.sertain.events.Disable
-import org.sert2521.sertain.events.Enable
-import org.sert2521.sertain.events.Events
-import org.sert2521.sertain.events.Start
-import org.sert2521.sertain.events.Teleop
-import org.sert2521.sertain.events.TeleopOver
-import org.sert2521.sertain.events.Test
-import org.sert2521.sertain.events.TestOver
-import org.sert2521.sertain.events.fire
-import org.sert2521.sertain.subsystems.manageTasks
+import org.botful.core.initializeWpiLib
+import org.botful.events.Auto
+import org.botful.events.AutoOver
+import org.botful.events.Connect
+import org.botful.events.Disable
+import org.botful.events.Enable
+import org.botful.events.Events
+import org.botful.events.Start
+import org.botful.events.Teleop
+import org.botful.events.TeleopOver
+import org.botful.events.Test
+import org.botful.events.TestOver
+import org.botful.events.fire
+import org.botful.subsystems.manageTasks
 
 object Robot {
     var mode = _root_ide_package_.org.botful.Robot.Mode.DISCONNECTED

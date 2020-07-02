@@ -30,7 +30,7 @@ repositories {
 
 dependencies {
   // other dependencies
-  implementation 'com.github.SouthEugeneRoboticsTeam:org.sert2521.sertain:0.0.12'
+  implementation 'com.github.SouthEugeneRoboticsTeam:org.botful:0.0.12'
 }
 ```
 

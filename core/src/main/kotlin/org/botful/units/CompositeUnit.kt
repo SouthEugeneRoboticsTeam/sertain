@@ -1,4 +1,3 @@
-
 package org.botful.units
 
 sealed class CompositionOperation

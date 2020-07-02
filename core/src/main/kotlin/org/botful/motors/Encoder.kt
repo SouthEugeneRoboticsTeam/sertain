@@ -1,11 +1,9 @@
 package org.botful.motors
 
-import org.sert2521.sertain.units.AngularVelocity
-import org.sert2521.sertain.units.AngularVelocityUnit
-import org.sert2521.sertain.units.MetricUnit
-import org.sert2521.sertain.units.angularUnit
-import org.sert2521.sertain.units.div
-import org.sert2521.sertain.units.seconds
+import org.botful.units.AngularVelocityUnit
+import org.botful.units.angularUnit
+import org.botful.units.div
+import org.botful.units.seconds
 import kotlin.math.PI
 
 class Encoder(ticksPerRevolution: Int) {

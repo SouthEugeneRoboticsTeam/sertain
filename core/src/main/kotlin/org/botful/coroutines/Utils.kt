@@ -5,15 +5,15 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.sert2521.sertain.events.Event
-import org.sert2521.sertain.events.Events
-import org.sert2521.sertain.units.Chronic
-import org.sert2521.sertain.units.MetricUnit
-import org.sert2521.sertain.units.MetricValue
-import org.sert2521.sertain.units.convert
-import org.sert2521.sertain.units.from
-import org.sert2521.sertain.units.milliseconds
-import org.sert2521.sertain.units.ms
+import org.botful.events.Event
+import org.botful.events.Events
+import org.botful.units.Chronic
+import org.botful.units.MetricUnit
+import org.botful.units.MetricValue
+import org.botful.units.convert
+import org.botful.units.from
+import org.botful.units.milliseconds
+import org.botful.units.ms
 import kotlin.coroutines.coroutineContext
 
 suspend fun delay(t: MetricValue<Chronic>) = delay(t.from(milliseconds).toLong())

@@ -9,8 +9,8 @@ import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.sert2521.sertain.events.Event
-import org.sert2521.sertain.events.Events
+import org.botful.events.Event
+import org.botful.events.Events
 import kotlin.coroutines.AbstractCoroutineContextElement
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.resume

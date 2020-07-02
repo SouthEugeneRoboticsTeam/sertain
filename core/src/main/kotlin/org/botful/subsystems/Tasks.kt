@@ -3,7 +3,7 @@ package org.botful.subsystems
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
-import org.sert2521.sertain.events.fire
+import org.botful.events.fire
 import kotlin.coroutines.coroutineContext
 
 /**

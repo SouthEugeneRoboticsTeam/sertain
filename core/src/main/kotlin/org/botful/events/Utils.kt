@@ -3,7 +3,7 @@ package org.botful.events
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import org.sert2521.sertain.coroutines.delayForever
+import org.botful.coroutines.delayForever
 
 fun fire(event: Event) = Events.fire(event)
 

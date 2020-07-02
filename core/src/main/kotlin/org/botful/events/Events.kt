@@ -3,7 +3,7 @@ package org.botful.events
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
-import org.sert2521.sertain.coroutines.RobotScope
+import org.botful.coroutines.RobotScope
 
 @OptIn(ExperimentalStdlibApi::class)
 object Events {

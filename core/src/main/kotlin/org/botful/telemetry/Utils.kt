@@ -2,9 +2,9 @@ package org.botful.telemetry
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import org.sert2521.sertain.coroutines.periodic
-import org.sert2521.sertain.coroutines.onChange
-import org.sert2521.sertain.coroutines.watch
+import org.botful.coroutines.periodic
+import org.botful.coroutines.onChange
+import org.botful.coroutines.watch
 
 fun <T> CoroutineScope.linkTableEntry(name: String, parent: Table, get: () -> T) = run {
     val entry = TableEntry(name, get(), parent)

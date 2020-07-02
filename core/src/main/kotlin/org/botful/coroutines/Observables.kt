@@ -2,10 +2,10 @@ package org.botful.coroutines
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import org.sert2521.sertain.events.Event
-import org.sert2521.sertain.events.Sub
-import org.sert2521.sertain.events.fire
-import org.sert2521.sertain.events.subscribe
+import org.botful.events.Event
+import org.botful.events.Sub
+import org.botful.events.fire
+import org.botful.events.subscribe
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 

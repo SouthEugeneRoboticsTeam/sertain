@@ -1,11 +1,11 @@
 package org.botful.motors
 
-import org.sert2521.sertain.units.Angular
-import org.sert2521.sertain.units.AngularUnit
-import org.sert2521.sertain.units.AngularVelocity
-import org.sert2521.sertain.units.AngularVelocityUnit
-import org.sert2521.sertain.units.MetricValue
-import org.sert2521.sertain.units.convertTo
+import org.botful.units.Angular
+import org.botful.units.AngularUnit
+import org.botful.units.AngularVelocity
+import org.botful.units.AngularVelocityUnit
+import org.botful.units.MetricValue
+import org.botful.units.convertTo
 import com.ctre.phoenix.motorcontrol.ControlMode as CtreControlMode
 import com.ctre.phoenix.motorcontrol.NeutralMode as CtreNeutralMode
 import com.ctre.phoenix.motorcontrol.can.TalonSRX as CtreTalon

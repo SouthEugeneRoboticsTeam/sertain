@@ -1,6 +1,6 @@
 package org.botful.telemetry
 
-import org.sert2521.sertain.coroutines.RobotScope
+import org.botful.coroutines.RobotScope
 
 open class Table(val name: String, val parent: Table? = null) {
     constructor(name: String, vararg location: String) :
