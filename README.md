@@ -9,16 +9,12 @@
 </h4>
 
 <p align="center">
-  <a href="https://github.com/SouthEugeneRoboticsTeam/sertain/actions">
-    <img src="https://img.shields.io/github/workflow/status/SouthEugeneRoboticsTeam/sertain/Java CI?style=flat-square" />
+  <a href="https://github.com/Botful/botful/actions">
+    <img src="https://img.shields.io/github/workflow/status/Botful/botful/Java CI?style=flat-square" />
   </a>
   
-  <a href="https://jitpack.io/#SouthEugeneRoboticsTeam/org.sert2521.sertain">
-    <img src="https://img.shields.io/jitpack/v/github/SouthEugeneRoboticsTeam/sertain?style=flat-square" />
-  </a>
-  
-  <a href="https://sert2521.org">
-    <img src="https://img.shields.io/badge/sert-2521-blueviolet?style=flat-square" />
+  <a href="https://jitpack.io/#Botful/org.sert2521.sertain">
+    <img src="https://img.shields.io/jitpack/v/github/Botful/botful?style=flat-square" />
   </a>
 </p>
  
