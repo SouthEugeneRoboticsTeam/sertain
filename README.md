@@ -13,7 +13,7 @@
     <img src="https://img.shields.io/github/workflow/status/Botful/botful/Java CI?style=flat-square" />
   </a>
   
-  <a href="https://jitpack.io/#Botful/org.sert2521.sertain">
+  <a href="https://jitpack.io/#Botful/org.botful">
     <img src="https://img.shields.io/jitpack/v/github/Botful/botful?style=flat-square" />
   </a>
 </p>
