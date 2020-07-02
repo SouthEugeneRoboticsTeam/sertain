@@ -15,11 +15,10 @@ import org.botful.events.Teleop
 import org.botful.events.TeleopOver
 import org.botful.events.Test
 import org.botful.events.TestOver
-import org.botful.events.fire
 import org.botful.subsystems.manageTasks
 
 object Robot {
-    var mode = _root_ide_package_.org.botful.Robot.Mode.DISCONNECTED
+    var mode = Mode.DISCONNECTED
         internal set
 
     enum class Mode {
@@ -46,7 +45,7 @@ object Robot {
         fun whenTest(action: suspend CoroutineScope.(Test) -> Unit) = Events.between<Test, TestOver>(action)
     }
 
-    suspend fun start(configure: _root_ide_package_.org.botful.Robot.Config.() -> Unit) {
+    suspend fun start(configure: Config.() -> Unit) {
         initializeWpiLib()
 
         // tell the DS that robot is ready to enable
@@ -56,7 +55,7 @@ object Robot {
         val running = true
 
         manageTasks()
-        _root_ide_package_.org.botful.Robot.Config().apply(configure)
+        Config().apply(configure)
 
         Events.fire(Start)
 
@@ -65,43 +64,43 @@ object Robot {
 
             if (!ds.isDSAttached) {
                 // robot has disconnected
-                _root_ide_package_.org.botful.Robot.mode = _root_ide_package_.org.botful.Robot.Mode.DISCONNECTED
+                mode = Mode.DISCONNECTED
             }
 
             if (hasNewData) {
-                if (_root_ide_package_.org.botful.Robot.mode == _root_ide_package_.org.botful.Robot.Mode.DISCONNECTED) {
+                if (mode == Mode.DISCONNECTED) {
                     // robot has just connected to DS
-                    _root_ide_package_.org.botful.Robot.mode = _root_ide_package_.org.botful.Robot.Mode.DISABLED
+                    mode = Mode.DISABLED
                     Events.fire(Connect)
                 }
 
-                val wasDisabled = _root_ide_package_.org.botful.Robot.mode == _root_ide_package_.org.botful.Robot.Mode.DISABLED
+                val wasDisabled = mode == Mode.DISABLED
 
                 when {
-                    ds.isDisabled && _root_ide_package_.org.botful.Robot.mode != _root_ide_package_.org.botful.Robot.Mode.DISABLED -> {
+                    ds.isDisabled && mode != Mode.DISABLED -> {
                         // robot has just been disabled
                         HAL.observeUserProgramDisabled()
-                        _root_ide_package_.org.botful.Robot.mode = _root_ide_package_.org.botful.Robot.Mode.DISABLED
+                        mode = Mode.DISABLED
                         Events.fire(Disable)
                     }
-                    ds.isAutonomous && ds.isEnabled && _root_ide_package_.org.botful.Robot.mode != _root_ide_package_.org.botful.Robot.Mode.AUTONOMOUS -> {
+                    ds.isAutonomous && ds.isEnabled && mode != Mode.AUTONOMOUS -> {
                         // robot has just been set to autonomous
                         HAL.observeUserProgramAutonomous()
-                        _root_ide_package_.org.botful.Robot.mode = _root_ide_package_.org.botful.Robot.Mode.AUTONOMOUS
+                        mode = Mode.AUTONOMOUS
                         if (wasDisabled) Events.fire(Enable)
                         Events.fire(Auto)
                     }
-                    ds.isOperatorControl && ds.isEnabled && _root_ide_package_.org.botful.Robot.mode != _root_ide_package_.org.botful.Robot.Mode.TELEOPERATED -> {
+                    ds.isOperatorControl && ds.isEnabled && mode != Mode.TELEOPERATED -> {
                         // robot has just been set to teleop
                         HAL.observeUserProgramTeleop()
-                        _root_ide_package_.org.botful.Robot.mode = _root_ide_package_.org.botful.Robot.Mode.TELEOPERATED
+                        mode = Mode.TELEOPERATED
                         if (wasDisabled) Events.fire(Enable)
                         Events.fire(Teleop)
                     }
-                    ds.isTest && ds.isEnabled && _root_ide_package_.org.botful.Robot.mode != _root_ide_package_.org.botful.Robot.Mode.TEST -> {
+                    ds.isTest && ds.isEnabled && mode != Mode.TEST -> {
                         // robot has just been set to test
                         HAL.observeUserProgramTest()
-                        _root_ide_package_.org.botful.Robot.mode = _root_ide_package_.org.botful.Robot.Mode.TEST
+                        mode = Mode.TEST
                         if (wasDisabled) Events.fire(Enable)
                         Events.fire(Test)
                     }

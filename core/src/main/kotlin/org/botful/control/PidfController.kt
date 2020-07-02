@@ -9,7 +9,7 @@ open class PidfConfig {
     var kf: Double? = null
 }
 
-class PidfController(config: _root_ide_package_.org.botful.control.PidfConfig, val dt: Double) {
+class PidfController(config: PidfConfig, val dt: Double) {
     private val kp = config.kp ?: 0.0
     private val ki = config.ki ?: 0.0
     private val kd = config.kd ?: 0.0

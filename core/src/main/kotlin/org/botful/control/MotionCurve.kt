@@ -13,9 +13,9 @@ data class MotionCurveConfig(
     var maxJerk: Double
 )
 
-class MotionCurve(config: _root_ide_package_.org.botful.control.MotionCurveConfig) {
+class MotionCurve(config: MotionCurveConfig) {
     constructor(distance: Double, maxVelocity: Double, maxAcceleration: Double, maxJerk: Double) :
-            this(_root_ide_package_.org.botful.control.MotionCurveConfig(distance, maxVelocity, maxAcceleration, maxJerk))
+            this(MotionCurveConfig(distance, maxVelocity, maxAcceleration, maxJerk))
 
     val d = config.distance
     val vm = config.maxVelocity

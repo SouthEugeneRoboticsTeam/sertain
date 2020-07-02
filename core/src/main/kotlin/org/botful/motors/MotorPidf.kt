@@ -1,5 +1,7 @@
 package org.botful.motors
 
+import org.botful.control.PidfConfig
+
 data class MotorPidf(
     val kp: Double = 0.0,
     val ki: Double = 0.0,
@@ -12,7 +14,7 @@ data class MotorPidf(
     val period: Int = 0
 )
 
-class MotorPidfConfig : _root_ide_package_.org.botful.control.PidfConfig() {
+class MotorPidfConfig : PidfConfig() {
     var integralZone: Int? = null
     var allowedError: Int? = null
     var maxIntegral: Double? = null
