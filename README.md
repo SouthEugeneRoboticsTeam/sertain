@@ -5,7 +5,7 @@
 </p>
 
 <h4 align="center">
-  Write more for your robot with less, and be absolutely <i>SERT</i>ain that your robot works.
+  Code your robot thoughtfully with Botful.
 </h4>
 
 <p align="center">
