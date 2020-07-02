@@ -1,6 +1,6 @@
 <p align="center">
   <a href="#">
-    <img alt="Botful" src="https://i.imgur.com/jflsDTy.png" />
+    <img alt="Botful" src="https://i.imgur.com/WAhi8NS.png" width="750px" height="auto"/>
   </a>
 </p>
 
