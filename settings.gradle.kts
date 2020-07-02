@@ -1,3 +1,3 @@
-rootProject.name = "sertain"
+rootProject.name = "botful"
 
 include("core")
