@@ -14,7 +14,7 @@
   </a>
 </p>
 
-Botful is a framework designed to make programming robots for the First Robotics Competition as easy as possible. It combines wrappers for WPILib, Pheonix motor controllers, and Spark motor controllers. The framework is written in Kotlin, a language meant to supplement and enhance Java.
+**Botful is a framework designed to make programming robots for the First Robotics Competition as easy as possible. It combines wrappers for WPILib, Pheonix motor controllers, and Spark motor controllers. The framework is written in Kotlin, a language meant to supplement and enhance Java.**
 
 ### Minimizes mistakes
 
