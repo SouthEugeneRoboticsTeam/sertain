@@ -6,18 +6,19 @@
 
 ### Installation
 
-```gradle
-repositories {
-  // other repositories
-  maven { url 'https://jitpack.io' }
-}
+It is recommended by FIRST that you use [Gradle](https://gradle.org/) to build your FRC projects, so that is the method that this guide will cover.
 
-dependencies {
-  // other dependencies
-  implementation 'com.github.Botful:org.botful:0.1.1'
+First, add this line to your `dependencies` block:
+
+```gradle
+maven { url 'https://jitpack.io' }
 ```
 
-You can also replace the any commit on master, and you can replace `0.1.1` with `any-branch-SNAPSHOT`. You can also use a commit hash as the version without a branch name. See [the Jitpack docs](https://jitpack.io/docs/) for more details.
+Then, add this line to your `repositories` block:
+
+```gradle
+implementation 'com.github.Botful:org.botful:0.1.1'
+```
 
 ### Getting Started
 
