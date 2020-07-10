@@ -30,7 +30,7 @@ Botful is straight to the point and doesn't require any excess setup. By utilizi
 
 Botful is built from the ground up to take full advantage of the Kotlin, a modern programming language built on top of Java. While Java has gotten better over the years, it still has problems like poor null safety and being very verbose. Kotlin's syntax is easier on the eyes and allows you to do more while write less code. Need to learn Kotlin? Check out this [tutorial](https://beginnersbook.com/2017/12/kotlin-tutorial/)!
 
-### Installation
+## Installation
 
 It is recommended by FIRST that you use [Gradle](https://gradle.org/) to build your FRC projects, so that is the method that this guide will cover.
 
@@ -46,7 +46,7 @@ Then, add this line to your `repositories` block:
 implementation 'com.github.Botful:org.botful:0.1.1'
 ```
 
-### What's it look like?
+## What's it look like?
 
 Here's a simple program that runs a motor controller at full strength while the robot is in teleop mode:
 
