@@ -7,7 +7,7 @@ plugins {
 }
 
 allprojects {
-    group = "org.botful"
+    group = "org.grease"
     version = "0.1.1"
 
     repositories {
