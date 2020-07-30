@@ -58,4 +58,4 @@ suspend fun main() = Robot.start {
 }
 ```
 
-Like what you see? Take a look at the [docs](https://github.com/Grease/grease/wiki)!
+Like what you see? Take a look at the [docs](https://github.com/GreaseLib/grease/wiki)!
