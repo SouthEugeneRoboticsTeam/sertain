@@ -39,7 +39,7 @@ maven { url 'https://jitpack.io' }
 Then, add this line to your `repositories` block:
 
 ```gradle
-implementation 'com.github.Grease:grease:0.1.1'
+implementation 'com.github.GreaseLib:grease:0.1.1'
 ```
 
 ## What's it look like?
