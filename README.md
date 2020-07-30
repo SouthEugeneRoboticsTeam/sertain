@@ -2,11 +2,11 @@
 
 <p align="center">
   <a href="https://github.com/Grease/grease/actions">
-    <img src="https://img.shields.io/github/workflow/status/Botful/botful/Java CI?style=flat-square" />
+    <img src="https://img.shields.io/github/workflow/status/GreaseLib/grease/Java CI?style=flat-square" />
   </a>
   
   <a href="https://jitpack.io/#Grease/org.grease">
-    <img src="https://img.shields.io/jitpack/v/github/SouthEugeneRoboticsTeam/sertain?style=flat-square" />
+    <img src="https://img.shields.io/jitpack/v/github/GreaseLib/grease?style=flat-square" />
   </a>
 </p>
 
