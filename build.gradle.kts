@@ -7,7 +7,7 @@ plugins {
 }
 
 allprojects {
-    group = "org.grease"
+    group = "org.sertain"
     version = "0.1.1"
 
     repositories {
