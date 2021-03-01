@@ -1,4 +1,4 @@
-# sertain
+# Sertain
 
 <p align="center">
   <a href="https://github.com/SouthEugeneRoboticsTeam/sertain/actions">
